@@ -1,0 +1,322 @@
+{
+ "context_manifest": {
+  "corpus_revision": "worktree",
+  "tool_version": "eg-2",
+  "conventions_hash": "6223646ae0bf823c",
+  "conventions_source": "project",
+  "mode": "brief:execute",
+  "budget": 16000,
+  "output_hash": "a78742cdffe83e4d"
+ },
+ "schema_version": "eg-2",
+ "mode": "execute",
+ "query": "TA2.3",
+ "resolved": [
+  "任务",
+  "A轨任务",
+  "TA2.3"
+ ],
+ "性质": "规范",
+ "judgment_status": "tainted",
+ "classification_complete": false,
+ "truncated": false,
+ "去重稳定排序": {
+  "去重键": "主键三元组",
+  "排序键": "(tier, 主键三元组)",
+  "已应用": true
+ },
+ "segments": [
+  {
+   "key": [
+    "任务",
+    "A轨任务",
+    "TA2.3"
+   ],
+   "display": "TA2.3",
+   "性质": "规范",
+   "锚": {
+    "doc": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 21,
+    "line_end": 21
+   },
+   "inclusion_reason": {
+    "边": "(自身)",
+    "从": [],
+    "深度": 0
+   },
+   "layer": "content",
+   "状态": "已合并",
+   "原文": "| **TA2.3** | 入站验证三件 + mint | R7-AC1；C2-AC1、C2-AC2；设计 §4.2、设计 §2.1 | TA2.1 | `packet_statement_binding`、`payload_type_gate`（负向，非 ac_ 前缀→无验证声明）、`ac_r7_ac1_inbound_mint` | P0 负向绿 + 正向绿 / M | 已合并 |"
+  },
+  {
+   "key": [
+    "契约AC",
+    "契约二",
+    "C2-AC1"
+   ],
+   "display": "C2-AC1",
+   "性质": "规范",
+   "锚": {
+    "doc": "protocol/契约初稿/契约二-资产包与否定凭据.md",
+    "line": 17,
+    "line_end": 17
+   },
+   "inclusion_reason": {
+    "边": "任务声明",
+    "从": [
+     "任务",
+     "A轨任务",
+     "TA2.3"
+    ],
+    "深度": 1,
+    "方向": "出"
+   },
+   "layer": "content",
+   "原文": "- **C2-AC1** WHEN 提交入站包 THEN 验证对象为「块终局承诺 + L1 头 `state_root` + epoch_ref」加完整 `PacketStatement`（含 `sequence`／`payload_type` 反引号字段名 token，不成测试节点）；本条与 R3-AC1 签名纪律精确共现，但映射表未登记该对 → 共现完备性提示正例。【损害等级：错误增发】"
+  },
+  {
+   "key": [
+    "契约AC",
+    "契约二",
+    "C2-AC2"
+   ],
+   "display": "C2-AC2",
+   "性质": "规范",
+   "锚": {
+    "doc": "protocol/契约初稿/契约二-资产包与否定凭据.md",
+    "line": 18,
+    "line_end": 18
+   },
+   "inclusion_reason": {
+    "边": "任务声明",
+    "从": [
+     "任务",
+     "A轨任务",
+     "TA2.3"
+    ],
+    "深度": 1,
+    "方向": "出"
+   },
+   "layer": "content",
+   "原文": "- **C2-AC2** WHEN 谓词三值细则触发 THEN 依 §5.2 规则求值。"
+  },
+  {
+   "key": [
+    "任务",
+    "A轨任务",
+    "TA2.1"
+   ],
+   "display": "TA2.1",
+   "性质": "规范",
+   "锚": {
+    "doc": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 20,
+    "line_end": 20
+   },
+   "inclusion_reason": {
+    "边": "前置依赖",
+    "从": [
+     "任务",
+     "A轨任务",
+     "TA2.3"
+    ],
+    "深度": 1,
+    "方向": "出"
+   },
+   "layer": "pointer",
+   "状态": "已合并",
+   "原文": null,
+   "摘要": "| **TA2.1** | 集合凭据采纳 | C1-AC13；设计 §4.1 | — | `ac_r2_ac1_setcred_dispatch` | 测试绿 / M | 已合并 |"
+  },
+  {
+   "key": [
+    "测试",
+    "测试名",
+    "ac_r7_ac1_inbound_mint"
+   ],
+   "display": "ac_r7_ac1_inbound_mint",
+   "性质": "规范",
+   "锚": {
+    "doc": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 21,
+    "line_end": 21
+   },
+   "inclusion_reason": {
+    "边": "任务测试声明",
+    "从": [
+     "任务",
+     "A轨任务",
+     "TA2.3"
+    ],
+    "深度": 1,
+    "方向": "出"
+   },
+   "layer": "pointer",
+   "原文": null
+  },
+  {
+   "key": [
+    "测试",
+    "测试名",
+    "packet_statement_binding"
+   ],
+   "display": "packet_statement_binding",
+   "性质": "规范",
+   "锚": {
+    "doc": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 21,
+    "line_end": 21
+   },
+   "inclusion_reason": {
+    "边": "任务测试声明",
+    "从": [
+     "任务",
+     "A轨任务",
+     "TA2.3"
+    ],
+    "深度": 1,
+    "方向": "出"
+   },
+   "layer": "pointer",
+   "原文": null
+  },
+  {
+   "key": [
+    "测试",
+    "测试名",
+    "payload_type_gate"
+   ],
+   "display": "payload_type_gate",
+   "性质": "规范",
+   "锚": {
+    "doc": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 21,
+    "line_end": 21
+   },
+   "inclusion_reason": {
+    "边": "任务测试声明",
+    "从": [
+     "任务",
+     "A轨任务",
+     "TA2.3"
+    ],
+    "深度": 1,
+    "方向": "出"
+   },
+   "layer": "pointer",
+   "原文": null
+  },
+  {
+   "key": [
+    "节条目",
+    "A轨设计",
+    "A轨设计§2.1"
+   ],
+   "display": "A轨设计§2.1",
+   "性质": "规范",
+   "锚": {
+    "doc": "protocol/A轨-Core与跨链/A轨设计.md",
+    "line": 16,
+    "line_end": 19
+   },
+   "inclusion_reason": {
+    "边": "阅读依赖",
+    "从": [
+     "任务",
+     "A轨任务",
+     "TA2.3"
+    ],
+    "深度": 1,
+    "方向": "出"
+   },
+   "layer": "content",
+   "原文": "### 2.1 VSET/STAKE 分区\n\n纯状态转移函数：候选池 → 活跃集 → 退出/解绑四阶段（TA1.1/TA2.3/TA9.* 阅读依赖靶）。\n"
+  },
+  {
+   "key": [
+    "节条目",
+    "A轨设计",
+    "A轨设计§4.2"
+   ],
+   "display": "A轨设计§4.2",
+   "性质": "规范",
+   "锚": {
+    "doc": "protocol/A轨-Core与跨链/A轨设计.md",
+    "line": 32,
+    "line_end": 35
+   },
+   "inclusion_reason": {
+    "边": "阅读依赖",
+    "从": [
+     "任务",
+     "A轨任务",
+     "TA2.3"
+    ],
+    "深度": 1,
+    "方向": "出"
+   },
+   "layer": "content",
+   "原文": "### 4.2 入站验证三件\n\n块头承诺 + 头揭示 + trie 路径（TA2.3 阅读依赖靶）。\n"
+  }
+ ],
+ "omitted": [
+  {
+   "key": [
+    "需求AC",
+    "REQUIREMENTS",
+    "R7-AC1"
+   ],
+   "display": "R7-AC1",
+   "性质": "unknown",
+   "原因": "未分类跳过",
+   "指针": null,
+   "inclusion_reason": {
+    "边": "任务声明",
+    "从": [
+     "任务",
+     "A轨任务",
+     "TA2.3"
+    ],
+    "深度": 1,
+    "方向": "出"
+   }
+  }
+ ],
+ "diagnostics": [
+  {
+   "诊断型": "无定义块",
+   "源文件": "protocol/A轨-Core与跨链/A轨任务.md",
+   "行": 21,
+   "原文": "R7-AC1",
+   "规则": "任务表spec锚",
+   "目标": [
+    "需求AC",
+    "REQUIREMENTS",
+    "R7-AC1"
+   ]
+  }
+ ],
+ "boundary_pointers": [
+  {
+   "key": [
+    "任务",
+    "A轨任务",
+    "TA2.4"
+   ],
+   "display": "TA2.4",
+   "性质": "规范",
+   "锚": {
+    "doc": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 22,
+    "line_end": 22
+   },
+   "关系": [
+    "共现索引(入)",
+    "前置依赖(入)"
+   ]
+  }
+ ],
+ "tainted_by": [
+  "REQUIREMENTS"
+ ]
+}

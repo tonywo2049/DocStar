@@ -1,0 +1,119 @@
+{
+ "context_manifest": {
+  "corpus_revision": "worktree",
+  "tool_version": "eg-2",
+  "conventions_hash": "6223646ae0bf823c",
+  "conventions_source": "project",
+  "mode": "harvest",
+  "budget": null,
+  "output_hash": "a1acf11d50630bf5"
+ },
+ "schema_version": "eg-2",
+ "algo": "h1",
+ "filtered": {
+  "长度越界": 7,
+  "结构化token": 42,
+  "文档名": 2,
+  "已标注专名": 6
+ },
+ "candidates": [
+  {
+   "word": "sequence",
+   "docs": 2,
+   "freq": 2,
+   "examples": [
+    "protocol/A轨-Core与跨链/A轨任务.md:29",
+    "protocol/契约初稿/契约二-资产包与否定凭据.md:17"
+   ]
+  },
+  {
+   "word": "state_root",
+   "docs": 2,
+   "freq": 2,
+   "examples": [
+    "protocol/A轨-Core与跨链/A轨任务.md:29",
+    "protocol/契约初稿/契约二-资产包与否定凭据.md:17"
+   ]
+  },
+  {
+   "word": "块内线性化",
+   "docs": 1,
+   "freq": 2,
+   "examples": [
+    "protocol/REQUIREMENTS.md:38"
+   ]
+  },
+  {
+   "word": "PacketStatement",
+   "docs": 1,
+   "freq": 1,
+   "examples": [
+    "protocol/契约初稿/契约二-资产包与否定凭据.md:17"
+   ]
+  },
+  {
+   "word": "chain_id",
+   "docs": 1,
+   "freq": 1,
+   "examples": [
+    "protocol/REQUIREMENTS.md:28"
+   ]
+  },
+  {
+   "word": "cycle_probe_a",
+   "docs": 1,
+   "freq": 1,
+   "examples": [
+    "protocol/A轨-Core与跨链/A轨任务.md:24"
+   ]
+  },
+  {
+   "word": "cycle_probe_b",
+   "docs": 1,
+   "freq": 1,
+   "examples": [
+    "protocol/A轨-Core与跨链/A轨任务.md:25"
+   ]
+  },
+  {
+   "word": "dual_ac_guard",
+   "docs": 1,
+   "freq": 1,
+   "examples": [
+    "protocol/A轨-Core与跨链/A轨任务.md:23"
+   ]
+  },
+  {
+   "word": "payload_type",
+   "docs": 1,
+   "freq": 1,
+   "examples": [
+    "protocol/契约初稿/契约二-资产包与否定凭据.md:17"
+   ]
+  },
+  {
+   "word": "payload_type_gate",
+   "docs": 1,
+   "freq": 1,
+   "examples": [
+    "protocol/A轨-Core与跨链/A轨任务.md:21"
+   ]
+  },
+  {
+   "word": "Δ₁ == 0",
+   "docs": 1,
+   "freq": 1,
+   "examples": [
+    "protocol/契约初稿/守恒审计器规格.md:17"
+   ]
+  },
+  {
+   "word": "背压门",
+   "docs": 1,
+   "freq": 1,
+   "examples": [
+    "protocol/REQUIREMENTS.md:38"
+   ]
+  }
+ ]
+}

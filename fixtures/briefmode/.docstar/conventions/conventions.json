@@ -1,0 +1,35 @@
+{
+  "version": "1",
+  "namespaces": {
+    "kind_namespace": {"需求AC": "REQUIREMENTS"},
+    "req_doc": "需求.md",
+    "param_registry": "参数.md",
+    "task_doc_stem": "任务",
+    "mapping_doc_stem": "映射",
+    "prefix_namespaces": {}
+  },
+  "def_forms": {
+    "需求AC": "^-\\s*\\*\\*(R\\d+-AC\\d+)\\*\\*",
+    "任务": "^\\|\\s*\\*\\*(T\\d+(?:\\.\\d+)?)\\*\\*"
+  },
+  "term_forms": {
+    "inplace": "\\*\\*([^*]{2,40})\\*\\*\\s*[（(]\\s*(?:定义|def)\\s*[:：]\\s*([^）)]+)\\s*[）)]",
+    "glossary": "^-?\\s*\\*\\*([^*]{2,40})\\*\\*\\s*[:：](.{4,})"
+  },
+  "form_headers": {
+    "ledger": "^\\|\\s*(?:date|日期)\\s*\\|\\s*(?:change|变更)\\s*\\|",
+    "changelist": "^\\|\\s*(?:item|项)\\s*\\|\\s*(?:location|落点|文档与落点)\\b",
+    "glossary_section": "(?i)术语表|名词解释|词汇表|glossary"
+  },
+  "harvest": {
+    "len_range": [2, 40],
+    "exclude": ["^\\d+$", "^\\d{4}-\\d{2}-\\d{2}$", "^v?\\d+(?:\\.\\d+)+[a-z]?$"]
+  },
+  "doc_id_kinds": [
+    ["需求AC", "(?<![A-Za-z0-9_])R\\d+-AC\\d+(?![A-Za-z0-9_])", "唯一；需求 AC"],
+    ["任务", "(?<![A-Za-z0-9_])T\\d+(?:\\.\\d+)?(?![A-Za-z0-9_])", "任务 T{n}"]
+  ],
+  "id_occ_kinds": {"需求AC": "需求AC", "任务": "任务"},
+  "cooccur_kinds": ["需求AC", "任务"],
+  "ac_prefix_kinds": {"R": "需求AC"}
+}

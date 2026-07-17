@@ -1,0 +1,3806 @@
+{
+ "context_manifest": {
+  "corpus_revision": "worktree",
+  "tool_version": "eg-2",
+  "conventions_hash": "6223646ae0bf823c",
+  "conventions_source": "project",
+  "mode": "dump",
+  "budget": null,
+  "output_hash": "0232b0ae66af60b8"
+ },
+ "schema_version": "eg-2",
+ "corpus_root": ".",
+ "classification_complete": false,
+ "unknown_documents": [
+  "protocol/未分类-契约三草案.md"
+ ],
+ "entities": [
+  {
+   "key": [
+    "专名",
+    "契约二-资产包与否定凭据",
+    "否定凭据"
+   ],
+   "display": "否定凭据",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/契约初稿/契约二-资产包与否定凭据.md",
+    "line": 26,
+    "line_end": 26
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "专名",
+    "契约二-资产包与否定凭据",
+    "块头承诺"
+   ],
+   "display": "块头承诺",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/契约初稿/契约二-资产包与否定凭据.md",
+    "line": 27,
+    "line_end": 27
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "专名",
+    "契约二-资产包与否定凭据",
+    "幽灵专名"
+   ],
+   "display": "幽灵专名",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/契约初稿/契约二-资产包与否定凭据.md",
+    "line": 37,
+    "line_end": 37
+   },
+   "candidates": [],
+   "attrs": {
+    "定义锚": "裁定簿 §99"
+   }
+  },
+  {
+   "key": [
+    "专名",
+    "契约二-资产包与否定凭据",
+    "逃生舱"
+   ],
+   "display": "逃生舱",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/契约初稿/契约二-资产包与否定凭据.md",
+    "line": 37,
+    "line_end": 37
+   },
+   "candidates": [],
+   "attrs": {
+    "定义锚": "裁定簿 §20.3"
+   }
+  },
+  {
+   "key": [
+    "任务",
+    "A轨任务",
+    "TA1.1"
+   ],
+   "display": "TA1.1",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 19,
+    "line_end": 19
+   },
+   "candidates": [],
+   "attrs": {},
+   "状态": "已合并"
+  },
+  {
+   "key": [
+    "任务",
+    "A轨任务",
+    "TA2.1"
+   ],
+   "display": "TA2.1",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 20,
+    "line_end": 20
+   },
+   "candidates": [],
+   "attrs": {},
+   "状态": "已合并"
+  },
+  {
+   "key": [
+    "任务",
+    "A轨任务",
+    "TA2.3"
+   ],
+   "display": "TA2.3",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 21,
+    "line_end": 21
+   },
+   "candidates": [],
+   "attrs": {},
+   "状态": "已合并"
+  },
+  {
+   "key": [
+    "任务",
+    "A轨任务",
+    "TA2.4"
+   ],
+   "display": "TA2.4",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 22,
+    "line_end": 22
+   },
+   "candidates": [],
+   "attrs": {},
+   "状态": "在飞"
+  },
+  {
+   "key": [
+    "任务",
+    "A轨任务",
+    "TA3.1"
+   ],
+   "display": "TA3.1",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 23,
+    "line_end": 23
+   },
+   "candidates": [],
+   "attrs": {},
+   "状态": "待开工"
+  },
+  {
+   "key": [
+    "任务",
+    "A轨任务",
+    "TA9"
+   ],
+   "display": "TA9",
+   "性质": "unknown",
+   "primary": null,
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "任务",
+    "A轨任务",
+    "TA9.1"
+   ],
+   "display": "TA9.1",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 24,
+    "line_end": 24
+   },
+   "candidates": [],
+   "attrs": {},
+   "状态": "待开工"
+  },
+  {
+   "key": [
+    "任务",
+    "A轨任务",
+    "TA9.2"
+   ],
+   "display": "TA9.2",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 25,
+    "line_end": 25
+   },
+   "candidates": [],
+   "attrs": {},
+   "状态": "待开工"
+  },
+  {
+   "key": [
+    "参数",
+    "全局",
+    "D_avail"
+   ],
+   "display": "D_avail",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/参数登记册.md",
+    "line": 22,
+    "line_end": 22
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "参数",
+    "全局",
+    "P_max_validators"
+   ],
+   "display": "P_max_validators",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/参数登记册.md",
+    "line": 28,
+    "line_end": 28
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "参数",
+    "全局",
+    "P_min_self_stake"
+   ],
+   "display": "P_min_self_stake",
+   "性质": "unknown",
+   "primary": null,
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "参数",
+    "全局",
+    "P_min_stake"
+   ],
+   "display": "P_min_stake",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/参数登记册.md",
+    "line": 29,
+    "line_end": 29
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "参数",
+    "全局",
+    "P_min_validators"
+   ],
+   "display": "P_min_validators",
+   "性质": "unknown",
+   "primary": null,
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "参数",
+    "全局",
+    "U_unbonding"
+   ],
+   "display": "U_unbonding",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/参数登记册.md",
+    "line": 19,
+    "line_end": 19
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "参数",
+    "全局",
+    "V_packet"
+   ],
+   "display": "V_packet",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/参数登记册.md",
+    "line": 21,
+    "line_end": 21
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "参数",
+    "全局",
+    "W_evidence"
+   ],
+   "display": "W_evidence",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/参数登记册.md",
+    "line": 20,
+    "line_end": 20
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "参数",
+    "全局",
+    "X_orphan"
+   ],
+   "display": "X_orphan",
+   "性质": "unknown",
+   "primary": null,
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "参数",
+    "全局",
+    "X_y"
+   ],
+   "display": "X_y",
+   "性质": "unknown",
+   "primary": null,
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "契约AC",
+    "契约一",
+    "C1-AC1"
+   ],
+   "display": "C1-AC1",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/契约初稿/契约一-集合凭据与采纳.md",
+    "line": 15,
+    "line_end": 15
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "契约AC",
+    "契约一",
+    "C1-AC13"
+   ],
+   "display": "C1-AC13",
+   "性质": "unknown",
+   "primary": null,
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "契约AC",
+    "契约一",
+    "C1-AC2"
+   ],
+   "display": "C1-AC2",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/契约初稿/契约一-集合凭据与采纳.md",
+    "line": 16,
+    "line_end": 16
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "契约AC",
+    "契约一",
+    "C1-AC3"
+   ],
+   "display": "C1-AC3",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/契约初稿/契约一-集合凭据与采纳.md",
+    "line": 17,
+    "line_end": 17
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "契约AC",
+    "契约一",
+    "C1-AC7"
+   ],
+   "display": "C1-AC7",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/契约初稿/契约一-集合凭据与采纳.md",
+    "line": 18,
+    "line_end": 18
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "契约AC",
+    "契约三",
+    "C3-AC1"
+   ],
+   "display": "C3-AC1",
+   "性质": "unknown",
+   "primary": {
+    "doc": "protocol/未分类-契约三草案.md",
+    "line": 16,
+    "line_end": 16
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "契约AC",
+    "契约二",
+    "C2-AC1"
+   ],
+   "display": "C2-AC1",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/契约初稿/契约二-资产包与否定凭据.md",
+    "line": 17,
+    "line_end": 17
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "契约AC",
+    "契约二",
+    "C2-AC2"
+   ],
+   "display": "C2-AC2",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/契约初稿/契约二-资产包与否定凭据.md",
+    "line": 18,
+    "line_end": 18
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "契约AC",
+    "契约二",
+    "C2-AC3"
+   ],
+   "display": "C2-AC3",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/契约初稿/契约二-资产包与否定凭据.md",
+    "line": 19,
+    "line_end": 19
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "契约AC",
+    "契约二",
+    "C2-AC31"
+   ],
+   "display": "C2-AC31",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/契约初稿/契约二-资产包与否定凭据.md",
+    "line": 35,
+    "line_end": 35
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "契约AC",
+    "契约二",
+    "C2-AC5"
+   ],
+   "display": "C2-AC5",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/契约初稿/契约二-资产包与否定凭据.md",
+    "line": 20,
+    "line_end": 20
+   },
+   "candidates": [
+    {
+     "doc": "protocol/契约初稿/Archive/批次C-泛化验证.md",
+     "line": 20,
+     "line_end": 20
+    }
+   ],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "审计AC",
+    "守恒审计器规格",
+    "AUD-AC1"
+   ],
+   "display": "AUD-AC1",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/契约初稿/守恒审计器规格.md",
+    "line": 17,
+    "line_end": 17
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "审计AC",
+    "守恒审计器规格",
+    "AUD-AC10"
+   ],
+   "display": "AUD-AC10",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/契约初稿/守恒审计器规格.md",
+    "line": 19,
+    "line_end": 19
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "审计AC",
+    "守恒审计器规格",
+    "AUD-AC2"
+   ],
+   "display": "AUD-AC2",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/契约初稿/守恒审计器规格.md",
+    "line": 18,
+    "line_end": 18
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "文档",
+    "路径",
+    "protocol/P0B-执行/envelope草案.md"
+   ],
+   "display": "envelope草案",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/P0B-执行/envelope草案.md",
+    "line": 1,
+    "line_end": 9
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "文档",
+    "路径",
+    "protocol/契约初稿/契约一-集合凭据与采纳.md"
+   ],
+   "display": "契约一-集合凭据与采纳",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/契约初稿/契约一-集合凭据与采纳.md",
+    "line": 1,
+    "line_end": 9
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "文档",
+    "路径",
+    "protocol/契约初稿/契约二-资产包与否定凭据.md"
+   ],
+   "display": "契约二-资产包与否定凭据",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/契约初稿/契约二-资产包与否定凭据.md",
+    "line": 1,
+    "line_end": 9
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "文档",
+    "路径",
+    "protocol/记述/守恒复算记录.md"
+   ],
+   "display": "守恒复算记录",
+   "性质": "记述",
+   "primary": {
+    "doc": "protocol/记述/守恒复算记录.md",
+    "line": 1,
+    "line_end": 9
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "治理期权",
+    "REQUIREMENTS-E",
+    "E-D5"
+   ],
+   "display": "E-D5",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/REQUIREMENTS.md",
+    "line": 46,
+    "line_end": 46
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "治理期权",
+    "REQUIREMENTS-E",
+    "E-D9"
+   ],
+   "display": "E-D9",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/REQUIREMENTS.md",
+    "line": 47,
+    "line_end": 47
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "测试",
+    "测试名",
+    "ac_r1_ac1_stake_admit"
+   ],
+   "display": "ac_r1_ac1_stake_admit",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 19,
+    "line_end": 19
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "测试",
+    "测试名",
+    "ac_r2_ac1_setcred_dispatch"
+   ],
+   "display": "ac_r2_ac1_setcred_dispatch",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 20,
+    "line_end": 20
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "测试",
+    "测试名",
+    "ac_r7_ac1_inbound_mint"
+   ],
+   "display": "ac_r7_ac1_inbound_mint",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 21,
+    "line_end": 21
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "测试",
+    "测试名",
+    "cycle_probe_a"
+   ],
+   "display": "cycle_probe_a",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 24,
+    "line_end": 24
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "测试",
+    "测试名",
+    "cycle_probe_b"
+   ],
+   "display": "cycle_probe_b",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 25,
+    "line_end": 25
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "测试",
+    "测试名",
+    "dual_ac_guard"
+   ],
+   "display": "dual_ac_guard",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 23,
+    "line_end": 23
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "测试",
+    "测试名",
+    "packet_statement_binding"
+   ],
+   "display": "packet_statement_binding",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 21,
+    "line_end": 21
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "测试",
+    "测试名",
+    "payload_type_gate"
+   ],
+   "display": "payload_type_gate",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 21,
+    "line_end": 21
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "测试",
+    "测试名",
+    "refunded_packet_escape_denied"
+   ],
+   "display": "refunded_packet_escape_denied",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 22,
+    "line_end": 22
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "节条目",
+    "A轨任务",
+    "A轨任务§2"
+   ],
+   "display": "A轨任务§2",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 15,
+    "line_end": 26
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "节条目",
+    "A轨任务",
+    "A轨任务§3"
+   ],
+   "display": "A轨任务§3",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 27,
+    "line_end": 29
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "节条目",
+    "A轨设计",
+    "A轨设计§10"
+   ],
+   "display": "A轨设计§10",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/A轨-Core与跨链/A轨设计.md",
+    "line": 48,
+    "line_end": 50
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "节条目",
+    "A轨设计",
+    "A轨设计§2"
+   ],
+   "display": "A轨设计§2",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/A轨-Core与跨链/A轨设计.md",
+    "line": 14,
+    "line_end": 19
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "节条目",
+    "A轨设计",
+    "A轨设计§2.1"
+   ],
+   "display": "A轨设计§2.1",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/A轨-Core与跨链/A轨设计.md",
+    "line": 16,
+    "line_end": 19
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "节条目",
+    "A轨设计",
+    "A轨设计§3"
+   ],
+   "display": "A轨设计§3",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/A轨-Core与跨链/A轨设计.md",
+    "line": 20,
+    "line_end": 25
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "节条目",
+    "A轨设计",
+    "A轨设计§3.3"
+   ],
+   "display": "A轨设计§3.3",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/A轨-Core与跨链/A轨设计.md",
+    "line": 22,
+    "line_end": 25
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "节条目",
+    "A轨设计",
+    "A轨设计§4"
+   ],
+   "display": "A轨设计§4",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/A轨-Core与跨链/A轨设计.md",
+    "line": 26,
+    "line_end": 39
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "节条目",
+    "A轨设计",
+    "A轨设计§4.1"
+   ],
+   "display": "A轨设计§4.1",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/A轨-Core与跨链/A轨设计.md",
+    "line": 28,
+    "line_end": 31
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "节条目",
+    "A轨设计",
+    "A轨设计§4.2"
+   ],
+   "display": "A轨设计§4.2",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/A轨-Core与跨链/A轨设计.md",
+    "line": 32,
+    "line_end": 35
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "节条目",
+    "A轨设计",
+    "A轨设计§4.3"
+   ],
+   "display": "A轨设计§4.3",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/A轨-Core与跨链/A轨设计.md",
+    "line": 36,
+    "line_end": 39
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "节条目",
+    "A轨设计",
+    "A轨设计§9"
+   ],
+   "display": "A轨设计§9",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/A轨-Core与跨链/A轨设计.md",
+    "line": 40,
+    "line_end": 47
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "节条目",
+    "A轨需求",
+    "A轨需求§6"
+   ],
+   "display": "A轨需求§6",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/A轨-Core与跨链/A轨需求.md",
+    "line": 14,
+    "line_end": 25
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "节条目",
+    "envelope草案",
+    "envelope草案§16"
+   ],
+   "display": "envelope草案§16",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/P0B-执行/envelope草案.md",
+    "line": 33,
+    "line_end": 37
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "节条目",
+    "envelope草案",
+    "envelope草案§2"
+   ],
+   "display": "envelope草案§2",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/P0B-执行/envelope草案.md",
+    "line": 13,
+    "line_end": 16
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "节条目",
+    "envelope草案",
+    "envelope草案§4A"
+   ],
+   "display": "envelope草案§4A",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/P0B-执行/envelope草案.md",
+    "line": 17,
+    "line_end": 32
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "节条目",
+    "envelope草案",
+    "envelope草案§4A.1"
+   ],
+   "display": "envelope草案§4A.1",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/P0B-执行/envelope草案.md",
+    "line": 21,
+    "line_end": 24
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "节条目",
+    "envelope草案",
+    "envelope草案§4A.2"
+   ],
+   "display": "envelope草案§4A.2",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/P0B-执行/envelope草案.md",
+    "line": 25,
+    "line_end": 28
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "节条目",
+    "envelope草案",
+    "envelope草案§4A.3"
+   ],
+   "display": "envelope草案§4A.3",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/P0B-执行/envelope草案.md",
+    "line": 29,
+    "line_end": 32
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "节条目",
+    "参数登记册",
+    "参数登记册§1"
+   ],
+   "display": "参数登记册§1",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/参数登记册.md",
+    "line": 15,
+    "line_end": 23
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "节条目",
+    "参数登记册",
+    "参数登记册§2"
+   ],
+   "display": "参数登记册§2",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/参数登记册.md",
+    "line": 24,
+    "line_end": 29
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "节条目",
+    "契约一-集合凭据与采纳",
+    "契约一-集合凭据与采纳§16"
+   ],
+   "display": "契约一-集合凭据与采纳§16",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/契约初稿/契约一-集合凭据与采纳.md",
+    "line": 20,
+    "line_end": 26
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "节条目",
+    "契约一-集合凭据与采纳",
+    "契约一-集合凭据与采纳§3"
+   ],
+   "display": "契约一-集合凭据与采纳§3",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/契约初稿/契约一-集合凭据与采纳.md",
+    "line": 13,
+    "line_end": 19
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "节条目",
+    "契约二-资产包与否定凭据",
+    "契约二-资产包与否定凭据§16"
+   ],
+   "display": "契约二-资产包与否定凭据§16",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/契约初稿/契约二-资产包与否定凭据.md",
+    "line": 39,
+    "line_end": 45
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "节条目",
+    "契约二-资产包与否定凭据",
+    "契约二-资产包与否定凭据§3"
+   ],
+   "display": "契约二-资产包与否定凭据§3",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/契约初稿/契约二-资产包与否定凭据.md",
+    "line": 13,
+    "line_end": 21
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "节条目",
+    "契约二-资产包与否定凭据",
+    "契约二-资产包与否定凭据§3.1"
+   ],
+   "display": "契约二-资产包与否定凭据§3.1",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/契约初稿/契约二-资产包与否定凭据.md",
+    "line": 15,
+    "line_end": 21
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "节条目",
+    "契约二-资产包与否定凭据",
+    "契约二-资产包与否定凭据§5"
+   ],
+   "display": "契约二-资产包与否定凭据§5",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/契约初稿/契约二-资产包与否定凭据.md",
+    "line": 22,
+    "line_end": 32
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "节条目",
+    "契约二-资产包与否定凭据",
+    "契约二-资产包与否定凭据§5.2"
+   ],
+   "display": "契约二-资产包与否定凭据§5.2",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/契约初稿/契约二-资产包与否定凭据.md",
+    "line": 29,
+    "line_end": 32
+   },
+   "candidates": [],
+   "attrs": {
+    "原始锚": [
+     "5.2.1"
+    ]
+   }
+  },
+  {
+   "key": [
+    "节条目",
+    "契约二-资产包与否定凭据",
+    "契约二-资产包与否定凭据§7"
+   ],
+   "display": "契约二-资产包与否定凭据§7",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/契约初稿/契约二-资产包与否定凭据.md",
+    "line": 33,
+    "line_end": 38
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "节条目",
+    "契约评审-意见汇总与裁定",
+    "契约评审-意见汇总与裁定§1"
+   ],
+   "display": "契约评审-意见汇总与裁定§1",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/A轨-Core与跨链/契约评审-意见汇总与裁定.md",
+    "line": 14,
+    "line_end": 17
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "节条目",
+    "契约评审-意见汇总与裁定",
+    "契约评审-意见汇总与裁定§18"
+   ],
+   "display": "契约评审-意见汇总与裁定§18",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/A轨-Core与跨链/契约评审-意见汇总与裁定.md",
+    "line": 30,
+    "line_end": 40
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "节条目",
+    "契约评审-意见汇总与裁定",
+    "契约评审-意见汇总与裁定§18.4"
+   ],
+   "display": "契约评审-意见汇总与裁定§18.4",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/A轨-Core与跨链/契约评审-意见汇总与裁定.md",
+    "line": 32,
+    "line_end": 40
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "节条目",
+    "契约评审-意见汇总与裁定",
+    "契约评审-意见汇总与裁定§2"
+   ],
+   "display": "契约评审-意见汇总与裁定§2",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/A轨-Core与跨链/契约评审-意见汇总与裁定.md",
+    "line": 18,
+    "line_end": 25
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "节条目",
+    "契约评审-意见汇总与裁定",
+    "契约评审-意见汇总与裁定§20"
+   ],
+   "display": "契约评审-意见汇总与裁定§20",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/A轨-Core与跨链/契约评审-意见汇总与裁定.md",
+    "line": 41,
+    "line_end": 52
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "节条目",
+    "契约评审-意见汇总与裁定",
+    "契约评审-意见汇总与裁定§20.3"
+   ],
+   "display": "契约评审-意见汇总与裁定§20.3",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/A轨-Core与跨链/契约评审-意见汇总与裁定.md",
+    "line": 45,
+    "line_end": 52
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "节条目",
+    "契约评审-意见汇总与裁定",
+    "契约评审-意见汇总与裁定§21"
+   ],
+   "display": "契约评审-意见汇总与裁定§21",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/A轨-Core与跨链/契约评审-意见汇总与裁定.md",
+    "line": 53,
+    "line_end": 59
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "节条目",
+    "契约评审-意见汇总与裁定",
+    "契约评审-意见汇总与裁定§7"
+   ],
+   "display": "契约评审-意见汇总与裁定§7",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/A轨-Core与跨链/契约评审-意见汇总与裁定.md",
+    "line": 26,
+    "line_end": 29
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "节条目",
+    "守恒复算记录",
+    "守恒复算记录§1"
+   ],
+   "display": "守恒复算记录§1",
+   "性质": "记述",
+   "primary": {
+    "doc": "protocol/记述/守恒复算记录.md",
+    "line": 13,
+    "line_end": 18
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "节条目",
+    "守恒复算记录",
+    "守恒复算记录§2"
+   ],
+   "display": "守恒复算记录§2",
+   "性质": "记述",
+   "primary": {
+    "doc": "protocol/记述/守恒复算记录.md",
+    "line": 19,
+    "line_end": 22
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "节条目",
+    "守恒复算记录",
+    "守恒复算记录§3"
+   ],
+   "display": "守恒复算记录§3",
+   "性质": "记述",
+   "primary": {
+    "doc": "protocol/记述/守恒复算记录.md",
+    "line": 23,
+    "line_end": 25
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "节条目",
+    "守恒审计器规格",
+    "守恒审计器规格§4"
+   ],
+   "display": "守恒审计器规格§4",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/契约初稿/守恒审计器规格.md",
+    "line": 13,
+    "line_end": 19
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "节条目",
+    "批次C-泛化验证",
+    "批次C-泛化验证§1"
+   ],
+   "display": "批次C-泛化验证§1",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/契约初稿/Archive/批次C-泛化验证.md",
+    "line": 13,
+    "line_end": 17
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "节条目",
+    "批次C-泛化验证",
+    "批次C-泛化验证§2"
+   ],
+   "display": "批次C-泛化验证§2",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/契约初稿/Archive/批次C-泛化验证.md",
+    "line": 18,
+    "line_end": 20
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "节条目",
+    "未分类-契约三草案",
+    "未分类-契约三草案§3"
+   ],
+   "display": "未分类-契约三草案§3",
+   "性质": "unknown",
+   "primary": {
+    "doc": "protocol/未分类-契约三草案.md",
+    "line": 14,
+    "line_end": 16
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "评审项",
+    "契约评审-意见汇总与裁定",
+    "B-1"
+   ],
+   "display": "B-1",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/A轨-Core与跨链/契约评审-意见汇总与裁定.md",
+    "line": 21,
+    "line_end": 21
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "评审项",
+    "契约评审-意见汇总与裁定",
+    "B-9"
+   ],
+   "display": "B-9",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/A轨-Core与跨链/契约评审-意见汇总与裁定.md",
+    "line": 22,
+    "line_end": 22
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "评审项",
+    "契约评审-意见汇总与裁定",
+    "N-01"
+   ],
+   "display": "N-01",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/A轨-Core与跨链/契约评审-意见汇总与裁定.md",
+    "line": 39,
+    "line_end": 39
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "评审项",
+    "契约评审-意见汇总与裁定",
+    "N-1"
+   ],
+   "display": "N-1",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/A轨-Core与跨链/契约评审-意见汇总与裁定.md",
+    "line": 20,
+    "line_end": 20
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "评审项",
+    "契约评审-意见汇总与裁定",
+    "Q-1"
+   ],
+   "display": "Q-1",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/A轨-Core与跨链/契约评审-意见汇总与裁定.md",
+    "line": 59,
+    "line_end": 59
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "评审项",
+    "契约评审-意见汇总与裁定",
+    "S-2"
+   ],
+   "display": "S-2",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/A轨-Core与跨链/契约评审-意见汇总与裁定.md",
+    "line": 51,
+    "line_end": 51
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "需求AC",
+    "REQUIREMENTS",
+    "R1-AC1"
+   ],
+   "display": "R1-AC1",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/REQUIREMENTS.md",
+    "line": 18,
+    "line_end": 18
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "需求AC",
+    "REQUIREMENTS",
+    "R1-AC2"
+   ],
+   "display": "R1-AC2",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/REQUIREMENTS.md",
+    "line": 19,
+    "line_end": 19
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "需求AC",
+    "REQUIREMENTS",
+    "R1-AC3"
+   ],
+   "display": "R1-AC3",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/REQUIREMENTS.md",
+    "line": 20,
+    "line_end": 20
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "需求AC",
+    "REQUIREMENTS",
+    "R13-AC4"
+   ],
+   "display": "R13-AC4",
+   "性质": "unknown",
+   "primary": null,
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "需求AC",
+    "REQUIREMENTS",
+    "R2-AC1"
+   ],
+   "display": "R2-AC1",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/REQUIREMENTS.md",
+    "line": 24,
+    "line_end": 24
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "需求AC",
+    "REQUIREMENTS",
+    "R3-AC1"
+   ],
+   "display": "R3-AC1",
+   "性质": "规范",
+   "primary": {
+    "doc": "protocol/REQUIREMENTS.md",
+    "line": 28,
+    "line_end": 28
+   },
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "需求AC",
+    "REQUIREMENTS",
+    "R7-AC1"
+   ],
+   "display": "R7-AC1",
+   "性质": "unknown",
+   "primary": null,
+   "candidates": [],
+   "attrs": {}
+  },
+  {
+   "key": [
+    "需求AC",
+    "REQUIREMENTS",
+    "R7-AC3"
+   ],
+   "display": "R7-AC3",
+   "性质": "unknown",
+   "primary": null,
+   "candidates": [],
+   "attrs": {}
+  }
+ ],
+ "edges": [
+  {
+   "type": "provenance",
+   "src": [
+    "文档",
+    "路径",
+    "protocol/记述/守恒复算记录.md"
+   ],
+   "dst": [
+    "审计AC",
+    "守恒审计器规格",
+    "AUD-AC1"
+   ],
+   "prov": {
+    "file": "protocol/记述/守恒复算记录.md",
+    "line": 15,
+    "method": "记述引用形"
+   },
+   "parse": "中",
+   "consumers": [],
+   "attrs": {}
+  },
+  {
+   "type": "provenance",
+   "src": [
+    "文档",
+    "路径",
+    "protocol/记述/守恒复算记录.md"
+   ],
+   "dst": [
+    "节条目",
+    "契约评审-意见汇总与裁定",
+    "契约评审-意见汇总与裁定§20.3"
+   ],
+   "prov": {
+    "file": "protocol/记述/守恒复算记录.md",
+    "line": 17,
+    "method": "记述引用形"
+   },
+   "parse": "中",
+   "consumers": [],
+   "attrs": {}
+  },
+  {
+   "type": "任务声明",
+   "src": [
+    "任务",
+    "A轨任务",
+    "TA1.1"
+   ],
+   "dst": [
+    "契约AC",
+    "契约一",
+    "C1-AC1"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 19,
+    "method": "任务表spec锚"
+   },
+   "parse": "高",
+   "consumers": [
+    "CHK-2覆盖缺口",
+    "brief"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "任务声明",
+   "src": [
+    "任务",
+    "A轨任务",
+    "TA1.1"
+   ],
+   "dst": [
+    "需求AC",
+    "REQUIREMENTS",
+    "R1-AC1"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 19,
+    "method": "任务表spec锚"
+   },
+   "parse": "高",
+   "consumers": [
+    "CHK-2覆盖缺口",
+    "brief"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "任务声明",
+   "src": [
+    "任务",
+    "A轨任务",
+    "TA1.1"
+   ],
+   "dst": [
+    "需求AC",
+    "REQUIREMENTS",
+    "R1-AC2"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 19,
+    "method": "任务表spec锚"
+   },
+   "parse": "高",
+   "consumers": [
+    "CHK-2覆盖缺口",
+    "brief"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "任务声明",
+   "src": [
+    "任务",
+    "A轨任务",
+    "TA2.1"
+   ],
+   "dst": [
+    "契约AC",
+    "契约一",
+    "C1-AC13"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 20,
+    "method": "任务表spec锚"
+   },
+   "parse": "高",
+   "consumers": [
+    "CHK-2覆盖缺口",
+    "brief"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "任务声明",
+   "src": [
+    "任务",
+    "A轨任务",
+    "TA2.3"
+   ],
+   "dst": [
+    "契约AC",
+    "契约二",
+    "C2-AC1"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 21,
+    "method": "任务表spec锚"
+   },
+   "parse": "高",
+   "consumers": [
+    "CHK-2覆盖缺口",
+    "brief"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "任务声明",
+   "src": [
+    "任务",
+    "A轨任务",
+    "TA2.3"
+   ],
+   "dst": [
+    "契约AC",
+    "契约二",
+    "C2-AC2"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 21,
+    "method": "任务表spec锚"
+   },
+   "parse": "高",
+   "consumers": [
+    "CHK-2覆盖缺口",
+    "brief"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "任务声明",
+   "src": [
+    "任务",
+    "A轨任务",
+    "TA2.3"
+   ],
+   "dst": [
+    "需求AC",
+    "REQUIREMENTS",
+    "R7-AC1"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 21,
+    "method": "任务表spec锚"
+   },
+   "parse": "高",
+   "consumers": [
+    "CHK-2覆盖缺口",
+    "brief"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "任务声明",
+   "src": [
+    "任务",
+    "A轨任务",
+    "TA2.4"
+   ],
+   "dst": [
+    "契约AC",
+    "契约二",
+    "C2-AC31"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 22,
+    "method": "任务表spec锚"
+   },
+   "parse": "高",
+   "consumers": [
+    "CHK-2覆盖缺口",
+    "brief"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "任务声明",
+   "src": [
+    "任务",
+    "A轨任务",
+    "TA3.1"
+   ],
+   "dst": [
+    "契约AC",
+    "契约二",
+    "C2-AC3"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 23,
+    "method": "任务表spec锚"
+   },
+   "parse": "高",
+   "consumers": [
+    "CHK-2覆盖缺口",
+    "brief"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "任务测试声明",
+   "src": [
+    "任务",
+    "A轨任务",
+    "TA1.1"
+   ],
+   "dst": [
+    "测试",
+    "测试名",
+    "ac_r1_ac1_stake_admit"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 19,
+    "method": "任务表红先列"
+   },
+   "parse": "高",
+   "consumers": [
+    "brief"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "任务测试声明",
+   "src": [
+    "任务",
+    "A轨任务",
+    "TA2.1"
+   ],
+   "dst": [
+    "测试",
+    "测试名",
+    "ac_r2_ac1_setcred_dispatch"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 20,
+    "method": "任务表红先列"
+   },
+   "parse": "高",
+   "consumers": [
+    "brief"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "任务测试声明",
+   "src": [
+    "任务",
+    "A轨任务",
+    "TA2.3"
+   ],
+   "dst": [
+    "测试",
+    "测试名",
+    "ac_r7_ac1_inbound_mint"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 21,
+    "method": "任务表红先列"
+   },
+   "parse": "高",
+   "consumers": [
+    "brief"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "任务测试声明",
+   "src": [
+    "任务",
+    "A轨任务",
+    "TA2.3"
+   ],
+   "dst": [
+    "测试",
+    "测试名",
+    "packet_statement_binding"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 21,
+    "method": "任务表红先列"
+   },
+   "parse": "高",
+   "consumers": [
+    "brief"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "任务测试声明",
+   "src": [
+    "任务",
+    "A轨任务",
+    "TA2.3"
+   ],
+   "dst": [
+    "测试",
+    "测试名",
+    "payload_type_gate"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 21,
+    "method": "任务表红先列"
+   },
+   "parse": "高",
+   "consumers": [
+    "brief"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "任务测试声明",
+   "src": [
+    "任务",
+    "A轨任务",
+    "TA2.4"
+   ],
+   "dst": [
+    "测试",
+    "测试名",
+    "refunded_packet_escape_denied"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 22,
+    "method": "任务表红先列"
+   },
+   "parse": "高",
+   "consumers": [
+    "brief"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "任务测试声明",
+   "src": [
+    "任务",
+    "A轨任务",
+    "TA3.1"
+   ],
+   "dst": [
+    "测试",
+    "测试名",
+    "dual_ac_guard"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 23,
+    "method": "任务表红先列"
+   },
+   "parse": "高",
+   "consumers": [
+    "brief"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "任务测试声明",
+   "src": [
+    "任务",
+    "A轨任务",
+    "TA9.1"
+   ],
+   "dst": [
+    "测试",
+    "测试名",
+    "cycle_probe_a"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 24,
+    "method": "任务表红先列"
+   },
+   "parse": "高",
+   "consumers": [
+    "brief"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "任务测试声明",
+   "src": [
+    "任务",
+    "A轨任务",
+    "TA9.2"
+   ],
+   "dst": [
+    "测试",
+    "测试名",
+    "cycle_probe_b"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 25,
+    "method": "任务表红先列"
+   },
+   "parse": "高",
+   "consumers": [
+    "brief"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "修订声明",
+   "src": [
+    "节条目",
+    "契约评审-意见汇总与裁定",
+    "契约评审-意见汇总与裁定§18.4"
+   ],
+   "dst": [
+    "契约AC",
+    "契约一",
+    "C1-AC3"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/契约评审-意见汇总与裁定.md",
+    "line": 38,
+    "method": "修改清单表行"
+   },
+   "parse": "高",
+   "consumers": [
+    "CHK-3传导断裂"
+   ],
+   "attrs": {
+    "落点原文": "契约一 §6、C1-AC3"
+   }
+  },
+  {
+   "type": "修订声明",
+   "src": [
+    "评审项",
+    "契约评审-意见汇总与裁定",
+    "N-01"
+   ],
+   "dst": [
+    "契约AC",
+    "契约二",
+    "C2-AC1"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/契约评审-意见汇总与裁定.md",
+    "line": 39,
+    "method": "修改清单表行"
+   },
+   "parse": "高",
+   "consumers": [
+    "CHK-3传导断裂"
+   ],
+   "attrs": {
+    "落点原文": "契约二 §3.1、C2-AC1"
+   }
+  },
+  {
+   "type": "修订声明",
+   "src": [
+    "评审项",
+    "契约评审-意见汇总与裁定",
+    "N-01"
+   ],
+   "dst": [
+    "节条目",
+    "契约二-资产包与否定凭据",
+    "契约二-资产包与否定凭据§3.1"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/契约评审-意见汇总与裁定.md",
+    "line": 39,
+    "method": "修改清单表行"
+   },
+   "parse": "高",
+   "consumers": [
+    "CHK-3传导断裂"
+   ],
+   "attrs": {
+    "落点原文": "契约二 §3.1、C2-AC1"
+   }
+  },
+  {
+   "type": "修订声明",
+   "src": [
+    "评审项",
+    "契约评审-意见汇总与裁定",
+    "S-2"
+   ],
+   "dst": [
+    "契约AC",
+    "契约二",
+    "C2-AC31"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/契约评审-意见汇总与裁定.md",
+    "line": 51,
+    "method": "修改清单表行"
+   },
+   "parse": "高",
+   "consumers": [
+    "CHK-3传导断裂"
+   ],
+   "attrs": {
+    "落点原文": "契约二 §7-2、C2-AC31"
+   }
+  },
+  {
+   "type": "修订声明",
+   "src": [
+    "评审项",
+    "契约评审-意见汇总与裁定",
+    "S-2"
+   ],
+   "dst": [
+    "节条目",
+    "契约二-资产包与否定凭据",
+    "契约二-资产包与否定凭据§7"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/契约评审-意见汇总与裁定.md",
+    "line": 51,
+    "method": "修改清单表行"
+   },
+   "parse": "高",
+   "consumers": [
+    "CHK-3传导断裂"
+   ],
+   "attrs": {
+    "落点原文": "契约二 §7-2、C2-AC31",
+    "原始锚": "7-2"
+   }
+  },
+  {
+   "type": "修订落账",
+   "src": [
+    "文档",
+    "路径",
+    "protocol/P0B-执行/envelope草案.md"
+   ],
+   "dst": [
+    "节条目",
+    "envelope草案",
+    "envelope草案§4A.1"
+   ],
+   "prov": {
+    "file": "protocol/P0B-执行/envelope草案.md",
+    "line": 37,
+    "method": "底账表行"
+   },
+   "parse": "高",
+   "consumers": [
+    "CHK-3传导断裂"
+   ],
+   "attrs": {
+    "r版本": "r2.2",
+    "日期": "2026-07-13"
+   }
+  },
+  {
+   "type": "修订落账",
+   "src": [
+    "文档",
+    "路径",
+    "protocol/契约初稿/契约一-集合凭据与采纳.md"
+   ],
+   "dst": [
+    "契约AC",
+    "契约一",
+    "C1-AC1"
+   ],
+   "prov": {
+    "file": "protocol/契约初稿/契约一-集合凭据与采纳.md",
+    "line": 24,
+    "method": "底账表行"
+   },
+   "parse": "高",
+   "consumers": [
+    "CHK-3传导断裂"
+   ],
+   "attrs": {
+    "r版本": null,
+    "日期": "2026-07-09"
+   }
+  },
+  {
+   "type": "修订落账",
+   "src": [
+    "文档",
+    "路径",
+    "protocol/契约初稿/契约一-集合凭据与采纳.md"
+   ],
+   "dst": [
+    "契约AC",
+    "契约一",
+    "C1-AC7"
+   ],
+   "prov": {
+    "file": "protocol/契约初稿/契约一-集合凭据与采纳.md",
+    "line": 26,
+    "method": "底账表行"
+   },
+   "parse": "高",
+   "consumers": [
+    "CHK-3传导断裂"
+   ],
+   "attrs": {
+    "r版本": "r3",
+    "日期": "2026-07-12"
+   }
+  },
+  {
+   "type": "修订落账",
+   "src": [
+    "文档",
+    "路径",
+    "protocol/契约初稿/契约二-资产包与否定凭据.md"
+   ],
+   "dst": [
+    "契约AC",
+    "契约二",
+    "C2-AC1"
+   ],
+   "prov": {
+    "file": "protocol/契约初稿/契约二-资产包与否定凭据.md",
+    "line": 43,
+    "method": "底账表行"
+   },
+   "parse": "高",
+   "consumers": [
+    "CHK-3传导断裂"
+   ],
+   "attrs": {
+    "r版本": null,
+    "日期": "2026-07-09"
+   }
+  },
+  {
+   "type": "修订落账",
+   "src": [
+    "文档",
+    "路径",
+    "protocol/契约初稿/契约二-资产包与否定凭据.md"
+   ],
+   "dst": [
+    "契约AC",
+    "契约二",
+    "C2-AC1"
+   ],
+   "prov": {
+    "file": "protocol/契约初稿/契约二-资产包与否定凭据.md",
+    "line": 44,
+    "method": "底账表行"
+   },
+   "parse": "高",
+   "consumers": [
+    "CHK-3传导断裂"
+   ],
+   "attrs": {
+    "r版本": "r3.4",
+    "日期": "2026-07-13"
+   }
+  },
+  {
+   "type": "修订落账",
+   "src": [
+    "文档",
+    "路径",
+    "protocol/契约初稿/契约二-资产包与否定凭据.md"
+   ],
+   "dst": [
+    "契约AC",
+    "契约二",
+    "C2-AC31"
+   ],
+   "prov": {
+    "file": "protocol/契约初稿/契约二-资产包与否定凭据.md",
+    "line": 45,
+    "method": "底账表行"
+   },
+   "parse": "高",
+   "consumers": [
+    "CHK-3传导断裂"
+   ],
+   "attrs": {
+    "r版本": "r3.6",
+    "日期": "2026-07-13"
+   }
+  },
+  {
+   "type": "修订落账",
+   "src": [
+    "文档",
+    "路径",
+    "protocol/契约初稿/契约二-资产包与否定凭据.md"
+   ],
+   "dst": [
+    "节条目",
+    "契约评审-意见汇总与裁定",
+    "契约评审-意见汇总与裁定§18"
+   ],
+   "prov": {
+    "file": "protocol/契约初稿/契约二-资产包与否定凭据.md",
+    "line": 44,
+    "method": "底账表行"
+   },
+   "parse": "高",
+   "consumers": [
+    "CHK-3传导断裂"
+   ],
+   "attrs": {
+    "r版本": "r3.4",
+    "日期": "2026-07-13"
+   }
+  },
+  {
+   "type": "修订落账",
+   "src": [
+    "文档",
+    "路径",
+    "protocol/契约初稿/契约二-资产包与否定凭据.md"
+   ],
+   "dst": [
+    "节条目",
+    "契约评审-意见汇总与裁定",
+    "契约评审-意见汇总与裁定§20"
+   ],
+   "prov": {
+    "file": "protocol/契约初稿/契约二-资产包与否定凭据.md",
+    "line": 45,
+    "method": "底账表行"
+   },
+   "parse": "高",
+   "consumers": [
+    "CHK-3传导断裂"
+   ],
+   "attrs": {
+    "r版本": "r3.6",
+    "日期": "2026-07-13"
+   }
+  },
+  {
+   "type": "共现索引",
+   "src": [
+    "任务",
+    "A轨任务",
+    "TA1.1"
+   ],
+   "dst": [
+    "契约AC",
+    "契约一",
+    "C1-AC1"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 19,
+    "method": "定义块共现"
+   },
+   "parse": "确定",
+   "consumers": [
+    "共现完备性"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "共现索引",
+   "src": [
+    "任务",
+    "A轨任务",
+    "TA1.1"
+   ],
+   "dst": [
+    "需求AC",
+    "REQUIREMENTS",
+    "R1-AC1"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 19,
+    "method": "定义块共现"
+   },
+   "parse": "确定",
+   "consumers": [
+    "共现完备性"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "共现索引",
+   "src": [
+    "任务",
+    "A轨任务",
+    "TA1.1"
+   ],
+   "dst": [
+    "需求AC",
+    "REQUIREMENTS",
+    "R1-AC2"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 19,
+    "method": "定义块共现"
+   },
+   "parse": "确定",
+   "consumers": [
+    "共现完备性"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "共现索引",
+   "src": [
+    "任务",
+    "A轨任务",
+    "TA2.1"
+   ],
+   "dst": [
+    "契约AC",
+    "契约一",
+    "C1-AC13"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 20,
+    "method": "定义块共现"
+   },
+   "parse": "确定",
+   "consumers": [
+    "共现完备性"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "共现索引",
+   "src": [
+    "任务",
+    "A轨任务",
+    "TA2.3"
+   ],
+   "dst": [
+    "任务",
+    "A轨任务",
+    "TA2.1"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 21,
+    "method": "定义块共现"
+   },
+   "parse": "确定",
+   "consumers": [
+    "共现完备性"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "共现索引",
+   "src": [
+    "任务",
+    "A轨任务",
+    "TA2.3"
+   ],
+   "dst": [
+    "契约AC",
+    "契约二",
+    "C2-AC1"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 21,
+    "method": "定义块共现"
+   },
+   "parse": "确定",
+   "consumers": [
+    "共现完备性"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "共现索引",
+   "src": [
+    "任务",
+    "A轨任务",
+    "TA2.3"
+   ],
+   "dst": [
+    "契约AC",
+    "契约二",
+    "C2-AC2"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 21,
+    "method": "定义块共现"
+   },
+   "parse": "确定",
+   "consumers": [
+    "共现完备性"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "共现索引",
+   "src": [
+    "任务",
+    "A轨任务",
+    "TA2.3"
+   ],
+   "dst": [
+    "需求AC",
+    "REQUIREMENTS",
+    "R7-AC1"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 21,
+    "method": "定义块共现"
+   },
+   "parse": "确定",
+   "consumers": [
+    "共现完备性"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "共现索引",
+   "src": [
+    "任务",
+    "A轨任务",
+    "TA2.4"
+   ],
+   "dst": [
+    "任务",
+    "A轨任务",
+    "TA2.3"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 22,
+    "method": "定义块共现"
+   },
+   "parse": "确定",
+   "consumers": [
+    "共现完备性"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "共现索引",
+   "src": [
+    "任务",
+    "A轨任务",
+    "TA2.4"
+   ],
+   "dst": [
+    "契约AC",
+    "契约二",
+    "C2-AC31"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 22,
+    "method": "定义块共现"
+   },
+   "parse": "确定",
+   "consumers": [
+    "共现完备性"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "共现索引",
+   "src": [
+    "任务",
+    "A轨任务",
+    "TA3.1"
+   ],
+   "dst": [
+    "任务",
+    "A轨任务",
+    "TA1.1"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 23,
+    "method": "定义块共现"
+   },
+   "parse": "确定",
+   "consumers": [
+    "共现完备性"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "共现索引",
+   "src": [
+    "任务",
+    "A轨任务",
+    "TA3.1"
+   ],
+   "dst": [
+    "契约AC",
+    "契约二",
+    "C2-AC3"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 23,
+    "method": "定义块共现"
+   },
+   "parse": "确定",
+   "consumers": [
+    "共现完备性"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "共现索引",
+   "src": [
+    "任务",
+    "A轨任务",
+    "TA9.1"
+   ],
+   "dst": [
+    "任务",
+    "A轨任务",
+    "TA9.2"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 24,
+    "method": "定义块共现"
+   },
+   "parse": "确定",
+   "consumers": [
+    "共现完备性"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "共现索引",
+   "src": [
+    "任务",
+    "A轨任务",
+    "TA9.2"
+   ],
+   "dst": [
+    "任务",
+    "A轨任务",
+    "TA9.1"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 25,
+    "method": "定义块共现"
+   },
+   "parse": "确定",
+   "consumers": [
+    "共现完备性"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "共现索引",
+   "src": [
+    "参数",
+    "全局",
+    "D_avail"
+   ],
+   "dst": [
+    "参数",
+    "全局",
+    "W_evidence"
+   ],
+   "prov": {
+    "file": "protocol/参数登记册.md",
+    "line": 22,
+    "method": "定义块共现"
+   },
+   "parse": "确定",
+   "consumers": [
+    "共现完备性"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "共现索引",
+   "src": [
+    "参数",
+    "全局",
+    "P_max_validators"
+   ],
+   "dst": [
+    "参数",
+    "全局",
+    "P_min_validators"
+   ],
+   "prov": {
+    "file": "protocol/参数登记册.md",
+    "line": 28,
+    "method": "定义块共现"
+   },
+   "parse": "确定",
+   "consumers": [
+    "共现完备性"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "共现索引",
+   "src": [
+    "参数",
+    "全局",
+    "P_min_stake"
+   ],
+   "dst": [
+    "参数",
+    "全局",
+    "P_min_self_stake"
+   ],
+   "prov": {
+    "file": "protocol/参数登记册.md",
+    "line": 29,
+    "method": "定义块共现"
+   },
+   "parse": "确定",
+   "consumers": [
+    "共现完备性"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "共现索引",
+   "src": [
+    "参数",
+    "全局",
+    "U_unbonding"
+   ],
+   "dst": [
+    "参数",
+    "全局",
+    "V_packet"
+   ],
+   "prov": {
+    "file": "protocol/参数登记册.md",
+    "line": 19,
+    "method": "定义块共现"
+   },
+   "parse": "确定",
+   "consumers": [
+    "共现完备性"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "共现索引",
+   "src": [
+    "参数",
+    "全局",
+    "U_unbonding"
+   ],
+   "dst": [
+    "参数",
+    "全局",
+    "W_evidence"
+   ],
+   "prov": {
+    "file": "protocol/参数登记册.md",
+    "line": 19,
+    "method": "定义块共现"
+   },
+   "parse": "确定",
+   "consumers": [
+    "共现完备性"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "共现索引",
+   "src": [
+    "参数",
+    "全局",
+    "V_packet"
+   ],
+   "dst": [
+    "参数",
+    "全局",
+    "W_evidence"
+   ],
+   "prov": {
+    "file": "protocol/参数登记册.md",
+    "line": 21,
+    "method": "定义块共现"
+   },
+   "parse": "确定",
+   "consumers": [
+    "共现完备性"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "共现索引",
+   "src": [
+    "参数",
+    "全局",
+    "W_evidence"
+   ],
+   "dst": [
+    "参数",
+    "全局",
+    "U_unbonding"
+   ],
+   "prov": {
+    "file": "protocol/参数登记册.md",
+    "line": 20,
+    "method": "定义块共现"
+   },
+   "parse": "确定",
+   "consumers": [
+    "共现完备性"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "共现索引",
+   "src": [
+    "参数",
+    "全局",
+    "W_evidence"
+   ],
+   "dst": [
+    "参数",
+    "全局",
+    "V_packet"
+   ],
+   "prov": {
+    "file": "protocol/参数登记册.md",
+    "line": 20,
+    "method": "定义块共现"
+   },
+   "parse": "确定",
+   "consumers": [
+    "共现完备性"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "共现索引",
+   "src": [
+    "契约AC",
+    "契约一",
+    "C1-AC1"
+   ],
+   "dst": [
+    "需求AC",
+    "REQUIREMENTS",
+    "R1-AC1"
+   ],
+   "prov": {
+    "file": "protocol/契约初稿/契约一-集合凭据与采纳.md",
+    "line": 15,
+    "method": "定义块共现"
+   },
+   "parse": "确定",
+   "consumers": [
+    "共现完备性"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "共现索引",
+   "src": [
+    "契约AC",
+    "契约二",
+    "C2-AC1"
+   ],
+   "dst": [
+    "需求AC",
+    "REQUIREMENTS",
+    "R3-AC1"
+   ],
+   "prov": {
+    "file": "protocol/契约初稿/契约二-资产包与否定凭据.md",
+    "line": 17,
+    "method": "定义块共现"
+   },
+   "parse": "确定",
+   "consumers": [
+    "共现完备性"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "共现索引",
+   "src": [
+    "需求AC",
+    "REQUIREMENTS",
+    "R3-AC1"
+   ],
+   "dst": [
+    "契约AC",
+    "契约二",
+    "C2-AC1"
+   ],
+   "prov": {
+    "file": "protocol/REQUIREMENTS.md",
+    "line": 28,
+    "method": "定义块共现"
+   },
+   "parse": "确定",
+   "consumers": [
+    "共现完备性"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "前置依赖",
+   "src": [
+    "任务",
+    "A轨任务",
+    "TA2.3"
+   ],
+   "dst": [
+    "任务",
+    "A轨任务",
+    "TA2.1"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 21,
+    "method": "任务表前置列"
+   },
+   "parse": "高",
+   "consumers": [
+    "CHK-环检测",
+    "brief"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "前置依赖",
+   "src": [
+    "任务",
+    "A轨任务",
+    "TA2.4"
+   ],
+   "dst": [
+    "任务",
+    "A轨任务",
+    "TA2.3"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 22,
+    "method": "任务表前置列"
+   },
+   "parse": "高",
+   "consumers": [
+    "CHK-环检测",
+    "brief"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "前置依赖",
+   "src": [
+    "任务",
+    "A轨任务",
+    "TA3.1"
+   ],
+   "dst": [
+    "任务",
+    "A轨任务",
+    "TA1.1"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 23,
+    "method": "任务表前置列"
+   },
+   "parse": "高",
+   "consumers": [
+    "CHK-环检测",
+    "brief"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "前置依赖",
+   "src": [
+    "任务",
+    "A轨任务",
+    "TA9.1"
+   ],
+   "dst": [
+    "任务",
+    "A轨任务",
+    "TA9.2"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 24,
+    "method": "任务表前置列"
+   },
+   "parse": "高",
+   "consumers": [
+    "CHK-环检测",
+    "brief"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "前置依赖",
+   "src": [
+    "任务",
+    "A轨任务",
+    "TA9.2"
+   ],
+   "dst": [
+    "任务",
+    "A轨任务",
+    "TA9.1"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 25,
+    "method": "任务表前置列"
+   },
+   "parse": "高",
+   "consumers": [
+    "CHK-环检测",
+    "brief"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "映射",
+   "src": [
+    "需求AC",
+    "REQUIREMENTS",
+    "R1-AC1"
+   ],
+   "dst": [
+    "契约AC",
+    "契约一",
+    "C1-AC1"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/A轨需求.md",
+    "line": 20,
+    "method": "映射表行"
+   },
+   "parse": "确定",
+   "consumers": [
+    "CHK-2映射缺口",
+    "共现完备性"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "映射",
+   "src": [
+    "需求AC",
+    "REQUIREMENTS",
+    "R1-AC2"
+   ],
+   "dst": [
+    "契约AC",
+    "契约一",
+    "C1-AC2"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/A轨需求.md",
+    "line": 21,
+    "method": "映射表行"
+   },
+   "parse": "确定",
+   "consumers": [
+    "CHK-2映射缺口",
+    "共现完备性"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "映射",
+   "src": [
+    "需求AC",
+    "REQUIREMENTS",
+    "R1-AC3"
+   ],
+   "dst": [
+    "契约AC",
+    "契约一",
+    "C1-AC3"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/A轨需求.md",
+    "line": 22,
+    "method": "映射表行"
+   },
+   "parse": "确定",
+   "consumers": [
+    "CHK-2映射缺口",
+    "共现完备性"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "映射",
+   "src": [
+    "需求AC",
+    "REQUIREMENTS",
+    "R2-AC1"
+   ],
+   "dst": [
+    "契约AC",
+    "契约一",
+    "C1-AC13"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/A轨需求.md",
+    "line": 23,
+    "method": "映射表行"
+   },
+   "parse": "确定",
+   "consumers": [
+    "CHK-2映射缺口",
+    "共现完备性"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "映射",
+   "src": [
+    "需求AC",
+    "REQUIREMENTS",
+    "R7-AC1"
+   ],
+   "dst": [
+    "契约AC",
+    "契约二",
+    "C2-AC5"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/A轨需求.md",
+    "line": 24,
+    "method": "映射表行"
+   },
+   "parse": "确定",
+   "consumers": [
+    "CHK-2映射缺口",
+    "共现完备性"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "阅读依赖",
+   "src": [
+    "任务",
+    "A轨任务",
+    "TA1.1"
+   ],
+   "dst": [
+    "节条目",
+    "A轨设计",
+    "A轨设计§2.1"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 19,
+    "method": "任务表spec锚§"
+   },
+   "parse": "高",
+   "consumers": [
+    "brief"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "阅读依赖",
+   "src": [
+    "任务",
+    "A轨任务",
+    "TA2.1"
+   ],
+   "dst": [
+    "节条目",
+    "A轨设计",
+    "A轨设计§4.1"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 20,
+    "method": "任务表spec锚§"
+   },
+   "parse": "高",
+   "consumers": [
+    "brief"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "阅读依赖",
+   "src": [
+    "任务",
+    "A轨任务",
+    "TA2.3"
+   ],
+   "dst": [
+    "节条目",
+    "A轨设计",
+    "A轨设计§2.1"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 21,
+    "method": "任务表spec锚§"
+   },
+   "parse": "高",
+   "consumers": [
+    "brief"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "阅读依赖",
+   "src": [
+    "任务",
+    "A轨任务",
+    "TA2.3"
+   ],
+   "dst": [
+    "节条目",
+    "A轨设计",
+    "A轨设计§4.2"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 21,
+    "method": "任务表spec锚§"
+   },
+   "parse": "高",
+   "consumers": [
+    "brief"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "阅读依赖",
+   "src": [
+    "任务",
+    "A轨任务",
+    "TA2.4"
+   ],
+   "dst": [
+    "节条目",
+    "A轨设计",
+    "A轨设计§4.3"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 22,
+    "method": "任务表spec锚§"
+   },
+   "parse": "高",
+   "consumers": [
+    "brief"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "阅读依赖",
+   "src": [
+    "任务",
+    "A轨任务",
+    "TA3.1"
+   ],
+   "dst": [
+    "节条目",
+    "A轨设计",
+    "A轨设计§3.3"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 23,
+    "method": "任务表spec锚§"
+   },
+   "parse": "高",
+   "consumers": [
+    "brief"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "阅读依赖",
+   "src": [
+    "任务",
+    "A轨任务",
+    "TA9.1"
+   ],
+   "dst": [
+    "节条目",
+    "A轨设计",
+    "A轨设计§2.1"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 24,
+    "method": "任务表spec锚§"
+   },
+   "parse": "高",
+   "consumers": [
+    "brief"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "阅读依赖",
+   "src": [
+    "任务",
+    "A轨任务",
+    "TA9.2"
+   ],
+   "dst": [
+    "节条目",
+    "A轨设计",
+    "A轨设计§2.1"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 25,
+    "method": "任务表spec锚§"
+   },
+   "parse": "高",
+   "consumers": [
+    "brief"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "验证声明",
+   "src": [
+    "测试",
+    "测试名",
+    "ac_r1_ac1_stake_admit"
+   ],
+   "dst": [
+    "需求AC",
+    "REQUIREMENTS",
+    "R1-AC1"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 19,
+    "method": "ac前缀名"
+   },
+   "parse": "确定",
+   "consumers": [
+    "CHK-2覆盖缺口"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "验证声明",
+   "src": [
+    "测试",
+    "测试名",
+    "ac_r2_ac1_setcred_dispatch"
+   ],
+   "dst": [
+    "需求AC",
+    "REQUIREMENTS",
+    "R2-AC1"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 20,
+    "method": "ac前缀名"
+   },
+   "parse": "确定",
+   "consumers": [
+    "CHK-2覆盖缺口"
+   ],
+   "attrs": {}
+  },
+  {
+   "type": "验证声明",
+   "src": [
+    "测试",
+    "测试名",
+    "ac_r7_ac1_inbound_mint"
+   ],
+   "dst": [
+    "需求AC",
+    "REQUIREMENTS",
+    "R7-AC1"
+   ],
+   "prov": {
+    "file": "protocol/A轨-Core与跨链/A轨任务.md",
+    "line": 21,
+    "method": "ac前缀名"
+   },
+   "parse": "确定",
+   "consumers": [
+    "CHK-2覆盖缺口"
+   ],
+   "attrs": {}
+  }
+ ],
+ "reports": {
+  "实体_重定义": [
+   {
+    "key": [
+     "契约AC",
+     "契约二",
+     "C2-AC5"
+    ],
+    "primary": {
+     "doc": "protocol/契约初稿/契约二-资产包与否定凭据.md",
+     "line": 20,
+     "line_end": 20
+    },
+    "candidates": [
+     {
+      "doc": "protocol/契约初稿/Archive/批次C-泛化验证.md",
+      "line": 20
+     }
+    ]
+   }
+  ],
+  "实体_无定义块": [
+   {
+    "key": [
+     "契约AC",
+     "契约一",
+     "C1-AC13"
+    ],
+    "occurrences": 2,
+    "首现": {
+     "doc": "protocol/A轨-Core与跨链/A轨任务.md",
+     "line": 20
+    }
+   },
+   {
+    "key": [
+     "需求AC",
+     "REQUIREMENTS",
+     "R7-AC1"
+    ],
+    "occurrences": 2,
+    "首现": {
+     "doc": "protocol/A轨-Core与跨链/A轨任务.md",
+     "line": 21
+    }
+   },
+   {
+    "key": [
+     "任务",
+     "A轨任务",
+     "TA9"
+    ],
+    "occurrences": 1,
+    "首现": {
+     "doc": "protocol/A轨-Core与跨链/A轨设计.md",
+     "line": 18
+    }
+   },
+   {
+    "key": [
+     "需求AC",
+     "REQUIREMENTS",
+     "R13-AC4"
+    ],
+    "occurrences": 1,
+    "首现": {
+     "doc": "protocol/A轨-Core与跨链/A轨设计.md",
+     "line": 45
+    }
+   },
+   {
+    "key": [
+     "需求AC",
+     "REQUIREMENTS",
+     "R7-AC3"
+    ],
+    "occurrences": 1,
+    "首现": {
+     "doc": "protocol/A轨-Core与跨链/A轨需求.md",
+     "line": 25
+    }
+   },
+   {
+    "key": [
+     "参数",
+     "全局",
+     "X_orphan"
+    ],
+    "occurrences": 2,
+    "首现": {
+     "doc": "protocol/REQUIREMENTS.md",
+     "line": 32
+    }
+   },
+   {
+    "key": [
+     "参数",
+     "全局",
+     "X_y"
+    ],
+    "occurrences": 1,
+    "首现": {
+     "doc": "protocol/参数登记册.md",
+     "line": 2
+    }
+   },
+   {
+    "key": [
+     "参数",
+     "全局",
+     "P_min_validators"
+    ],
+    "occurrences": 1,
+    "首现": {
+     "doc": "protocol/参数登记册.md",
+     "line": 28
+    }
+   },
+   {
+    "key": [
+     "参数",
+     "全局",
+     "P_min_self_stake"
+    ],
+    "occurrences": 1,
+    "首现": {
+     "doc": "protocol/参数登记册.md",
+     "line": 29
+    }
+   }
+  ],
+  "实体_修订行未解析": [
+   {
+    "file": "protocol/契约初稿/契约一-集合凭据与采纳.md",
+    "line": 25,
+    "摘要": "初稿（引擎无关骨架，范围与 AC 待两轨会签冻结）"
+   }
+  ],
+  "未分类文档": [
+   "protocol/未分类-契约三草案.md"
+  ],
+  "unresolved_reference": [
+   {
+    "来源": "provenance",
+    "期望": "裁定簿 §97",
+    "file": "protocol/记述/守恒复算记录.md",
+    "line": 21,
+    "原文": "裁定簿 §97",
+    "规则": "prov_form",
+    "诊断型": "断锚"
+   },
+   {
+    "来源": "幽灵专名",
+    "期望": "裁定簿 §99",
+    "file": "protocol/契约初稿/契约二-资产包与否定凭据.md",
+    "line": 37,
+    "原文": "裁定簿 §99",
+    "规则": "term_anchor",
+    "诊断型": "断锚"
+   }
+  ],
+  "ambiguous_reference": [
+   {
+    "来源": "R11",
+    "file": "protocol/A轨-Core与跨链/A轨设计.md",
+    "line": 46,
+    "原文": "R11",
+    "规则": "bare_id",
+    "诊断型": "歧义引用"
+   },
+   {
+    "来源": "R5",
+    "file": "protocol/A轨-Core与跨链/A轨设计.md",
+    "line": 44,
+    "原文": "R5",
+    "规则": "bare_id",
+    "诊断型": "歧义引用"
+   },
+   {
+    "来源": "R7",
+    "file": "protocol/A轨-Core与跨链/A轨设计.md",
+    "line": 45,
+    "原文": "R7",
+    "规则": "bare_id",
+    "诊断型": "歧义引用"
+   }
+  ],
+  "实体_schema_孤儿consumer": []
+ }
+}

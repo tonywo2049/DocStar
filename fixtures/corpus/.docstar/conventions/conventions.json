@@ -1,0 +1,99 @@
+{
+  "version": "1",
+  "namespaces": {
+    "kind_namespace": {
+      "需求AC": "REQUIREMENTS",
+      "审计AC": "守恒审计器规格",
+      "治理期权": "REQUIREMENTS-E"
+    },
+    "req_doc": "REQUIREMENTS.md",
+    "param_registry": "参数登记册.md",
+    "task_doc_stem": "A轨任务",
+    "mapping_doc_stem": "A轨需求",
+    "prefix_namespaces": {
+      "C1": "契约一",
+      "C2": "契约二",
+      "C3": "契约三"
+    }
+  },
+  "def_forms": {
+    "需求AC": "^-\\s*\\*\\*(R\\d+-AC\\d+)\\*\\*",
+    "契约AC": "^-\\s*\\*\\*(C\\d+-AC\\d+)\\*\\*",
+    "审计AC": "^\\|\\s*\\*\\*(AUD-AC\\d+)\\*\\*",
+    "参数": "^\\|\\s*`([A-Z]_[a-z][A-Za-z0-9_]*)`[^|]*\\|",
+    "任务": "^\\|\\s*\\*\\*((?:TA\\d+(?:\\.\\d+)?[a-z]?|TG\\.\\d+[a-z]?|T\\d+\\.\\d+[a-z]?))\\*\\*"
+  },
+  "term_forms": {
+    "inplace": "\\*\\*([^*]{2,20})\\*\\*（定义：([^）]+)）",
+    "glossary": "^-?\\s*\\*\\*([^*]{2,20})\\*\\*[：:](.{4,})"
+  },
+  "form_headers": {
+    "ledger": "^\\|\\s*日期\\s*\\|\\s*变更\\s*\\|\\s*理由\\s*\\|",
+    "changelist": "^\\|\\s*项\\s*\\|\\s*(?:落点|文档与落点)\\b",
+    "glossary_section": "术语表|名词解释|名词表|词汇表|术语定义|glossary"
+  },
+  "harvest": {
+    "len_range": [
+      2,
+      20
+    ],
+    "exclude": [
+      "^\\d+$",
+      "^\\d{4}-\\d{2}-\\d{2}$",
+      "^r\\d+(?:\\.\\d+)?$",
+      "^(?:[RC]\\d+(?:-AC\\d+)?|AUD-AC\\d+|E-D\\d+|CT-[A-Za-z0-9]{1,6}(?:-M\\d+)?|TA\\d+(?:\\.\\d+)?[a-z]?|TG\\.\\d+[a-z]?|T\\d+(?:\\.\\d+[a-z]?)?|[A-Z]-\\d+|M\\d|D\\d+|[A-Z]_[a-z][A-Za-z0-9_]*|§?\\d+(?:\\.\\d+)*[A-Z]?)$"
+    ]
+  },
+  "doc_id_kinds": [
+    ["契约AC", "(?<![A-Za-z0-9_])C\\d+-AC\\d+(?![A-Za-z0-9_])", "唯一；C1/C2/C3=契约一/二/三"],
+    ["审计AC", "(?<![A-Za-z0-9_])AUD-AC\\d+(?![A-Za-z0-9_])", "唯一；守恒审计器规格"],
+    ["需求AC", "(?<![A-Za-z0-9_])R\\d+-AC\\d+(?![A-Za-z0-9_])", "唯一；REQUIREMENTS / A轨需求矩阵"],
+    ["治理期权", "(?<![A-Za-z0-9_])E-D\\d+(?![A-Za-z0-9_])", "唯一；REQUIREMENTS E 节期权"],
+    ["测试记录", "(?<![A-Za-z0-9_])CT-[A-Za-z0-9]{1,6}(?:-M\\d+)?(?![A-Za-z0-9_])", "唯一；组件测试记录/"],
+    ["任务", "(?<![A-Za-z0-9_])(?:TA\\d+(?:\\.\\d+)?[a-z]?|TG\\.\\d+[a-z]?|T\\d+\\.\\d+[a-z]?)(?![A-Za-z0-9_])", "TA*/T0.*/TG.*；A轨任务"],
+    ["拓扑档", "(?<![A-Za-z0-9_])T\\d+(?![A-Za-z0-9_])", "T0/T1/T2=P0B 判定拓扑档（T2 同洲/T1 跨洲），非任务"],
+    ["编号项", "(?<![A-Za-z0-9_])[A-Z]-\\d+(?![A-Za-z0-9_])", "多命名空间：N-/F-/G-=评审项，C-/S-=批次C发现，按前缀区分"],
+    ["需求", "(?<![A-Za-z0-9_])R\\d+(?![A-Za-z0-9_])", "歧义：R1-R19 需求 vs A轨设计§9 修订清单 R1-R11"],
+    ["决议", "(?<![A-Za-z0-9_])D\\d+(?![A-Za-z0-9_])", "歧义：REQUIREMENTS D1-D12 / SpotChain 决议 / P0B D4/D5/D7 交付，勿跨域混读"],
+    ["里程碑", "(?<![A-Za-z0-9_])M\\d(?![A-Za-z0-9_])", "歧义：M0-M7 规划 vs 环境基线机器 M2/M3"],
+    ["参数", "(?<![A-Za-z0-9_])[A-Z]_[a-z][A-Za-z0-9_]*(?![A-Za-z0-9_])", "唯一；登记册=参数登记册.md"],
+    ["版本", "(?<![A-Za-z0-9_.])r\\d+\\.\\d+(?![0-9.])", "多命名空间：所属文档看前缀词（如 契约二 r3.7）"]
+  ],
+  "edges": {
+    "directed_pairs": [
+      ["上游", "下游"]
+    ],
+    "self_words": ["本文", "本节", "本表", "上文", "下文", "上表", "下表", "附录", "详见", "见"],
+    "section_ref_marker": "§"
+  },
+  "id_occ_kinds": {
+    "需求AC": "需求AC",
+    "契约AC": "契约AC",
+    "审计AC": "审计AC",
+    "治理期权": "治理期权",
+    "任务": "任务"
+  },
+  "cooccur_kinds": ["需求AC", "契约AC", "审计AC", "参数", "任务", "治理期权"],
+  "ac_prefix_kinds": {"R": "需求AC", "C": "契约AC", "A": "审计AC"},
+  "option_rows": [
+    {"kind": "治理期权", "doc": "req_doc", "row": "^\\|\\s*D(\\d+)\\s*\\|", "id": "E-D\\1"}
+  ],
+  "review_item": {"form": "(?<![A-Za-z0-9_])[A-Z]-\\d+(?![A-Za-z0-9_])", "kind": "评审项"},
+  "prov_form": "本(?:文|表|节|测试)(?:所)?(?:测|审|验证|针对|覆盖|评估)(?:的(?:是|对象))?[：:]?",
+  "required_edges": [
+    {"rule": "覆盖-任务声明须覆盖AC", "src_kinds": ["需求AC", "契约AC"], "edge": "任务声明", "direction": "in", "dst_kinds": ["任务"], "severity": "report"},
+    {"rule": "覆盖-验证声明须覆盖AC", "src_kinds": ["需求AC", "契约AC"], "edge": "验证声明", "direction": "in", "dst_kinds": ["测试"], "severity": "report"},
+    {"rule": "映射-需求AC对应契约AC", "src_kinds": ["需求AC"], "edge": "映射", "direction": "out", "dst_kinds": ["契约AC"], "severity": "report"}
+  ],
+  "revision_target_kinds": ["需求AC", "契约AC", "审计AC"],
+  "cooccur_mapping_kinds": ["需求AC", "契约AC"],
+  "aliases": {
+    "裁定簿": "契约评审-意见汇总与裁定",
+    "审计器": "守恒审计器规格",
+    "审计器规格": "守恒审计器规格",
+    "envelope": "envelope草案",
+    "会签包": "0.8-契约会签包-2026-07-12",
+    "任务书": "技术选型任务书",
+    "REQUIREMENTS": "REQUIREMENTS"
+  }
+}

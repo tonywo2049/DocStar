@@ -1,0 +1,65 @@
+# DocStar CI —— 落盘位置：.github/workflows/tests.yml
+#
+# 零依赖项目：无 requirements.txt / setup.py / pyproject.toml，全 stdlib + 仓内本地模块，
+# 故无 pip install 步骤，setup-python 后直接跑。
+#
+# 【为何恒用 --skip-slow】tests.py 分三层：
+#   A 逻辑断言（引擎自有，须全绿）
+#   B golden 逐字节比对（只读，绝不 --bless）
+#   C 慢断言 layer_c —— 克隆自身上的自宿主全量 + 性能中位断言（EG-7-AC1）。任何机器可跑，
+#     但性能断言在共享 runner 上随负载抖动误红。
+#   → CI 恒用 --skip-slow，只跑 A+B；layer_c 由维护者在本机全量档覆盖。
+#
+# 【退出码契约】tests.py main() 仅在「TB 自有逻辑红」时 return 1；对照红 / TDD 待建 /
+#   golden 待重锁均 return 0（见 tests.py main() 末尾注释）。CI 以退出码判定通过即可，
+#   无需额外解析输出。
+
+name: tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  tests:
+    name: tests.py --skip-slow · py${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # 全 5 版本（非仅 oldest/mid/newest 采样）：DG-60 实证——判定对象 __bool__ 谎报
+        # 致 json indent 编码器在 3.9-3.12 吞键，唯 3.13 幸免，维护者 3.13 单环境长期遮蔽
+        # 4 版本缺陷。多版本矩阵是该类「仅某版本复现」缺陷的唯一网底，故全覆盖。
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      # 零依赖，无安装步骤。--skip-slow 原因见文件头注释。
+      - name: Run test suite (A 逻辑 + B golden 只读；跳过真实仓/性能慢断言)
+        run: python3 tests.py --skip-slow
+
+  selftest:
+    # 引擎自验证：与主测试同矩阵，覆盖 3.9→3.13 的引擎代码路径（corpus 扫描 / conventions 加载）。
+    # 单版本亦可满足最小需求；此处随主矩阵统一覆盖，成本可忽略。
+    name: engine selftests · py${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # 全 5 版本（非仅 oldest/mid/newest 采样）：DG-60 实证——判定对象 __bool__ 谎报
+        # 致 json indent 编码器在 3.9-3.12 吞键，唯 3.13 幸免，维护者 3.13 单环境长期遮蔽
+        # 4 版本缺陷。多版本矩阵是该类「仅某版本复现」缺陷的唯一网底，故全覆盖。
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: corpus 引擎自验证
+        run: python3 internal/corpus.py --selftest
+      - name: conventions 加载器自验证
+        run: python3 conventions/__init__.py --selftest

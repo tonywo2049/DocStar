@@ -1,0 +1,601 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>实体图谱</title>
+<style>
+  :root {
+    --surface-1: #fcfcfb; --surface-2: #f3f3f0; --page: #f9f9f7;
+    --ink-1: #0b0b0b; --ink-2: #52514e; --ink-3: #898781;
+    --grid: #e1e0d9; --baseline: #c3c2b7; --ring: rgba(11,11,11,0.10);
+    --ok: #1f9d57; --warn: #d08300; --bad: #d64545; --idet: #6b7280;
+    --s1:#2a78d6; --s2:#1baf7a; --s3:#eda100; --s4:#008300; --s5:#4a3aa7; --s6:#e34948;
+    --s7:#e87ba4; --s8:#eb6834; --s9:#0e9aa7; --s10:#8a6d3b; --s11:#b452cd; --s12:#5b8c00;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --surface-1: #1a1a19; --surface-2: #232322; --page: #0d0d0d;
+      --ink-1: #ffffff; --ink-2: #c3c2b7; --ink-3: #898781;
+      --grid: #2c2c2a; --baseline: #383835; --ring: rgba(255,255,255,0.12);
+      --ok: #35c07a; --warn: #e0a13a; --bad: #ec6a6a; --idet: #8b93a1;
+      --s1:#3987e5; --s2:#199e70; --s3:#c98500; --s4:#2a9d3a; --s5:#9085e9; --s6:#e66767;
+      --s7:#d55181; --s8:#d95926; --s9:#2fb5c2; --s10:#c0975a; --s11:#c874e0; --s12:#7cae33;
+    }
+  }
+  :root[data-theme="dark"] {
+    --surface-1: #1a1a19; --surface-2: #232322; --page: #0d0d0d;
+    --ink-1: #ffffff; --ink-2: #c3c2b7; --ink-3: #898781;
+    --grid: #2c2c2a; --baseline: #383835; --ring: rgba(255,255,255,0.12);
+    --ok: #35c07a; --warn: #e0a13a; --bad: #ec6a6a; --idet: #8b93a1;
+    --s1:#3987e5; --s2:#199e70; --s3:#c98500; --s4:#2a9d3a; --s5:#9085e9; --s6:#e66767;
+    --s7:#d55181; --s8:#d95926; --s9:#2fb5c2; --s10:#c0975a; --s11:#c874e0; --s12:#7cae33;
+  }
+  :root[data-theme="light"] {
+    --surface-1: #fcfcfb; --surface-2: #f3f3f0; --page: #f9f9f7;
+    --ink-1: #0b0b0b; --ink-2: #52514e; --ink-3: #898781;
+    --grid: #e1e0d9; --baseline: #c3c2b7; --ring: rgba(11,11,11,0.10);
+    --ok: #1f9d57; --warn: #d08300; --bad: #d64545; --idet: #6b7280;
+    --s1:#2a78d6; --s2:#1baf7a; --s3:#eda100; --s4:#008300; --s5:#4a3aa7; --s6:#e34948;
+    --s7:#e87ba4; --s8:#eb6834; --s9:#0e9aa7; --s10:#8a6d3b; --s11:#b452cd; --s12:#5b8c00;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    background: var(--page); color: var(--ink-1);
+    font: 13px/1.45 system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    height: 100vh; display: flex; flex-direction: column; overflow: hidden;
+  }
+  header {
+    padding: 9px 14px; display: flex; flex-wrap: wrap; gap: 7px 13px; align-items: center;
+    border-bottom: 1px solid var(--grid); flex-shrink: 0;
+  }
+  header h1 { font-size: 15px; font-weight: 600; }
+  header .stats { color: var(--ink-3); font-size: 12px; }
+  header .sp { flex: 1; }
+  #q {
+    background: var(--surface-1); color: var(--ink-1); border: 1px solid var(--baseline);
+    border-radius: 6px; padding: 5px 10px; font: inherit; width: 280px; max-width: 60vw;
+  }
+  #q:focus { outline: 1.5px solid var(--s1); border-color: transparent; }
+  button {
+    background: var(--surface-1); color: var(--ink-2); cursor: pointer;
+    border: 1px solid var(--baseline); border-radius: 6px; padding: 5px 11px; font: inherit;
+  }
+  button:hover { color: var(--ink-1); }
+
+  /* 判定概览条 */
+  #chk { border-bottom: 1px solid var(--grid); background: var(--surface-1); flex-shrink: 0; }
+  #chk > summary {
+    cursor: pointer; padding: 6px 14px; color: var(--ink-2); font-size: 12px;
+    list-style: none; user-select: none; display: flex; align-items: center; gap: 8px;
+  }
+  #chk > summary::-webkit-details-marker { display: none; }
+  #chk > summary .tri { transition: transform .15s; color: var(--ink-3); }
+  #chk[open] > summary .tri { transform: rotate(90deg); }
+  #tiles { display: flex; flex-wrap: wrap; gap: 7px; padding: 2px 14px 11px; }
+  .tile {
+    border: 1px solid var(--baseline); border-left-width: 3px; border-radius: 6px;
+    padding: 5px 9px; min-width: 132px; background: var(--surface-2);
+  }
+  .tile .tk { font-size: 12px; color: var(--ink-1); font-weight: 600; }
+  .tile .tm { font-size: 11px; color: var(--ink-3); margin-top: 2px; }
+  .tile.ok { border-left-color: var(--ok); }
+  .tile.bad { border-left-color: var(--bad); }
+  .tile.warn { border-left-color: var(--warn); }
+  .tile.idet { border-left-color: var(--idet); }
+  .tile .badge { font-weight: 600; }
+  .tile.ok .badge { color: var(--ok); }
+  .tile.bad .badge { color: var(--bad); }
+  .tile.warn .badge { color: var(--warn); }
+  .tile.idet .badge { color: var(--idet); }
+
+  main { flex: 1; display: flex; min-height: 0; }
+  /* 左栏：过滤 + 结果列表 */
+  #left {
+    width: 340px; flex-shrink: 0; border-right: 1px solid var(--grid);
+    background: var(--surface-1); display: flex; flex-direction: column; min-height: 0;
+  }
+  .filters { padding: 9px 12px 4px; border-bottom: 1px solid var(--grid); }
+  .fgroup { margin-bottom: 7px; }
+  .flabel {
+    font-size: 11px; color: var(--ink-3); text-transform: uppercase; letter-spacing: .04em;
+    margin-bottom: 4px; display: flex; justify-content: space-between; align-items: baseline;
+  }
+  .flabel a { color: var(--s1); cursor: pointer; font-size: 11px; text-transform: none; letter-spacing: 0; }
+  .chips { display: flex; flex-wrap: wrap; gap: 4px; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 5px; cursor: pointer; user-select: none;
+    border: 1px solid var(--baseline); border-radius: 20px; padding: 2px 9px;
+    font-size: 11.5px; color: var(--ink-2); background: var(--surface-2);
+  }
+  .chip i { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+  .chip .n { color: var(--ink-3); font-variant-numeric: tabular-nums; }
+  .chip.off { opacity: .38; }
+  .chip:hover { color: var(--ink-1); }
+  #listmeta { padding: 6px 12px; font-size: 11px; color: var(--ink-3); border-bottom: 1px solid var(--grid); }
+  #list { flex: 1; overflow-y: auto; list-style: none; }
+  #list li {
+    padding: 6px 12px; border-bottom: 1px solid var(--grid); cursor: pointer;
+    display: flex; align-items: center; gap: 8px;
+  }
+  #list li:hover { background: var(--surface-2); }
+  #list li.sel { background: var(--surface-2); box-shadow: inset 3px 0 0 var(--s1); }
+  #list li .dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+  #list li .nm { flex: 1; min-width: 0; color: var(--ink-1); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #list li .kd { font-size: 10.5px; color: var(--ink-3); flex-shrink: 0; }
+  #list li .dg { font-size: 10.5px; color: var(--ink-3); font-variant-numeric: tabular-nums; flex-shrink: 0; min-width: 16px; text-align: right; }
+
+  /* 右栏：邻域图 + 详情 */
+  #right { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  #graphbox { height: 46%; min-height: 200px; position: relative; border-bottom: 1px solid var(--grid); display: none; }
+  #graphbox.on { display: block; }
+  #ego { width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; }
+  #ego .lk { stroke-width: 1.4; opacity: .62; }
+  #ego .node circle { stroke: var(--ring); stroke-width: 1; }
+  #ego .node.center circle { stroke: var(--ink-1); stroke-width: 2; }
+  #ego .node text { fill: var(--ink-2); font-size: 10.5px; text-anchor: middle; pointer-events: none; }
+  #ego .node.center text { fill: var(--ink-1); font-weight: 600; }
+  #egotip {
+    position: absolute; pointer-events: none; display: none; max-width: 300px;
+    background: var(--surface-1); border: 1px solid var(--baseline); border-radius: 6px;
+    padding: 5px 9px; font-size: 11.5px; color: var(--ink-2); box-shadow: 0 4px 14px rgba(0,0,0,.2); z-index: 6;
+  }
+  #egotip b { color: var(--ink-1); }
+  #egohint {
+    position: absolute; top: 7px; left: 10px; font-size: 11px; color: var(--ink-3);
+    background: var(--surface-1); border: 1px solid var(--grid); border-radius: 5px; padding: 2px 7px; pointer-events: none;
+  }
+  #detail { flex: 1; overflow-y: auto; padding: 14px 18px; }
+
+  /* 详情内容 */
+  .empty { color: var(--ink-3); max-width: 660px; }
+  .empty h2 { font-size: 14px; color: var(--ink-2); font-weight: 600; margin-bottom: 6px; }
+  .kdist { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 14px; }
+  .kdist .chip { cursor: default; }
+  .dhead { display: flex; align-items: flex-start; gap: 9px; margin-bottom: 3px; }
+  .dhead .dot { width: 13px; height: 13px; border-radius: 50%; margin-top: 3px; flex-shrink: 0; }
+  .dhead h2 { font-size: 17px; font-weight: 600; word-break: break-word; }
+  .dkey { color: var(--ink-3); font-size: 12px; margin-bottom: 9px; word-break: break-all; }
+  .dkey code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--ink-2); }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 11px; }
+  .tag { font-size: 11.5px; padding: 2px 9px; border-radius: 5px; background: var(--surface-2); border: 1px solid var(--baseline); color: var(--ink-2); }
+  .tag b { color: var(--ink-1); font-weight: 600; }
+  .drow { margin-bottom: 10px; }
+  .drow .lab { font-size: 11px; color: var(--ink-3); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 3px; }
+  .loc { color: var(--ink-2); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; word-break: break-all; }
+  .loc .sub { color: var(--ink-3); }
+  pre.body {
+    background: var(--surface-2); border: 1px solid var(--grid); border-radius: 7px;
+    padding: 9px 11px; font-size: 12px; line-height: 1.5; white-space: pre-wrap; word-break: break-word;
+    color: var(--ink-1); max-height: 260px; overflow: auto; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  .cmd { color: var(--ink-3); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11.5px; word-break: break-all; margin-top: 3px; }
+  .edgesec h3 { font-size: 13px; margin: 16px 0 7px; display: flex; align-items: baseline; gap: 7px; }
+  .edgesec h3 .n { color: var(--ink-3); font-weight: 400; font-size: 12px; }
+  .etgroup { margin: 0 0 9px; border: 1px solid var(--grid); border-radius: 7px; overflow: hidden; }
+  .etgroup > .et {
+    display: flex; align-items: center; gap: 7px; padding: 5px 10px; background: var(--surface-2);
+    font-size: 12px; font-weight: 600;
+  }
+  .etgroup > .et i { width: 12px; height: 3px; border-radius: 2px; flex-shrink: 0; }
+  .etgroup > .et .n { color: var(--ink-3); font-weight: 400; margin-left: auto; }
+  .erow {
+    display: flex; align-items: center; gap: 8px; padding: 5px 10px; border-top: 1px solid var(--grid); cursor: pointer;
+  }
+  .erow:hover { background: var(--surface-2); }
+  .erow .arr { color: var(--ink-3); flex-shrink: 0; }
+  .erow .dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+  .erow .pn { flex: 1; min-width: 0; color: var(--ink-1); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .erow .pk { font-size: 10.5px; color: var(--ink-3); flex-shrink: 0; }
+  .erow .pv { font-size: 10.5px; color: var(--ink-3); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; flex-shrink: 0; }
+  .muted { color: var(--ink-3); }
+</style>
+</head>
+<body>
+<header>
+  <h1>实体图谱</h1>
+  <span class="stats" id="stats"></span>
+  <span class="sp"></span>
+  <input id="q" type="search" placeholder="搜索：名称 / 标识 / 主键三元组（Enter 定位首个）">
+  <button id="clear" title="清空选择与搜索">清空</button>
+  <button id="theme" title="切换明暗">明暗</button>
+</header>
+<details id="chk" open>
+  <summary><span class="tri">▸</span><span id="chksum"></span></summary>
+  <div id="tiles"></div>
+</details>
+<main>
+  <aside id="left">
+    <div class="filters">
+      <div class="fgroup">
+        <div class="flabel"><span>实体类别</span><a id="kall">全选</a></div>
+        <div id="kindchips" class="chips"></div>
+      </div>
+      <div class="fgroup">
+        <div class="flabel"><span>关系类型</span><a id="eall">全选</a></div>
+        <div id="edgechips" class="chips"></div>
+      </div>
+    </div>
+    <div id="listmeta"></div>
+    <ul id="list"></ul>
+  </aside>
+  <section id="right">
+    <div id="graphbox">
+      <svg id="ego" preserveAspectRatio="xMidYMid meet"></svg>
+      <div id="egohint"></div>
+      <div id="egotip"></div>
+    </div>
+    <div id="detail"></div>
+  </section>
+</main>
+<script>
+const DATA = /*__DATA__*/null;
+const $ = id => document.getElementById(id);
+const SLOTS = ["--s1","--s2","--s3","--s4","--s5","--s6","--s7","--s8","--s9","--s10","--s11","--s12"];
+const ENTS = DATA.ents, EDGES = DATA.edges, N = ENTS.length;
+function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+function clip(s,n){ s=String(s); return s.length>n ? s.slice(0,n-1)+"…" : s; }
+
+// ---- 类别 / 关系类型 → 稳定色槽（顺序取自数据分布，标签清单不硬编码）----
+const kindSlot = {}, edgeSlot = {};
+DATA.kinds.forEach((k,i)=> kindSlot[k.name] = SLOTS[i % SLOTS.length]);
+DATA.edgeTypes.forEach((t,i)=> edgeSlot[t.name] = SLOTS[i % SLOTS.length]);
+const kindColor = k => `var(${kindSlot[k] || "--s1"})`;
+const edgeColor = t => `var(${edgeSlot[t] || "--s1"})`;
+
+// ---- 邻接（出/入边索引）----
+const outE = Array.from({length:N}, ()=>[]), inE = Array.from({length:N}, ()=>[]);
+EDGES.forEach((e,ei)=>{ outE[e.s].push(ei); inE[e.t].push(ei); });
+
+// ---- 搜索索引 ----
+ENTS.forEach(e => { e._s = (e.kind+" "+e.ns+" "+e.cid+" "+e.disp).toLowerCase(); });
+
+// ---- 状态 ----
+let sel = null, qstr = "";
+const kindsOn = new Set(DATA.kinds.map(k=>k.name));
+const edgesOn = new Set(DATA.edgeTypes.map(t=>t.name));
+
+// 引用格式化：blocked_by/tainted_by 元素可能是字符串或 {file,line,摘要} 对象 → 可读文本
+function fmtRef(x){
+  if (x == null) return "";
+  if (typeof x !== "object") return String(x);
+  const loc = (x.file || x.doc || "") + (x.line != null ? ":" + x.line : "");
+  const extra = x.摘要 || x.digest || x.来源 || x.期望 || x.entry || "";
+  const s = (loc + (extra ? " " + extra : "")).trim();
+  return s || JSON.stringify(x);
+}
+
+// ================= 判定瓦片 =================
+function tileCls(t){
+  if (t.status === "broken") return "idet";
+  if (t.status === "tainted") return "warn";
+  if (t.status === "structurally_complete")
+    return t.result === "pass" ? "ok" : t.result === "fail" ? "bad" : "idet"; // result=null=informational→灰
+  return "idet";
+}
+function renderTiles(){
+  const vd = DATA.verdicts || {tiles:[]}, tiles = vd.tiles || [];
+  const bad = tiles.filter(t => t.status !== "structurally_complete" || t.result === "fail").length;
+  $("chksum").innerHTML = `判定概览 · schema ${esc(vd.schema_version || "—")}`
+    + (tiles.length ? ` · ${tiles.length} 项检查，${bad} 项非干净通过` : (vd.error ? ` · 判定不可用（${esc(vd.error)}）` : ""));
+  if (!tiles.length){ $("tiles").innerHTML = `<div class="muted">无判定数据（该特性为可选）。</div>`; return; }
+  $("tiles").innerHTML = tiles.map(t => {
+    const cls = tileCls(t);
+    const rp = t.result || "—";
+    let m = `<span class="badge">${esc(t.status)}</span> · ${esc(rp)} · 命中 ${t.findings}`;
+    if (t.blocked_by && t.blocked_by.length) m += ` · 阻断×${t.blocked_by.length}`;
+    if (t.tainted_by && t.tainted_by.length) m += ` · 污染×${t.tainted_by.length}`;
+    const tip = [].concat(
+      t.blocked_by && t.blocked_by.length ? ["阻断: "+t.blocked_by.map(fmtRef).join("、")] : [],
+      t.tainted_by && t.tainted_by.length ? ["污染源: "+t.tainted_by.map(fmtRef).join("、")] : []).join(" | ");
+    return `<div class="tile ${cls}"${tip?` title="${esc(tip)}"`:""}><div class="tk">${esc(t.key)}</div><div class="tm">${m}</div></div>`;
+  }).join("");
+}
+
+// ================= 过滤 chips =================
+function renderChips(){
+  $("kindchips").innerHTML = DATA.kinds.map(k =>
+    `<span class="chip kind${kindsOn.has(k.name)?"":" off"}" data-k="${esc(k.name)}">`
+    + `<i style="background:${kindColor(k.name)}"></i>${esc(k.name)} <span class="n">${k.count}</span></span>`).join("");
+  $("edgechips").innerHTML = DATA.edgeTypes.map(t =>
+    `<span class="chip edge${edgesOn.has(t.name)?"":" off"}" data-t="${esc(t.name)}">`
+    + `<i style="background:${edgeColor(t.name)}"></i>${esc(t.name)} <span class="n">${t.count}</span></span>`).join("");
+}
+
+// ================= 结果列表 =================
+const LIST_CAP = 400;
+function scored(){
+  const q = qstr;
+  let arr = [];
+  for (let i=0;i<N;i++){
+    const e = ENTS[i];
+    if (!kindsOn.has(e.kind)) continue;
+    if (q){
+      const pos = e._s.indexOf(q);
+      if (pos < 0) continue;
+      let rank = 5;   // cid 精确 > cid 前缀 > display 前缀 > 命中靠前，再按度数
+      if (e.cid.toLowerCase() === q) rank = 0;
+      else if (e.cid.toLowerCase().startsWith(q)) rank = 1;
+      else if (e.disp.toLowerCase().startsWith(q)) rank = 2;
+      else if (pos === 0) rank = 3;
+      arr.push([i, rank, pos]);
+    } else arr.push([i, 0, 0]);
+  }
+  arr.sort((a,b) => a[1]-b[1] || a[2]-b[2] || ENTS[b[0]].deg-ENTS[a[0]].deg
+    || ENTS[a[0]].disp.localeCompare(ENTS[b[0]].disp));
+  return arr.map(x => x[0]);
+}
+function renderList(){
+  const ids = scored();
+  const shown = ids.slice(0, LIST_CAP);
+  $("listmeta").textContent = qstr
+    ? `${ids.length} 个匹配${ids.length>LIST_CAP?`（显示前 ${LIST_CAP}）`:""}`
+    : `${ids.length} 个实体${ids.length>LIST_CAP?`（显示前 ${LIST_CAP}，可搜索/按类别收窄）`:""}`;
+  $("list").innerHTML = shown.map(i => {
+    const e = ENTS[i];
+    return `<li data-i="${i}"${i===sel?' class="sel"':''}>`
+      + `<span class="dot" style="background:${kindColor(e.kind)}"></span>`
+      + `<span class="nm" title="${esc(e.disp)}">${esc(e.disp)}</span>`
+      + `<span class="kd">${esc(e.kind)}</span><span class="dg">${e.deg}</span></li>`;
+  }).join("") || `<li class="muted" style="cursor:default">无匹配实体</li>`;
+}
+
+// ================= 选中 / 详情 =================
+function select(i){
+  i = +i;
+  if (!Number.isInteger(i) || i < 0 || i >= N) return;
+  sel = i;
+  // 详情最重要：先渲染详情+邻域图（即便后续高亮/滚动出错，详情已就绪）
+  renderDetail(i);
+  renderEgo(i);
+  $("graphbox").classList.add("on");
+  markSelected(i);
+}
+// 列表高亮就地更新（不重建 innerHTML，避免销毁正在派发 click 的节点）
+function markSelected(i){
+  const ul = $("list");
+  ul.querySelectorAll("li.sel").forEach(li => li.classList.remove("sel"));
+  const li = ul.querySelector(`li[data-i="${i}"]`);
+  if (li){ li.classList.add("sel"); li.scrollIntoView({block:"nearest"}); }
+}
+function clearSel(){
+  sel = null;
+  $("graphbox").classList.remove("on");
+  renderList();
+  renderEmpty();
+}
+function locHtml(doc, line){
+  if (!doc) return `<span class="muted">（无定义块）</span>`;
+  return `<span class="loc">${esc(doc)}<span class="sub">:${line}</span></span>`;
+}
+function renderDetail(i){
+  const e = ENTS[i];
+  const tags = [`<span class="tag">类别 <b>${esc(e.kind)}</b></span>`,
+               `<span class="tag">命名空间 <b>${esc(e.ns)}</b></span>`,
+               `<span class="tag">性质 <b>${esc(e.nature)}</b></span>`];
+  if (e.status) tags.push(`<span class="tag">状态 <b>${esc(e.status)}</b></span>`);
+  tags.push(`<span class="tag">关系度 <b>${e.deg}</b></span>`);
+  const attrKeys = Object.keys(e.attrs || {});
+  attrKeys.forEach(k => tags.push(`<span class="tag">${esc(k)} <b>${esc([].concat(e.attrs[k]).join("、"))}</b></span>`));
+
+  // 出/入边（受关系类型过滤）分组
+  const groupsHtml = (edgeIdxs, dir) => {
+    const by = {};
+    edgeIdxs.forEach(ei => {
+      const ed = EDGES[ei];
+      if (!edgesOn.has(ed.ty)) return;
+      (by[ed.ty] = by[ed.ty] || []).push(ei);
+    });
+    const types = Object.keys(by).sort((a,b) => by[b].length - by[a].length || a.localeCompare(b));
+    if (!types.length) return `<div class="muted" style="padding:2px 0">${edgeIdxs.length?"（已被关系类型过滤隐藏）":"（无）"}</div>`;
+    return types.map(ty => {
+      const rows = by[ty].map(ei => {
+        const ed = EDGES[ei];
+        const peer = dir === "out" ? ed.t : ed.s;
+        const pe = ENTS[peer];
+        return `<div class="erow" data-i="${peer}">`
+          + `<span class="arr">${dir==="out"?"→":"←"}</span>`
+          + `<span class="dot" style="background:${kindColor(pe.kind)}"></span>`
+          + `<span class="pn" title="${esc(pe.disp)}">${esc(pe.disp)}</span>`
+          + `<span class="pk">${esc(pe.kind)}</span>`
+          + `<span class="pv" title="method: ${esc(ed.method)}">${esc(ed.file)}:${ed.line}</span></div>`;
+      }).join("");
+      return `<div class="etgroup"><div class="et"><i style="background:${edgeColor(ty)}"></i>`
+        + `${esc(ty)}<span class="n">×${by[ty].length}</span></div>${rows}</div>`;
+    }).join("");
+  };
+
+  let html = `<div class="dhead"><span class="dot" style="background:${kindColor(e.kind)}"></span>`
+    + `<h2>${esc(e.disp)}</h2></div>`
+    + `<div class="dkey"><code>${esc(e.kind)} / ${esc(e.ns)} / ${esc(e.cid)}</code></div>`
+    + `<div class="tags">${tags.join("")}</div>`
+    + `<div class="drow"><div class="lab">定义位置</div>${locHtml(e.doc, e.line)}`;
+  if (e.cand && e.cand.length) html += `<div style="margin-top:3px">` + e.cand.map(c =>
+    `<div class="loc sub">另见定义块 ${esc(c.doc)}:${c.line}</div>`).join("") + `</div>`;
+  html += `<div class="cmd">python3 docstar.py trace ${esc(e.cid)}</div></div>`;
+  if (e.txt) html += `<div class="drow"><div class="lab">主体正文</div><pre class="body">${esc(e.txt)}</pre></div>`;
+  html += `<div class="edgesec"><h3>出边 <span class="n">${outE[i].length}（本实体指向谁）</span></h3>${groupsHtml(outE[i],"out")}</div>`;
+  html += `<div class="edgesec"><h3>入边 <span class="n">${inE[i].length}（谁指向本实体）</span></h3>${groupsHtml(inE[i],"in")}</div>`;
+  const d = $("detail");
+  d.innerHTML = html;
+  d.scrollTop = 0;
+}
+function renderEmpty(){
+  const rep = DATA.reports || {};
+  const repRows = Object.keys(rep).filter(k => rep[k] > 0)
+    .map(k => `<li>${esc(k)} <span class="muted">× ${rep[k]}</span></li>`).join("");
+  $("detail").innerHTML = `<div class="empty">`
+    + `<h2>实体图谱查询</h2>`
+    + `<p>左侧搜索或点选一个实体查看详情：类别、命名空间、性质、定义位置、主体正文，以及按关系类型分组的全部出入边（可点邻居跳转）。选中后上方显示其一跳邻域图。</p>`
+    + `<p style="margin-top:8px">用顶部搜索框按 <b>名称 / 标识 / 主键三元组</b> 定位；用左侧 <b>类别</b>、<b>关系类型</b> chips 过滤。</p>`
+    + `<div class="drow" style="margin-top:16px"><div class="lab">按类别分布</div><div class="kdist">`
+    + DATA.kinds.map(k => `<span class="chip"><i style="background:${kindColor(k.name)}"></i>${esc(k.name)} <span class="n">${k.count}</span></span>`).join("")
+    + `</div></div>`
+    + (repRows ? `<div class="drow"><div class="lab">抽取报告</div><ul style="margin-left:18px">${repRows}</ul></div>` : "")
+    + (DATA.unknown_documents && DATA.unknown_documents.length
+        ? `<div class="drow"><div class="lab">未分类文档 ×${DATA.unknown_documents.length}</div><div class="muted" style="word-break:break-all">${DATA.unknown_documents.map(esc).join("、")}</div></div>`
+        : `<div class="muted">分类完备：${DATA.classification_complete ? "是" : "否"}</div>`)
+    + `</div>`;
+}
+
+// ================= 邻域图（SVG ego，≤ 上限，防大图卡顿）=================
+const EGO_CAP = 60, CX = 400, CY = 250;
+let egoView = { k: 1, x: 0, y: 0 };
+function renderEgo(i){
+  const nb = new Map();   // peer index -> 连边计数（排序 + 半径用）
+  const collect = (idxs, isOut) => idxs.forEach(ei => {
+    const ed = EDGES[ei]; if (!edgesOn.has(ed.ty)) return;
+    const p = isOut ? ed.t : ed.s; if (p === i) return;
+    nb.set(p, (nb.get(p) || 0) + 1);
+  });
+  collect(outE[i], true); collect(inE[i], false);
+  let neigh = [...nb.keys()].sort((a,b) => (nb.get(b)-nb.get(a)) || (ENTS[b].deg-ENTS[a].deg));
+  const total = neigh.length, truncated = total > EGO_CAP;
+  neigh = neigh.slice(0, EGO_CAP);
+  const vis = new Set([i, ...neigh]);
+
+  // 径向布局：中心 + 同心环
+  const pos = {}; pos[i] = { x: CX, y: CY };
+  const perRing = 20;
+  neigh.forEach((idx, k) => {
+    const ring = Math.floor(k / perRing);
+    const cnt = Math.min(perRing, neigh.length - ring * perRing);
+    const p = k % perRing;
+    const rad = 135 + ring * 78;
+    const ang = (p / cnt) * 2 * Math.PI - Math.PI / 2 + ring * 0.32;
+    pos[idx] = { x: CX + Math.cos(ang) * rad, y: CY + Math.sin(ang) * rad * 0.8 };
+  });
+  const nrad = idx => idx === i ? 12 : Math.max(5, Math.min(11, 4 + Math.sqrt(ENTS[idx].deg)));
+
+  // 可见边（两端都在 vis 且类型激活）
+  const seenLk = new Set(), links = [];
+  EDGES.forEach(ed => {
+    if (!edgesOn.has(ed.ty) || !vis.has(ed.s) || !vis.has(ed.t) || ed.s === ed.t) return;
+    const key = ed.s+"|"+ed.t+"|"+ed.ty; if (seenLk.has(key)) return; seenLk.add(key);
+    links.push(ed);
+  });
+
+  const lkSvg = links.map(ed => {
+    const a = pos[ed.s], b = pos[ed.t];
+    const dx = b.x-a.x, dy = b.y-a.y, d = Math.hypot(dx,dy) || 1;
+    const ra = nrad(ed.s), rb = nrad(ed.t);
+    const x1 = a.x + dx/d*ra, y1 = a.y + dy/d*ra;
+    const x2 = b.x - dx/d*(rb+7), y2 = b.y - dy/d*(rb+7);
+    const slot = (edgeSlot[ed.ty] || "--s1").slice(2);
+    return `<line class="lk" x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="var(${edgeSlot[ed.ty]||"--s1"})" marker-end="url(#arw-${slot})"><title>${esc(ed.ty)}: ${esc(ENTS[ed.s].disp)} → ${esc(ENTS[ed.t].disp)}</title></line>`;
+  }).join("");
+
+  const order = [...neigh, i];   // 中心最后画（叠在最上）
+  const ndSvg = order.map(idx => {
+    const p = pos[idx], e = ENTS[idx], r = nrad(idx);
+    const lab = clip(e.disp, idx === i ? 20 : 14);
+    return `<g class="node${idx===i?" center":""}" data-i="${idx}" transform="translate(${p.x.toFixed(1)},${p.y.toFixed(1)})">`
+      + `<circle r="${r}" fill="${kindColor(e.kind)}"></circle>`
+      + `<text y="${(-r-4).toFixed(1)}">${esc(lab)}</text>`
+      + `<title>${esc(e.disp)} · ${esc(e.kind)}</title></g>`;
+  }).join("");
+
+  const usedTy = [...new Set(links.map(l => l.ty))];
+  const legend = usedTy.map((ty, k) =>
+    `<g transform="translate(12,${16 + k*15})"><line x1="0" y1="0" x2="16" y2="0" stroke="var(${edgeSlot[ty]||"--s1"})" stroke-width="2.4"></line>`
+    + `<text x="21" y="3.5" fill="var(--ink-3)" font-size="10.5">${esc(ty)}</text></g>`).join("");
+
+  const markers = DATA.edgeTypes.map(t => {
+    const slot = (edgeSlot[t.name] || "--s1").slice(2);
+    return `<marker id="arw-${slot}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(${edgeSlot[t.name]||"--s1"})"></path></marker>`;
+  }).join("");
+
+  const svg = $("ego");
+  svg.setAttribute("viewBox", `0 0 ${CX*2} ${CY*2}`);
+  egoView = { k: 1, x: 0, y: 0 };
+  svg.innerHTML = `<defs>${markers}</defs><g id="egoLegend">${legend}</g><g id="egoZoom">${lkSvg}${ndSvg}</g>`;
+  $("egohint").textContent = truncated
+    ? `一跳邻域：${neigh.length}/${total} 邻居（按关系度截取）· 点节点跳转`
+    : `一跳邻域：${neigh.length} 邻居 · 点节点跳转 · 滚轮缩放 · 拖拽平移`;
+  bindEgo();
+}
+function egoTransform(){ const z = $("egoZoom"); if (z) z.setAttribute("transform", `translate(${egoView.x},${egoView.y}) scale(${egoView.k})`); }
+function bindEgo(){
+  $("ego").querySelectorAll(".node[data-i]").forEach(g => {
+    g.addEventListener("mousemove", ev => {
+      const e = ENTS[+g.dataset.i], tip = $("egotip"), box = $("graphbox").getBoundingClientRect();
+      tip.style.display = "block";
+      tip.innerHTML = `<b>${esc(e.disp)}</b><br>${esc(e.kind)} · ${esc(e.ns)}<br>关系度 ${e.deg}`;
+      tip.style.left = Math.min(ev.clientX - box.left + 12, box.width - 250) + "px";
+      tip.style.top = (ev.clientY - box.top + 12) + "px";
+    });
+    g.addEventListener("mouseleave", () => { $("egotip").style.display = "none"; });
+  });
+}
+// 邻域图缩放/平移（一次性绑定，作用于持续存在的 <svg>）
+(function(){
+  const svg = $("ego"); let pan = null;
+  svg.addEventListener("wheel", ev => {
+    ev.preventDefault();
+    egoView.k = Math.min(Math.max(egoView.k * Math.pow(1.0015, -ev.deltaY), 0.4), 5);
+    egoTransform();
+  }, { passive: false });
+  svg.addEventListener("pointerdown", ev => {
+    if (ev.target.closest(".node")) return;
+    pan = { x: ev.clientX, y: ev.clientY, ox: egoView.x, oy: egoView.y };
+    svg.setPointerCapture(ev.pointerId); svg.style.cursor = "grabbing";
+  });
+  svg.addEventListener("pointermove", ev => {
+    if (!pan) return;
+    egoView.x = pan.ox + (ev.clientX - pan.x); egoView.y = pan.oy + (ev.clientY - pan.y); egoTransform();
+  });
+  svg.addEventListener("pointerup", () => { pan = null; svg.style.cursor = ""; });
+})();
+
+// ================= 头部控件 =================
+$("q").addEventListener("input", ev => { qstr = ev.target.value.trim().toLowerCase(); renderList(); });
+$("q").addEventListener("keydown", ev => {
+  if (ev.key !== "Enter") return;
+  const ids = scored(); if (ids.length) select(ids[0]);
+});
+$("clear").onclick = () => { $("q").value = ""; qstr = ""; clearSel(); };
+$("kall").onclick = () => { DATA.kinds.forEach(k => kindsOn.add(k.name)); renderChips(); renderList(); };
+$("eall").onclick = () => {
+  DATA.edgeTypes.forEach(t => edgesOn.add(t.name)); renderChips();
+  if (sel !== null){ renderDetail(sel); renderEgo(sel); }
+};
+$("theme").onclick = () => {
+  const cur = document.documentElement.getAttribute("data-theme");
+  const dark = cur ? cur === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  document.documentElement.setAttribute("data-theme", dark ? "light" : "dark");
+};
+
+// ================= 事件委托（绑定在持久容器上，跨重渲染始终有效）=================
+$("list").addEventListener("click", ev => {
+  const li = ev.target.closest("li[data-i]");
+  if (li) select(+li.dataset.i);
+});
+$("detail").addEventListener("click", ev => {
+  const r = ev.target.closest(".erow[data-i]");
+  if (r) select(+r.dataset.i);
+});
+$("ego").addEventListener("click", ev => {
+  const g = ev.target.closest(".node[data-i]");
+  if (g) select(+g.dataset.i);
+});
+$("kindchips").addEventListener("click", ev => {
+  const c = ev.target.closest(".chip[data-k]"); if (!c) return;
+  const k = c.dataset.k; kindsOn.has(k) ? kindsOn.delete(k) : kindsOn.add(k);
+  renderChips(); renderList();
+});
+$("edgechips").addEventListener("click", ev => {
+  const c = ev.target.closest(".chip[data-t]"); if (!c) return;
+  const t = c.dataset.t; edgesOn.has(t) ? edgesOn.delete(t) : edgesOn.add(t);
+  renderChips();
+  if (sel !== null){ renderDetail(sel); renderEgo(sel); }
+});
+
+// ================= 初始化 =================
+$("stats").textContent = `${DATA.counts.entities} 实体 · ${DATA.counts.edges} 关系 · ${DATA.kinds.length} 类别 · ${DATA.edgeTypes.length} 关系类型 · 生成于 ${DATA.generated}`;
+renderTiles();
+renderChips();
+renderList();
+renderEmpty();
+</script>
+</body>
+</html>

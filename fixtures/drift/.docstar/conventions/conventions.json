@@ -1,0 +1,34 @@
+{
+  "version": "1",
+  "namespaces": {
+    "prefix_namespaces": {},
+    "kind_namespace": {},
+    "req_doc": "requirements.md",
+    "param_registry": "parameters.md",
+    "task_doc_stem": "tasks",
+    "mapping_doc_stem": "mapping"
+  },
+  "def_forms": {
+    "需求AC": "^-\\s*\\*\\*(REQ-\\d+)\\*\\*",
+    "参数": "^\\|\\s*`([A-Za-z_][A-Za-z0-9_]*)`[^|]*\\|",
+    "任务": "^\\|\\s*\\*\\*(TASK-\\d+)\\*\\*"
+  },
+  "term_forms": {
+    "inplace": "\\*\\*([^*]{2,40})\\*\\*\\s*[（(]\\s*(?:定义|def)\\s*[:：]\\s*([^）)]+)\\s*[）)]",
+    "glossary": "^-?\\s*\\*\\*([^*]{2,40})\\*\\*\\s*[:：](.{4,})"
+  },
+  "form_headers": {
+    "ledger": "^\\|\\s*(?:date|日期)\\s*\\|\\s*(?:change|变更)\\s*\\|",
+    "changelist": "^\\|\\s*(?:item|项)\\s*\\|\\s*(?:location|落点|文档与落点)\\b",
+    "glossary_section": "(?i)术语表|名词解释|词汇表|glossary"
+  },
+  "harvest": {
+    "len_range": [2, 40],
+    "exclude": ["^\\d+$", "^\\d{4}-\\d{2}-\\d{2}$", "^v?\\d+(?:\\.\\d+)+[a-z]?$"]
+  },
+  "managed_values": [
+    {"name": "协议版本", "owner_kind": null, "occ": "协议版本[：:]\\s*(v[0-9.]+)", "scope": null},
+    {"name": "重试上限", "owner_kind": null, "occ": "重试上限[：:]\\s*(\\d+)", "scope": null},
+    {"name": "唯一常量", "owner_kind": null, "occ": "唯一常量[：:]\\s*([A-Z0-9]+)", "scope": null}
+  ]
+}

@@ -1,0 +1,22 @@
+{
+ "context_manifest": {
+  "corpus_revision": "worktree",
+  "tool_version": "eg-2",
+  "conventions_hash": "6223646ae0bf823c",
+  "conventions_source": "project",
+  "mode": "verify",
+  "budget": null,
+  "output_hash": "753ba7d3c8830743"
+ },
+ "schema_version": "eg-2",
+ "baseline": "HEAD",
+ "baseline_来源": "显式指定",
+ "scan_root": ".",
+ "引入实体": [],
+ "删除实体": [],
+ "引入边": [],
+ "删除边": [],
+ "引入缺陷": [],
+ "进图缺失": [],
+ "局限说明": "移动=旧实体删除+新实体新增（主键含路径/文档stem，MVP 不承诺移动下身份稳定）；git rename map 归一列=未实现（下一相）；诊断身份不含 file/line（仅展示）。"
+}
