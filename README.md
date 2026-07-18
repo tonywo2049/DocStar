@@ -63,8 +63,8 @@ DocStar separates human language from machine contracts:
 - `--json` always emits the `eg-3` English schema. `--lang` never changes JSON.
 - New graph-governed project documents use stable English frontmatter keys and tokens;
   prose and headings may be English or Chinese.
-- Legacy Chinese keys such as `性质`, `上游`, and `下游` remain accepted as input
-  for migration, but new templates do not emit them.
+- Legacy Chinese keys such as `性质`, `上游`, and `下游` remain accepted as migration
+  input, but new documents use the canonical keys.
 
 The shared project-document metadata contract is:
 
@@ -78,8 +78,13 @@ type: requirement # see the writing guide
 nature: normative # normative | descriptive
 ```
 
-See [references/writing-guide.md](references/writing-guide.md) for complete English
-and Chinese templates.
+See [references/writing-guide.md](references/writing-guide.md) for bilingual structural
+rules and a content checklist. DocStar does not prescribe document headings or layout;
+the governing workflow or Skill defines required content.
+
+Platform control files are outside the document corpus: `AGENTS.md`, `CLAUDE.md`,
+`SKILL.md`, hidden agent configuration directories, and the repository-root `agents/`
+directory. A domain-document directory such as `docs/agents/` remains in the corpus.
 
 ## Zero configuration and conventions
 

@@ -1273,6 +1273,16 @@ def a_bilingual_docs():
     missing_tokens = [token for token in tokens if token not in writing_en or token not in writing_zh]
     ok("docs/writing_contract_parity", not missing_tokens,
        f"两种语言的写作规范共享机器 token；缺失={missing_tokens}")
+    removed_skeleton_markers = (
+        "## Normative template", "## Descriptive templates", "# <Title>",
+        "## 规范文档模板", "## 记述文档模板", "# <标题>",
+    )
+    skeleton_hits = [
+        marker for marker in removed_skeleton_markers
+        if marker in writing_en or marker in writing_zh
+    ]
+    ok("docs/no_copy_ready_skeletons", not skeleton_hits,
+       f"写作指南只保留内容契约与检查清单，不含可复制章节骨架；残留={skeleton_hits}")
     canonical_task_header = "| # | task | spec anchor | prerequisite | failing test | status |"
     task_surfaces = [
         writing_en,
@@ -1283,7 +1293,7 @@ def a_bilingual_docs():
     ok("docs/canonical_task_header",
        all(canonical_task_header in text and "| # | goal |" not in text
            for text in task_surfaces),
-       "DocStar 双语模板与 GMGN fixture 共用完整的固定任务表头")
+       "DocStar 双语写作契约与 GMGN fixture 共用完整的固定任务表头")
 
 
 # ---- EG-31/DG-62 投影查询面功能语义（critic 轮1 处置 A-M1/B-M1：EXPECTED_TOP 已锁顶层键，本组锁数据内容） ----

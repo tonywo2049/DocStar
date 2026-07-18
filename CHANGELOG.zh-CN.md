@@ -32,6 +32,9 @@ English: [CHANGELOG.md](CHANGELOG.md)
 - 增加内置 `gmgn-v1` 约定预设。
 - 统一 GMGN 元数据、文档类型、工作状态、任务表头，以及
   Goal → Requirement → Design → Task 抽取链。
+- 删除可复制的文档章节骨架，改用不限制版式的结构契约与检查清单；GMGN 各阶段 Skill 继续作为
+  必备内容权威。
+- 排除 Claude Code 仓库根的 `agents/` 控制目录，但保留 `docs/agents/` 这类业务文档目录。
 
 ### 维护
 

@@ -1,6 +1,6 @@
 ---
 locale: zh-CN
-purpose: 定义双语 Markdown 元信息、实体写法和可复用模板。
+purpose: 定义双语 Markdown 元信息、实体写法和不限制版式的结构检查清单。
 status: approved
 type: writing-guide
 nature: normative
@@ -46,99 +46,27 @@ GMGN profile 把 `type` 固定为 `whitepaper`、`roadmap`、`goal`、`requireme
 
 普通散文中的加粗不是实体；日期、状态等纯标量不会被猜成关系。
 
-## 规范文档模板——英文正文
+## 内容契约，不提供版式模板
 
-```markdown
----
-locale: en
-purpose: <what this document decides or requires>
-upstream:
-  - [<source>](<source>.md)
-downstream:
-  - [<consumer>](<consumer>.md)
-status: draft
-type: requirement
-nature: normative
----
+DocStar 不规定标题、章节顺序或行文形态。开始写作前，先从项目工作流或当前阶段 Skill 取得
+内容契约，其中必须说明：
 
-# <Title>
+- 文档回答的权威问题、`type`、`nature` 与初始 `status`；
+- 必须包含的事实或决策，以及明确排除项；
+- 真实的上下游权威；
+- 稳定 ID 和解析器需要读取的固定表头；
+- 自检与验证要求。
 
-## Requirements
+Author 可以选择任何清楚且满足要求的结构。Critic / Reviewer 按同一内容契约审查，不按可复制
+章节骨架审查。不得把本指南重新扩成项目文档模板。
 
-- **R1** — <verifiable requirement>.
+下游必须遵守本文义务、判据或裁决时用 `nature: normative`；调研、实验、日志、Handoff 或事件
+记录不单独设门禁时用 `nature: descriptive`。
 
-## Acceptance Criteria
+交接前检查：七个 frontmatter 键齐全；每条声明边都是真实链接或明确 `none`；实体 ID 稳定且
+唯一；定义位于带类型的小节；正文语言与 `locale` 一致；`verify --json` 没有新增断裂。
 
-- **R1-AC1** — <deterministic acceptance condition>.
-```
-
-## 规范文档模板——中文正文
-
-```markdown
----
-locale: zh-CN
-purpose: <本文决定或要求什么>
-upstream:
-  - [<上游显示名>](<source>.md)
-downstream:
-  - [<下游显示名>](<consumer>.md)
-status: draft
-type: requirement
-nature: normative
----
-
-# <标题>
-
-## 需求
-
-- **R1** — <可验证需求>。
-
-## 验收标准
-
-- **R1-AC1** — <确定性验收条件>。
-```
-
-两者只改变正文；键、枚举、文件名和 ID 不变。
-
-## 记述文档模板
-
-英文：
-
-```markdown
----
-locale: en
-purpose: Record <investigation, experiment, handoff, or event>.
-upstream: [<subject>](<spec>.md)
-downstream: none (record only)
-status: approved
-type: research
-nature: descriptive
----
-
-# <What happened or was studied>
-
-The findings reference <spec> §2 but impose no requirement on it.
-```
-
-中文：
-
-```markdown
----
-locale: zh-CN
-purpose: 记录<调研、实验、交接或事件>。
-upstream: [<对象>](<spec>.md)
-downstream: none (record only)
-status: approved
-type: research
-nature: descriptive
----
-
-# <发生了什么或研究了什么>
-
-本文引用 <spec> §2，但不对它新增要求。
-```
-
-## GMGN 任务表
+## GMGN 解析接口任务表头
 
 表头属于机器接口，中英文正文都保持英文：
 

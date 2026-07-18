@@ -1,6 +1,6 @@
 ---
 locale: en
-purpose: Define bilingual Markdown metadata, entity syntax, and reusable templates.
+purpose: Define bilingual Markdown metadata, entity syntax, and a layout-free structural checklist.
 status: approved
 type: writing-guide
 nature: normative
@@ -53,99 +53,30 @@ aliases. Do not use them in new files.
 Ordinary bold prose is not an entity. Plain scalar metadata such as dates or status
 is not guessed to be a relationship.
 
-## Normative template — English prose
+## Content contract without a layout template
 
-```markdown
----
-locale: en
-purpose: <what this document decides or requires>
-upstream:
-  - [<source>](<source>.md)
-downstream:
-  - [<consumer>](<consumer>.md)
-status: draft
-type: requirement
-nature: normative
----
+DocStar does not prescribe headings, section order, or prose shape. Before authoring, obtain
+the content contract from the governing project workflow or stage Skill. It must state:
 
-# <Title>
+- the document's authoritative question, `type`, `nature`, and initial `status`;
+- required facts or decisions and explicit exclusions;
+- real upstream/downstream authorities;
+- stable IDs and any parser-facing table headers;
+- self-check and verification requirements.
 
-## Requirements
+The Author may choose any clear structure that satisfies those requirements. A Critic or
+reviewer checks the result against the same content contract, not against a copy-ready
+skeleton. Do not turn this guide into a project-document template.
 
-- **R1** — <verifiable requirement>.
+Use `nature: normative` when downstream work must obey the document's obligations,
+criteria, or rulings. Use `nature: descriptive` for investigation, experiments, logs,
+handoffs, or event records that do not independently establish a gate.
 
-## Acceptance Criteria
+Before handoff, confirm that all seven frontmatter keys are present, every declared edge is
+real or explicitly `none`, entity IDs are stable and unique, definitions sit under a typed
+section, prose language matches `locale`, and `verify --json` reports no introduced break.
 
-- **R1-AC1** — <deterministic acceptance condition>.
-```
-
-## Normative template — Chinese prose
-
-```markdown
----
-locale: zh-CN
-purpose: <本文决定或要求什么>
-upstream:
-  - [<上游显示名>](<source>.md)
-downstream:
-  - [<下游显示名>](<consumer>.md)
-status: draft
-type: requirement
-nature: normative
----
-
-# <标题>
-
-## 需求
-
-- **R1** — <可验证需求>。
-
-## 验收标准
-
-- **R1-AC1** — <确定性验收条件>。
-```
-
-The prose differs; keys, enums, filenames, and IDs do not.
-
-## Descriptive templates
-
-English:
-
-```markdown
----
-locale: en
-purpose: Record <investigation, experiment, handoff, or event>.
-upstream: [<subject>](<spec>.md)
-downstream: none (record only)
-status: approved
-type: research
-nature: descriptive
----
-
-# <What happened or was studied>
-
-The findings reference <spec> §2 but impose no requirement on it.
-```
-
-中文：
-
-```markdown
----
-locale: zh-CN
-purpose: 记录<调研、实验、交接或事件>。
-upstream: [<对象>](<spec>.md)
-downstream: none (record only)
-status: approved
-type: research
-nature: descriptive
----
-
-# <发生了什么或研究了什么>
-
-本文引用 <spec> §2，但不对它新增要求。
-```
-
-## GMGN task table
+## GMGN parser-facing task header
 
 The table header is a machine surface and stays English in both prose editions:
 

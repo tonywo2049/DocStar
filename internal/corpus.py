@@ -24,15 +24,17 @@ TOOL_DIR = Path(__file__).resolve().parent                        # 工具自身
 EXCLUDE_PARTS = frozenset({
     ".git", ".agents", ".claude", ".codex", ".docstar", "node_modules",
 })
+ROOT_CONTROL_DIRS = frozenset({"agents"})
 CONTROL_DOC_BASENAMES = frozenset({
     "agent.md", "agents.md", "agents.override.md", "claude.md", "skill.md",
 })
 
 
 def excluded_doc(rel):
-    """AI agent 控制文档与工具配置子树不入语料。basename 匹配大小写不敏感。"""
+    """控制文件、隐藏配置子树和仓库根 agents/ 不入语料；业务 docs/agents/ 保留。"""
     parts = Path(rel).parts
     return (any(part in EXCLUDE_PARTS for part in parts)
+            or bool(parts and parts[0] in ROOT_CONTROL_DIRS)
             or bool(parts and parts[-1].casefold() in CONTROL_DOC_BASENAMES))
 
 # ==================== 1. Source：扫描源抽象（DG-21） ====================
@@ -414,10 +416,11 @@ def _selftest():
     # 5b. AI agent 控制文档不是业务语料；工作树与 git 快照必须共用同一边界。
     with tempfile.TemporaryDirectory() as tmp:
         probe = Path(tmp)
-        included = {"visible.md", "nested/keep.md"}
+        included = {"visible.md", "nested/keep.md", "docs/agents/architecture.md"}
         files = {
-            "visible.md", "nested/keep.md",
+            "visible.md", "nested/keep.md", "docs/agents/architecture.md",
             "AGENT.md", "agents.md", "nested/AgEnTs.Override.md", "nested/ClAuDe.md", "SKILL.md",
+            "agents/author.md", "agents/reviewer.md",
             ".agents/skills/docstar/SKILL.md", ".codex/control.md", ".claude/control.md",
         }
         for rel in files:
@@ -426,7 +429,7 @@ def _selftest():
             p.write_text(f"# {rel}\n", encoding="utf-8")
 
         file_docs = set(FileSource(probe).docs())
-        check("FileSource：排除 agent/claude/skill 控制文档（basename 大小写不敏感）",
+        check("FileSource：排除 agent/claude/skill 控制文档与根 agents/，保留 docs/agents/",
               file_docs == included)
 
         def git(*args):
@@ -439,7 +442,7 @@ def _selftest():
             git("-c", "user.name=DocStar Selftest", "-c", "user.email=selftest@example.invalid",
                 "commit", "-qm", "fixture")
             git_docs = set(GitSource("HEAD", repo=probe).docs())
-            check("GitSource：与 FileSource 同语义排除 agent/claude/skill 控制文档",
+            check("GitSource：与 FileSource 同语义排除控制文档与根 agents/",
                   git_docs == included and git_docs == file_docs)
         except (subprocess.CalledProcessError, FileNotFoundError):
             check("GitSource：自验证临时仓可用", False)

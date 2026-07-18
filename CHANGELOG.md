@@ -34,6 +34,10 @@ schema-contract stamp.
 - Added the bundled `gmgn-v1` conventions preset.
 - Standardized GMGN metadata, document types, work status, task-table headers, and
   Goal → Requirement → Design → Task extraction.
+- Replaced copy-ready document skeletons with a layout-free structural contract and
+  checklist; GMGN stage Skills remain the content authorities.
+- Excluded Claude Code's repository-root `agents/` control directory without excluding
+  domain documentation such as `docs/agents/`.
 
 ### Maintenance
 

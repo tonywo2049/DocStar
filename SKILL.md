@@ -95,7 +95,7 @@ Apply these rules:
 5. Declare `nature` at document birth; do not guess missing values.
 6. Run `verify` before commit or handoff.
 
-For copyable English and Chinese templates, read
+For bilingual structural rules and the layout-free content checklist, read
 [references/writing-guide.md](references/writing-guide.md) or
 [references/writing-guide.zh-CN.md](references/writing-guide.zh-CN.md), matching the
 project language.

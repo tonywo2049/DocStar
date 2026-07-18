@@ -60,7 +60,7 @@ DocStar 把人类语言和机器契约分开：
 - `--lang en|zh-CN` 只切换帮助、CLI 和 HTML 的人类可读标签。
 - `--json` 始终输出 `eg-3` 英文 schema，完全不受 `--lang` 影响。
 - 新建且纳入文档图管理的项目文档使用固定英文 frontmatter 键和值；正文和标题可以写中文或英文。
-- `性质`、`上游`、`下游` 等旧中文键仍可读，便于迁移，但新模板不再生成。
+- `性质`、`上游`、`下游` 等旧中文键仍可作为迁移输入，但新文档使用 canonical 键。
 
 共享项目文档元信息契约如下：
 
@@ -74,8 +74,12 @@ type: requirement # 类型表见写作指南
 nature: normative # normative | descriptive
 ```
 
-完整中英文模板见
-[references/writing-guide.zh-CN.md](references/writing-guide.zh-CN.md)。
+双语结构规则与内容检查清单见
+[references/writing-guide.zh-CN.md](references/writing-guide.zh-CN.md)。DocStar 不规定章节或版式；
+必备内容由项目工作流或当前 Skill 定义。
+
+平台控制文件不属于文档语料：`AGENTS.md`、`CLAUDE.md`、`SKILL.md`、隐藏的 agent 配置目录，
+以及仓库根的 `agents/`。`docs/agents/` 这类业务文档目录仍会进入语料。
 
 ## 零配置与 conventions
 
