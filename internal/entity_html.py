@@ -112,7 +112,7 @@ def cmd_html_entity(g, conv, out):
     tpl = (Path(__file__).parent / "entity_template.html").read_text(encoding="utf-8")
     html = tpl.replace("/*__DATA__*/null",
                        json.dumps(payload, ensure_ascii=False).replace("</", "<\\/"))
-    out_path = Path(out) if out else Path(__file__).parent / "entity_graph.html"
+    out_path = Path(out) if out else Path("entity_graph.html")
     if not out_path.is_absolute():
         out_path = Path.cwd() / out_path
     out_path.write_text(html, encoding="utf-8")

@@ -10,15 +10,17 @@
 #     但性能断言在共享 runner 上随负载抖动误红。
 #   → CI 恒用 --skip-slow，只跑 A+B；layer_c 由维护者在本机全量档覆盖。
 #
-# 【退出码契约】tests.py main() 仅在「TB 自有逻辑红」时 return 1；对照红 / TDD 待建 /
-#   golden 待重锁均 return 0（见 tests.py main() 末尾注释）。CI 以退出码判定通过即可，
-#   无需额外解析输出。
+# 【退出码契约】tests.py 对任一真实 FAIL（逻辑红、对照红、TDD 待建、golden 待重锁）
+#   return 1；INFO 不代表失败。CI 以退出码判定通过即可，无需额外解析输出。
 
 name: tests
 
 on:
   push:
   pull_request:
+
+permissions:
+  contents: read
 
 jobs:
   tests:

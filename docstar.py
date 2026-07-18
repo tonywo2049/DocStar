@@ -20,7 +20,7 @@
   python3 docstar.py verify           # 增量差分+进图自查（EG-14，实体层）
   python3 docstar.py classify --pending|--validate  # 文档性质分类（EG-11-AC6）
   python3 docstar.py harvest          # 未标注高频词提示（实体层）
-  任意命令加 --json 输出机器可读 JSON。
+  除 html/html-entity 外的查询与分析命令加 --json 输出机器可读 JSON；HTML 命令始终写文件。
   旗标：
     --corpus DIR          替换扫描根=语料根（fixtures 隔离级；默认全仓）
     --conventions DIR     显式约定集（DG-33；未指定→语料根 .docstar/conventions/ →祖先走查至 git 边界[DG-55] →内置默认）
@@ -30,7 +30,7 @@
     check --gate 键1,键2  指定判定项非空→退出码 1；键名拼错→退出码 2（fail-closed）
     verify --baseline REV 差分基线 git revision；classify --validate --baseline REV --manifest SCOPE
     harvest --baseline F  对上次输出文件做差量视图
-  实体层 JSON 形状权威=golden/*.json 字节锁定基线（tests.py 层 B 逐字节校验；命令→顶层键契约表见 SKILL.md「JSON output contract」）。
+  实体层 JSON 形状权威=golden/*.json 字节锁定基线（tests.py 层 B 逐字节校验；命令→顶层键契约表见 references/command-contracts.md）。
 """
 
 import json
@@ -42,7 +42,7 @@ from fnmatch import fnmatchcase
 from pathlib import Path
 from urllib.parse import unquote
 
-__version__ = "0.1.0"   # 发布版本（语义化）；与 manifest 的 tool_version="eg-2"（schema 契约戳，DG-43）正交
+__version__ = "0.1.1"   # 发布版本（语义化）；与 manifest 的 tool_version="eg-2"（schema 契约戳，DG-43）正交
 
 sys.path.insert(0, str(Path(__file__).resolve().parent / "internal"))  # 内部模块（corpus/entity_*）迁入 internal/
 
@@ -751,7 +751,7 @@ def cmd_html(g, out):
     tpl = (Path(__file__).parent / "internal" / "graph_template.html").read_text(encoding="utf-8")
     html = tpl.replace("/*__DATA__*/null",
                        json.dumps(payload, ensure_ascii=False).replace("</", "<\\/"))
-    out_path = Path(out) if out else Path(__file__).parent / "graph.html"
+    out_path = Path(out) if out else Path("graph.html")
     if not out_path.is_absolute():
         out_path = Path.cwd() / out_path
     out_path.write_text(html, encoding="utf-8")
@@ -869,7 +869,7 @@ def main(argv):
         if verify_migrate:                                 # DG-49（波13-P2 交付 cmd_verify_migrate）
             if mod and hasattr(mod, "cmd_verify_migrate"):
                 return mod.cmd_verify_migrate(g, conv, baseline, as_json)
-            print("verify --migrate 未交付（波13-P2，见 实体图谱任务.md）", file=sys.stderr)
+            print("verify --migrate 不可用：entity_verify 模块缺失或版本不含迁移模式", file=sys.stderr)
             return 2
         return mod.cmd_verify(g, conv, baseline, as_json) if mod else 2
     if cmd == "drift":

@@ -21,7 +21,19 @@ from pathlib import Path
 # 消费者（FileSource 默认根 / GitSource 仓库 / entity_verify 的 git 操作）据此自动落到语料仓。
 ROOT = Path.cwd()
 TOOL_DIR = Path(__file__).resolve().parent                        # 工具自身目录（模板/fixtures 等自带资产）
-EXCLUDE_PARTS = {".git", ".claude", ".docstar", "node_modules"}   # .docstar=约定配置目录，非语料
+EXCLUDE_PARTS = frozenset({
+    ".git", ".agents", ".claude", ".codex", ".docstar", "node_modules",
+})
+CONTROL_DOC_BASENAMES = frozenset({
+    "agent.md", "agents.md", "agents.override.md", "claude.md", "skill.md",
+})
+
+
+def excluded_doc(rel):
+    """AI agent 控制文档与工具配置子树不入语料。basename 匹配大小写不敏感。"""
+    parts = Path(rel).parts
+    return (any(part in EXCLUDE_PARTS for part in parts)
+            or bool(parts and parts[-1].casefold() in CONTROL_DOC_BASENAMES))
 
 # ==================== 1. Source：扫描源抽象（DG-21） ====================
 # scan(src) 消费 Source；工作树与 git revision 同一接口，verify --baseline 无需第二套扫描逻辑。
@@ -38,7 +50,7 @@ class FileSource:
         out = []
         for p in sorted(self.root.rglob("*.md")):
             rel = p.relative_to(self.root)
-            if any(part in EXCLUDE_PARTS for part in rel.parts):
+            if excluded_doc(rel):
                 continue
             out.append(rel.as_posix())   # rel 恒 POSIX `/`（Windows 归一；GitSource 天然 `/`——docs glob 与全库 `/` 假设跨平台一致，DG-59 分隔符教训）
         return out
@@ -78,7 +90,7 @@ class GitSource:
             if not path.endswith(".md"):
                 continue
             rel = path[len(prefix):] if path.startswith(prefix) else path
-            if any(part in EXCLUDE_PARTS for part in Path(rel).parts):
+            if excluded_doc(rel):
                 continue
             out.append(rel)
         return sorted(out)
@@ -282,6 +294,7 @@ def same_dir_pick(candidates, src_rel):
 
 def _selftest():
     import re as _re
+    import tempfile
     ok = True
 
     def check(name, cond):
@@ -381,6 +394,39 @@ def _selftest():
         p in Path(d).parts for d in docs for p in EXCLUDE_PARTS))
     check("FileSource：可读文本", bool(src.text(docs[0])) if docs else False)
     check("FileSource：rel 为语料相对（非绝对）", all(not Path(d).is_absolute() for d in docs))
+
+    # 5b. AI agent 控制文档不是业务语料；工作树与 git 快照必须共用同一边界。
+    with tempfile.TemporaryDirectory() as tmp:
+        probe = Path(tmp)
+        included = {"visible.md", "nested/keep.md"}
+        files = {
+            "visible.md", "nested/keep.md",
+            "AGENT.md", "agents.md", "nested/AgEnTs.Override.md", "nested/ClAuDe.md", "SKILL.md",
+            ".agents/skills/docstar/SKILL.md", ".codex/control.md", ".claude/control.md",
+        }
+        for rel in files:
+            p = probe / rel
+            p.parent.mkdir(parents=True, exist_ok=True)
+            p.write_text(f"# {rel}\n", encoding="utf-8")
+
+        file_docs = set(FileSource(probe).docs())
+        check("FileSource：排除 agent/claude/skill 控制文档（basename 大小写不敏感）",
+              file_docs == included)
+
+        def git(*args):
+            return subprocess.run(
+                ["git", "-C", str(probe), *args], capture_output=True, text=True, check=True)
+
+        try:
+            git("init", "-q")
+            git("add", ".")
+            git("-c", "user.name=DocStar Selftest", "-c", "user.email=selftest@example.invalid",
+                "commit", "-qm", "fixture")
+            git_docs = set(GitSource("HEAD", repo=probe).docs())
+            check("GitSource：与 FileSource 同语义排除 agent/claude/skill 控制文档",
+                  git_docs == included and git_docs == file_docs)
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            check("GitSource：自验证临时仓可用", False)
 
     print("\n  corpus 自验证：" + ("全 PASS" if ok else "有 FAIL"))
     return 0 if ok else 1

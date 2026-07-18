@@ -8,6 +8,23 @@ Format loosely follows [Keep a Changelog](https://keepachangelog.com/); versions
 The `tool_version` field inside `context_manifest` JSON output is a schema-contract stamp
 (currently `eg-2`), independent of these release versions.
 
+## v0.1.1 — 2026-07-18
+
+### Agent compatibility
+- Added a Codex-compatible skill manifest, repository `AGENTS.md`, and installation paths
+  for both Codex and Claude Code.
+- Split detailed command, conventions, and writing contracts into progressive-disclosure
+  references while keeping `SKILL.md` as the concise discovery and routing entry point.
+- Agent control files (`AGENT.md`, `AGENTS.md`, `AGENTS.override.md`, `CLAUDE.md`, and
+  `SKILL.md`, case-insensitive) and `.agents` / `.codex` control trees are excluded from
+  both working-tree and Git-revision corpus scans.
+
+### Safety and CI
+- `html` and `html-entity` now write default output to the caller's working directory,
+  so read-only skill installations remain usable.
+- The test runner now exits non-zero for every real failure, including golden drift and
+  pending TDD cases; GitHub Actions has explicit read-only repository permissions.
+
 ## v0.1.0 — 2026-07-17
 
 Initial public release.
@@ -44,8 +61,8 @@ Initial public release.
   exit 2 on unknown keys and unknown flags (fail-closed CLI).
 
 ### Machine-readable contract (agent-first)
-- Every command supports `--json`. The command → top-level-key contract is documented in
-  `SKILL.md` ("JSON output contract") and drift-locked by the test suite against the
+- Every query and analysis command except `html` / `html-entity` supports `--json`. The command → top-level-key contract is documented in
+  `references/command-contracts.md` ("JSON output contract") and drift-locked by the test suite against the
   fixtures corpus.
 - `context_manifest` on analysis commands: corpus revision, conventions hash, output hash —
   reproducible provenance for machine consumers.

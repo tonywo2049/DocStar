@@ -15,7 +15,7 @@ TDD 红态自适配：波6 命令（dump/trace/harvest）落地转绿；波7 命
 runner 打印「N 绿 / M 待建 / K 逻辑红」。退出码：逻辑红>0 或 待建>0 → 1（TDD 未全绿）；全绿 → 0。
 
 用法：python3 tests.py [--skip-slow]
-断言名 ↔ fixtures/README.md 覆盖矩阵行一一对应（三向可互查）。
+断言名 ↔ 覆盖矩阵行一一对应（三向可互查；矩阵台账在维护者侧 docs/process/，不随发布树）。
 """
 
 import json
@@ -1043,12 +1043,12 @@ def a_output_naming():
        f"entity_template.html 无旧态词 authoritative/indeterminate（命中={tpl_hits or '无'}；DG-44 输出面含 HTML 模板）")
 
 
-# ---- EG-32/DG-64 机读契约 drift-lock：每命令 --json 顶层键集锁定（SKILL 契约表机检对账） ----
+# ---- EG-32/DG-64 机读契约 drift-lock：每命令 --json 顶层键集锁定（command-contracts 契约表机检对账） ----
 
 def a_contract_toplevel():
     """EG-32/DG-64：硬编码每命令 --json 顶层键集（EXPECTED_TOP），对 fixtures/corpus 逐命令 run_json
-    断言 实际顶层键==期望集——SKILL.md「JSON output contract」表的机检对账，防契约表悄然腐坏（加/删/
-    改键须 SKILL 表与本 dict 两处同批改，人工对齐）。覆盖全部 12 个 --json 命令，无豁免：verify 用
+    断言 实际顶层键==期望集——references/command-contracts.md「JSON output contract」表的机检对账，
+    防契约表悄然腐坏（加/删/改键须契约表与本 dict 两处同批改，人工对齐）。覆盖全部 13 个 JSON 命令，无豁免：verify 用
     --baseline HEAD（fixtures/corpus 在 git 下、diff 内容不入顶层键故键集稳定确定）、classify 用
     --pending、harvest 无需基线——皆 fixtures/corpus 上确定。ids 顶层键=kind 值（开放词汇，此处锁
     fixtures/corpus 冻结的 kind 集，drift=fixture kind 词汇变=真信号，非命令形状回归）；doc 取无
@@ -1088,12 +1088,13 @@ def a_contract_toplevel():
                      ["classify", "--pending"]),
         "harvest": ({"context_manifest", "schema_version", "algo", "filtered", "candidates"},
                     ["harvest"]),
+        "drift": ({"context_manifest", "schema_version", "drifts"}, ["drift"]),
     }
     for name, (expected, args) in EXPECTED_TOP.items():
         _c, d, _e = run_json(*args)
         actual = set(d) if isinstance(d, dict) else None
         ok(f"contract/top_{name}", actual == expected,
-           f"{name} --json 顶层键==契约表期望（SKILL JSON output contract 对账）；"
+           f"{name} --json 顶层键==契约表期望（command-contracts JSON output contract 对账）；"
            f"缺={sorted(expected - (actual or set()))} 多={sorted((actual or set()) - expected)}")
 
 
@@ -1792,6 +1793,35 @@ def a_archived():
         return json.loads(m.group(1)) if m else None
 
     with tempfile.TemporaryDirectory() as td:
+        # HTML 文件是用户产物：省略输出路径时必须落在调用者 cwd，而不是工具安装目录。
+        # 同时锁定位置参数的相对/绝对语义，保证 Codex 的只读 skill/plugin 缓存也可运行。
+        sandbox = Path(td) / "html-output"
+        sandbox.mkdir()
+
+        def _run_from_cwd(*args):
+            p = subprocess.run(
+                [sys.executable, str(DOCSTAR), *args, "--corpus", GENERIC],
+                cwd=sandbox, capture_output=True, text=True,
+            )
+            return p.returncode
+
+        absolute_html = Path(td) / "absolute-graph.html"
+        absolute_entity = Path(td) / "absolute-entity.html"
+        c_html_default = _run_from_cwd("html")
+        c_entity_default = _run_from_cwd("html-entity")
+        c_html_relative = _run_from_cwd("html", "relative-graph.html")
+        c_entity_relative = _run_from_cwd("html-entity", "relative-entity.html")
+        c_html_absolute = _run_from_cwd("html", str(absolute_html))
+        c_entity_absolute = _run_from_cwd("html-entity", str(absolute_entity))
+        ok("html/output_path_sandbox_safe",
+           c_html_default == c_entity_default == c_html_relative == c_entity_relative == c_html_absolute == c_entity_absolute == 0
+           and (sandbox / "graph.html").is_file()
+           and (sandbox / "entity_graph.html").is_file()
+           and (sandbox / "relative-graph.html").is_file()
+           and (sandbox / "relative-entity.html").is_file()
+           and absolute_html.is_file() and absolute_entity.is_file(),
+           "html/html-entity 默认输出落 cwd；相对路径随 cwd、绝对路径保持原位")
+
         h1 = str(Path(td) / "g1.html")
         c9, _, _ = run("html", h1, corpus=ARCHIVED)
         d9 = _html_data(h1) or {"nodes": [], "edges": []}
@@ -2198,9 +2228,10 @@ def main():
         print(f"\nTDD 待建（命令未交付，本波预期）：{len(todos)} 项（前 10）")
         for name, _, msg, _ in todos[:10]:
             print(f"  待建  {name}")
-    # 退出码：TB 自有逻辑红 → 1（真问题，须清零）；对照红/待建/golden 待重锁 → 0（本波「TB 零逻辑红」即绿；
-    # golden_diff 是 DG-42/43/44 输出形改动的预期红，交控制者亲核重 bless，非 TB bug）
-    return 1 if logic else 0
+    # 默认 fail-closed：任一真实 FAIL（逻辑红、对照红、待建、golden 待重锁）都阻断 CI。
+    # INFO 仅表示尚无可比对的 golden，不是测试失败。
+    failures = [r for r in RESULTS if r[1] == "FAIL"]
+    return 1 if failures else 0
 
 if __name__ == "__main__":
     sys.exit(main())

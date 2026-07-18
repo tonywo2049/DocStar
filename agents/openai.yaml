@@ -1,0 +1,4 @@
+interface:
+  display_name: "DocStar"
+  short_description: "Query and validate Markdown document graphs"
+  default_prompt: "Use $docstar to query or validate this Markdown corpus and return evidence with file and line pointers."
