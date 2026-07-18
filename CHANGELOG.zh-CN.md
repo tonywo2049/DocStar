@@ -13,7 +13,7 @@ JSON 中的 `tool_version` 是独立的 schema 契约版本。
 
 English: [CHANGELOG.md](CHANGELOG.md)
 
-## v0.2.0 — 未发布
+## v0.2.0 — 2026-07-19
 
 ### 双语界面
 

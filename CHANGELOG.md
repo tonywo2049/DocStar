@@ -14,7 +14,7 @@ schema-contract stamp.
 
 中文版本：[CHANGELOG.zh-CN.md](CHANGELOG.zh-CN.md)
 
-## v0.2.0 — unreleased
+## v0.2.0 — 2026-07-19
 
 ### Bilingual interface
 
