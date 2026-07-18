@@ -1,20 +1,20 @@
 {
  "context_manifest": {
   "corpus_revision": "worktree",
-  "tool_version": "eg-2",
+  "tool_version": "eg-3",
   "conventions_hash": "6223646ae0bf823c",
   "conventions_source": "project",
   "mode": "harvest",
   "budget": null,
-  "output_hash": "a1acf11d50630bf5"
+  "output_hash": "89a52e1fb2880b07"
  },
- "schema_version": "eg-2",
+ "schema_version": "eg-3",
  "algo": "h1",
  "filtered": {
-  "长度越界": 7,
-  "结构化token": 42,
-  "文档名": 2,
-  "已标注专名": 6
+  "length_out_of_range": 7,
+  "structured_tokens": 42,
+  "document_names": 2,
+  "annotated_terms": 6
  },
  "candidates": [
   {

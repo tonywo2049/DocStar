@@ -1,14 +1,14 @@
 {
  "context_manifest": {
   "corpus_revision": "worktree",
-  "tool_version": "eg-2",
+  "tool_version": "eg-3",
   "conventions_hash": "6223646ae0bf823c",
   "conventions_source": "project",
   "mode": "classify:pending",
   "budget": null,
-  "output_hash": "066948c02235e471"
+  "output_hash": "1dd0abd6f4062c96"
  },
- "schema_version": "eg-2",
+ "schema_version": "eg-3",
  "mode": "pending",
  "corpus_root": ".",
  "classification_complete": false,
@@ -17,14 +17,14 @@
  "pending": [
   {
    "path": "protocol/未分类-契约三草案.md",
-   "缺声明原因": "frontmatter缺性质字段",
-   "证据": {
-    "定义实体数": 2,
-    "底账表形态": false,
-    "被规范文档引用": false,
-    "引用来源规范文档": [],
-    "标题": "合成契约三草案（fixture，未声明性质＝unknown）",
-    "类型": [
+   "missing_declaration_reason": "frontmatter缺性质字段",
+   "evidence": {
+    "defined_entity_count": 2,
+    "ledger_shape": false,
+    "referenced_by_normative_document": false,
+    "normative_reference_sources": [],
+    "heading": "合成契约三草案（fixture，未声明性质＝unknown）",
+    "document_type": [
      "结论型"
     ]
    }

@@ -1,44 +1,75 @@
 ---
-性质: 规范
+locale: en
+purpose: Explain convention discovery, bundled presets, and compatibility rules.
+status: approved
+type: conventions-guide
+nature: normative
 ---
 
-# DocStar conventions
+# Conventions
 
-## 目录
+[简体中文](conventions.zh-CN.md)
 
-- [发现顺序](#发现顺序)
-- [配置族](#配置族)
-- [修改纪律](#修改纪律)
+Conventions adapt DocStar's generic parser to project-specific IDs, tables, and
+policies. They change extraction and checks, not the eg-3 public JSON language.
 
-## 发现顺序
+## Resolution order
 
-1. `--conventions DIR`。
-2. `<corpus>/.docstar/conventions/conventions.json`。
-3. 从语料根父目录上行到 Git 边界，最近者胜。
-4. 内置通用默认。
+1. `--conventions DIR`
+2. `--preset NAME`
+3. `<corpus>/.docstar/conventions/conventions.json`
+4. nearest ancestor config up to and including the Git boundary
+5. the built-in generic default
 
-显式配置是整套替换，不是逐键叠加。必须包含 `version` 和 loader 声明的必需 section；非法值退出 2，不回落默认。
+`--conventions` and `--preset` are mutually exclusive. An explicit config is a
+complete replacement, not a per-key overlay. Invalid config exits 2.
 
-## 配置族
+## Bundled GMGN preset
 
-- `edges.*`：有向键对、节引用标记、自指词和有意非链接前缀。
-- `type_sections`、`def_forms`、`doc_id_kinds`：实体类型小节和项目自有 ID 语法。
-- `task_columns`、`id_occ_kinds`、`cooccur_kinds`、`ac_prefix_kinds`：任务表和 ID 参与域。
-- `nature_source`：从项目已有 frontmatter 字段映射规范/记述性质；显式 `性质` 始终优先。
-- `required_edges`：跨类型必需边规则及 `report`/`gate` 严重级。
-- `managed_values`：受管值与属主绑定，供 `drift` 使用。
-- `revision_target_kinds`、`cooccur_mapping_kinds`：修订传导和共现完整性检查域；缺席即 `dormant`。
-- `archive_globs`：按路径段排除归档子树；`--include-archived` 可临时恢复。
-- `aliases`、`namespaces`：文档别名和裸 ID 消歧锚。
+```bash
+python3 docstar.py check --preset gmgn-v1 --json --corpus <project>
+```
 
-完整配置样例在 `fixtures/corpus/.docstar/conventions/conventions.json`，分特性样例在 `fixtures/methodology`、`fixtures/nonlink`、`fixtures/reqedge`、`fixtures/archived` 等目录。
+`gmgn-v1` recognizes:
 
-## 修改纪律
+- `Goal.md → Requirement.md → Design.md → Task.md`;
+- stable `upstream` and `downstream` links;
+- `Rn-ACn` acceptance criteria and `(Mn-)Tn` task IDs;
+- the canonical task-table layout `# | task | spec anchor | prerequisite | failing test |
+  status` in both English and Chinese prose editions;
+- `none`, `external:`, `无`, and `外部：` as declared non-link prefixes;
+- the policy that every requirement AC needs an incoming task declaration.
 
-新增 conventions 键必须同时满足：
+The preset file is [conventions/presets/gmgn-v1.json](../conventions/presets/gmgn-v1.json).
+Projects that need automatic discovery may copy that file to
+`.docstar/conventions/conventions.json`; keep it byte-identical unless the project
+intentionally forks the contract.
 
-1. additive 可选；不填不改变既有行为。
-2. 缺席休眠且 golden 零涟漪。
-3. 非法值 fail-closed。
+## Configuration groups
 
-每个新键同时补 loader selftest、端到端正例、负例和 hash 变化断言。
+- `edges.*`: directed key pairs, section marker, self-reference words, and declared
+  non-link prefixes.
+- `type_sections`, `def_forms`, `doc_id_kinds`: typed sections and project ID forms.
+- `task_columns`, `id_occ_kinds`, `cooccur_kinds`, `ac_prefix_kinds`: task-table and
+  ID participation rules.
+- `nature_source`: migration mapping from an existing metadata field to
+  `normative` or `descriptive`; explicit `nature`/`性质` wins.
+- `required_edges`: cross-kind policies and report/gate severity.
+- `uncovered_kind_exclusions`: generic or support kinds intentionally outside those
+  policies; do not use it to hide a spelling alias of a policy subject.
+- `managed_values`: managed values for `drift`.
+- `revision_target_kinds`, `cooccur_mapping_kinds`: check domains; absent means
+  `dormant`.
+- `archive_globs`: path-segment archive filters.
+- `aliases`, `namespaces`: document aliases and bare-ID disambiguation anchors.
+
+The full stress fixture is under
+`fixtures/corpus/.docstar/conventions/conventions.json`. Focused examples live in
+`fixtures/gmgn`, `fixtures/methodology`, `fixtures/nonlink`, `fixtures/reqedge`, and
+`fixtures/archived`.
+
+## Compatibility rules
+
+Every new key must be optional and additive, preserve existing output when absent,
+and fail closed when malformed. Add loader self-tests, end-to-end positive and
+negative cases, and a conventions-hash assertion in the same change.

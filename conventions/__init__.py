@@ -25,6 +25,7 @@ except ImportError:                            # 作为脚本直接跑 --selftes
 SUPPORTED_VERSIONS = {"1"}                     # 配置 schema 格式版本（DG-33）
 CONFIG_FILENAME = "conventions.json"
 DISCOVERY_SUBPATH = ".docstar/conventions"    # 语料根内项目配置目录
+PRESETS_DIR = Path(__file__).resolve().parent / "presets"
 
 REQUIRED_KEYS = ("version", "namespaces", "def_forms", "term_forms", "form_headers", "harvest")
 REQUIRED_NS_KEYS = ("prefix_namespaces", "kind_namespace", "req_doc", "param_registry",
@@ -121,6 +122,10 @@ class Conventions:
              "direction": r["direction"], "dst_kinds": (list(r["dst_kinds"]) if r.get("dst_kinds") else None),
              "severity": r.get("severity", "report")}
             for r in raw.get("required_edges", [])]
+        # Kinds that are intentionally outside required-edge policy. This keeps the
+        # open-kind drift warning useful without flagging generic graph/support kinds
+        # (document, section, test, parameter, etc.) in every project preset.
+        self.uncovered_kind_exclusions = list(raw.get("uncovered_kind_exclusions", []))
         # ---- 值漂移：受管值↔属主绑定（DG-48/EG-24；additive 可选键，缺席即休眠） ----
         # 每条：{name, owner_kind?(可选), occ(出现形正则 group(1)=值), scope(doc 角色名|null 全语料)}。
         # 缺席→[]（drift 空跑，沿休眠先例）；occ 编译，group(1) 取受管值。
@@ -151,11 +156,12 @@ class Conventions:
             nm = ns_.get("map")
             if not isinstance(nm, dict) or not nm:
                 raise ConventionsError("nature_source.map 须为非空映射")
-            bad = sorted(str(v) for v in nm.values() if v not in ("规范", "记述"))
+            nature_aliases = {"规范": "规范", "normative": "规范", "记述": "记述", "descriptive": "记述"}
+            bad = sorted(str(v) for v in nm.values() if v not in nature_aliases)
             if bad:
-                raise ConventionsError(f"nature_source.map 值域越界（仅 规范|记述）：{bad}")
+                raise ConventionsError(f"nature_source.map 值域越界（仅 normative|descriptive 及旧中文别名）：{bad}")
             self.nature_source = {"field": ns_["field"].strip(),
-                                  "map": {str(k): str(v) for k, v in nm.items()}}
+                                  "map": {str(k): nature_aliases[v] for k, v in nm.items()}}
             if "normalize" in ns_:
                 if ns_["normalize"] != "bracket-base":
                     raise ConventionsError('nature_source.normalize 仅支持字面量 "bracket-base"')
@@ -257,6 +263,9 @@ class Conventions:
                 raise ConventionsError(f"required_edges[{r['rule']}] dst_kinds 须为列表")
             if r.get("severity", "report") not in ("report", "gate"):
                 raise ConventionsError(f"required_edges[{r['rule']}] severity 须为 report|gate")
+        uke = raw.get("uncovered_kind_exclusions", [])
+        if not isinstance(uke, list) or any(not isinstance(k, str) or not k.strip() for k in uke):
+            raise ConventionsError("uncovered_kind_exclusions 须为非空字符串列表")
         # managed_values（DG-48）：可选；给了就校验每条形状
         mvs = raw.get("managed_values", [])
         if not isinstance(mvs, list):
@@ -334,7 +343,11 @@ class Conventions:
     def source_label(self):
         """manifest 的 conventions_source（DG-43）：稳定、机器无关（禁绝对路径入输出）——
         内置默认→'default'；发现/显式项目配置→'project'。具体哪套由 conventions_hash 精确鉴别。"""
-        return "default" if self.source == "<default>" else "project"
+        if self.source == "<default>":
+            return "default"
+        if self.source.startswith("<preset:"):
+            return self.source[1:-1]
+        return "project"
 
 
 def validate(raw, source_label="<raw>"):
@@ -354,7 +367,21 @@ def _load_dir(config_dir):
     return Conventions(raw, source_label=str(f))
 
 
-def load_conventions(corpus_root=None, explicit_dir=None):
+def _load_preset(name):
+    if not isinstance(name, str) or not re.fullmatch(r"[a-z0-9][a-z0-9-]*", name):
+        raise ConventionsError(f"preset 名称非法：{name!r}")
+    path = PRESETS_DIR / f"{name}.json"
+    if not path.is_file():
+        available = sorted(p.stem for p in PRESETS_DIR.glob("*.json"))
+        raise ConventionsError(f"preset 不存在：{name}；可选：{available}")
+    try:
+        raw = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as e:
+        raise ConventionsError(f"preset 读取/解析失败（{path.name}）：{e}")
+    return Conventions(raw, source_label=f"<preset:{name}>")
+
+
+def load_conventions(corpus_root=None, explicit_dir=None, preset=None):
     """发现契约（DG-33/DG-55）：explicit_dir（--conventions）> 语料根/.docstar/conventions/ >
     祖先走查（语料根父级→git 边界，最近者胜，DG-55）> 内置默认。
 
@@ -362,6 +389,8 @@ def load_conventions(corpus_root=None, explicit_dir=None):
     显式指定非法即报错（不静默回退——用户明确指了就该按指的来）。"""
     if explicit_dir is not None:
         return _load_dir(explicit_dir)
+    if preset is not None:
+        return _load_preset(preset)
     if corpus_root is not None:
         proj = Path(corpus_root) / DISCOVERY_SUBPATH
         if (proj / CONFIG_FILENAME).is_file():
@@ -418,6 +447,17 @@ def _selftest():
     conv = load_conventions()
     check("默认集加载（version=1）", conv.version == "1")
     check("默认集来源=<default>", conv.source == "<default>")
+    gmgn = load_conventions(preset="gmgn-v1")
+    check("内置预设 gmgn-v1 可加载", gmgn.source == "<preset:gmgn-v1>")
+    check("gmgn-v1 固定英文任务表头",
+          gmgn.task_columns == {"spec": "spec anchor", "prereq": "prerequisite",
+                                "red": "failing test", "status": "status"})
+    check("gmgn-v1 只把 Rn-ACn 当需求 AC",
+          gmgn.type_of_heading("Requirements") is None)
+    check("gmgn-v1 辅助 kind 不进入 AC→Task 策略网",
+          set(gmgn.uncovered_kind_exclusions)
+          == {"参数", "测试", "专名", "文档", "节条目", "里程碑"})
+    check("未知预设 fail-closed", raises(lambda: load_conventions(preset="missing-preset")))
 
     # 2. namespace_for（通用默认值 + 前缀机制配置驱动，不点名具体 kind）
     check("命名空间：需求AC→requirements（通用默认）", conv.namespace_for("需求AC", "REQ-1") == "requirements")
@@ -491,7 +531,7 @@ def _selftest():
     check("非法：nature_source.field 空报错", raises(lambda: validate(bad_ns1)))
     bad_ns2 = copy.deepcopy(good); bad_ns2["nature_source"] = {"field": "类型", "map": {}}
     check("非法：nature_source.map 空报错", raises(lambda: validate(bad_ns2)))
-    bad_ns3 = copy.deepcopy(good); bad_ns3["nature_source"] = {"field": "类型", "map": {"结论型": "normative"}}
+    bad_ns3 = copy.deepcopy(good); bad_ns3["nature_source"] = {"field": "类型", "map": {"结论型": "policy"}}
     check("非法：nature_source.map 值域越界报错", raises(lambda: validate(bad_ns3)))
     # nature_source.normalize（DG-56/EG-27：可选子键，括号剥离归一；子键集封闭 {field, map, normalize}）
     check("nature_source：缺席 normalize 时 self.nature_source 不含该键", "normalize" not in validate(ns_proj).nature_source)
@@ -573,6 +613,7 @@ def _selftest():
 
     # 4.6 required_edges（DG-47）/ managed_values（DG-48）——additive 可选键，缺席即休眠
     check("required_edges 缺省→空（跨类型政策休眠）", conv.required_edges == [])
+    check("uncovered_kind_exclusions 缺省→空", conv.uncovered_kind_exclusions == [])
     check("managed_values 缺省→空（drift 休眠）", conv.managed_values == [])
     re_raw = copy.deepcopy(good)
     re_raw["required_edges"] = [
@@ -592,6 +633,12 @@ def _selftest():
     check("managed_values 装载：occ 编译 group(1)=值",
           rc.managed_values[0]["occ"].search('schema_version = "eg-2"').group(1) == "eg-2")
     check("required_edges/managed_values 入 hash（防不可见第二事实源）", rc.hash() != conv.hash())
+    uke_raw = copy.deepcopy(good); uke_raw["uncovered_kind_exclusions"] = ["参数", "文档"]
+    check("uncovered_kind_exclusions 装载保真",
+          validate(uke_raw).uncovered_kind_exclusions == ["参数", "文档"])
+    check("uncovered_kind_exclusions 入 hash", validate(uke_raw).hash() != conv.hash())
+    bad_uke = copy.deepcopy(good); bad_uke["uncovered_kind_exclusions"] = [""]
+    check("非法：uncovered_kind_exclusions 空元素报错", raises(lambda: validate(bad_uke)))
     bad_re1 = copy.deepcopy(good); bad_re1["required_edges"] = [{"rule": "r", "src_kinds": ["x"], "edge": "e"}]
     check("非法：required_edges 缺 direction 报错", raises(lambda: validate(bad_re1)))
     bad_re2 = copy.deepcopy(good); bad_re2["required_edges"] = [

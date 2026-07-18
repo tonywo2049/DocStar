@@ -25,6 +25,7 @@ from pathlib import Path
 import corpus
 import entity_extract
 import entity_model as M
+import i18n
 
 # 路径空间＝**语料本身**（独立工具无「工具所在仓库」概念；原 REPO=parents[2] 是位置硬假设，
 # 抽离后 parents[2] 会漂成任意上级目录并把它泄进输出——已删）。输出/manifest 一律语料相对。
@@ -120,7 +121,7 @@ def pending(g, conv):
                 "被规范文档引用": bool(refs),
                 "引用来源规范文档": sorted(_repo_rel(g, r) or r for r in refs),
                 "标题": _title(g.texts.get(rel, "") or "", d["stem"]),
-                "类型": list(meta.get("类型", [])),
+                "类型": list(meta.get("type", meta.get("类型", []))),
             },
         })
     out.sort(key=lambda x: x["path"])
@@ -303,14 +304,24 @@ def cmd_classify(g, conv, mode, baseline, manifest, as_json):
         data = {"context_manifest": M.context_manifest(  # DG-43
             "worktree", conv, "classify:pending", body=data,
             include_archived=getattr(g, "include_archived", False)), **data}
-        print(M.emit(data)) if as_json else _print_pending(data)
+        if as_json:
+            print(M.emit(data))
+        elif i18n.language() == "en":
+            print(i18n.render_public(data))
+        else:
+            _print_pending(data)
         return 0
     if mode == "validate":
         data, code = validate(g, conv, baseline, manifest)
         data = {"context_manifest": M.context_manifest(  # DG-43
             "worktree", conv, "classify:validate", body=data,
             include_archived=getattr(g, "include_archived", False)), **data}
-        print(M.emit(data)) if as_json else _print_validate(data, code)
+        if as_json:
+            print(M.emit(data))
+        elif i18n.language() == "en":
+            print(i18n.render_public(data))
+        else:
+            _print_validate(data, code)
         return code
     print(f"未知 classify 模式：{mode}（应由 DocStar 校验为 pending|validate）", file=sys.stderr)
     return 2

@@ -42,12 +42,14 @@ from fnmatch import fnmatchcase
 from pathlib import Path
 from urllib.parse import unquote
 
-__version__ = "0.1.1"   # 发布版本（语义化）；与 manifest 的 tool_version="eg-2"（schema 契约戳，DG-43）正交
+__version__ = "0.2.0"   # 发布版本（语义化）；与 manifest 的 tool_version="eg-3"（schema 契约戳）正交
 
 sys.path.insert(0, str(Path(__file__).resolve().parent / "internal"))  # 内部模块（corpus/entity_*）迁入 internal/
 
 import conventions                          # DG-33 约定集（loader + Conventions + ConventionsError）
 import corpus                               # DG-21 语料源抽象（FileSource/GitSource；scan 消费）
+import i18n
+import json_contract
 
 TOOL_DIR = Path(__file__).resolve().parent      # 工具自身目录（模板/自带 fixtures）
 _SELF_FIXTURES = TOOL_DIR / "fixtures"          # 自带测试语料
@@ -371,7 +373,9 @@ def _clip(s, n=110):
 
 def _emit(data, as_json, text_fn):
     if as_json:
-        print(json.dumps(data, ensure_ascii=False, indent=1))
+        print(json.dumps(json_contract.to_public(data), ensure_ascii=False, indent=1))
+    elif i18n.language() == "en":
+        print(i18n.render_public(data))
     else:
         text_fn()
 
@@ -569,7 +573,8 @@ def cmd_docs(g, glob, fields, as_json):
         d = g.docs[rel]
         row = {"doc": rel, "has_fm": d["has_fm"]}
         for f in fields:
-            row[f] = d["meta"].get(f)   # 原值列表；字段缺失=null
+            row[f] = next((d["meta"][key] for key in json_contract.frontmatter_candidates(f)
+                           if key in d["meta"]), None)   # 原值列表；字段缺失=null
         rows.append(row)
     data = {"docs": rows}
     def txt():
@@ -646,7 +651,7 @@ def cmd_check(g, as_json, gate=None, conv=None):
          and not any(h == n or h.startswith(n + ".") for h in g.docs[dst]["headings"])),
         key=lambda x: (x["目标"], x["源文件"], x["行"]))
     R["缺frontmatter"] = sorted(d for d, v in g.docs.items() if not v["has_fm"])
-    try:                        # 实体层检查项（波7 交付后自动并入；见 实体图谱任务.md）
+    try:                        # 实体层检查项由同一发布包提供；失败时保留文档层结果并显式降级
         import entity_check
         R.update(entity_check.sections(g, conv))
     except (ImportError, AttributeError, TypeError) as e:
@@ -685,7 +690,7 @@ def cmd_check(g, as_json, gate=None, conv=None):
                 print(f"  … 另 {n - cap} 项（--json 看全量）")
     _emit(R, as_json, txt)
     if gate:                    # EG-9-AC4：指定判定项非空→非零退出；键名拼错→2（fail-closed）
-        items = [x.strip() for x in gate.split(",") if x.strip()]
+        items = [json_contract.to_internal_key(x.strip()) for x in gate.split(",") if x.strip()]
         unknown = [x for x in items if x not in R]
         if unknown:
             print(f"--gate 未知键：{'、'.join(unknown)}；可用键：{'、'.join(R)}", file=sys.stderr)
@@ -702,7 +707,7 @@ def cmd_html(g, out):
         # html 可视化的目录分组：取相对路径顶层目录名（如 internal/）；根目录文件归"仓库根"。
         # 分组从被扫语料实际路径运行时推导，不写死任何具体项目的目录结构。
         i = rel.find("/")
-        return rel[:i] if i >= 0 else "仓库根"
+        return rel[:i] if i >= 0 else i18n.text("Repository root", "仓库根")
     groups = sorted({top_dir(rel) for rel in g.docs})   # 按名称稳定排序→色槽位顺序（分组数随语料变化）
     gindex = {name: i for i, name in enumerate(groups)}
     def gid(rel):
@@ -734,11 +739,13 @@ def cmd_html(g, out):
     agl = getattr(g.conv, "archive_globs", None) if g.conv else None
     for rel, d in g.docs.items():
         meta = d["meta"]
+        goal = next((meta[k] for k in json_contract.frontmatter_candidates("purpose") if meta.get(k)), [])
+        status = next((meta[k] for k in json_contract.frontmatter_candidates("status") if meta.get(k)), [])
         nodes.append({
             "id": rel, "path": rel, "stem": d["stem"], "g": gid(rel),
             "arc": (corpus.archived(rel, agl) if agl else "/Archive/" in rel), "fm": d["has_fm"],
-            "goal": _clip(" ".join(meta["目标"]), 160) if meta.get("目标") else "",
-            "status": _clip(" ".join(meta["状态"]), 80) if meta.get("状态") else "",
+            "goal": _clip(" ".join(goal), 160) if goal else "",
+            "status": _clip(" ".join(status), 80) if status else "",
             "din": din[rel], "dout": dout[rel]})
     stats = {"docs": len(nodes),
              "fm": sum(1 for e in edges if e["k"] == "fm"),
@@ -749,29 +756,38 @@ def cmd_html(g, out):
     payload = {"generated": datetime.now().strftime("%Y-%m-%d %H:%M"),
                "groups": groups, "nodes": nodes, "edges": edges, "stats": stats}
     tpl = (Path(__file__).parent / "internal" / "graph_template.html").read_text(encoding="utf-8")
+    tpl = i18n.localize_html(tpl)
     html = tpl.replace("/*__DATA__*/null",
                        json.dumps(payload, ensure_ascii=False).replace("</", "<\\/"))
     out_path = Path(out) if out else Path("graph.html")
     if not out_path.is_absolute():
         out_path = Path.cwd() / out_path
     out_path.write_text(html, encoding="utf-8")
-    print(f"已生成 {out_path}（{stats['docs']} 节点 / {len(edges)} 边：上下游 {stats['fm']}、链接 {stats['link']}、§引用 {stats['sec']}）")
+    print(i18n.text(
+        f"Generated {out_path} ({stats['docs']} nodes / {len(edges)} edges: "
+        f"dependencies {stats['fm']}, links {stats['link']}, section references {stats['sec']})",
+        f"已生成 {out_path}（{stats['docs']} 节点 / {len(edges)} 边：上下游 {stats['fm']}、链接 {stats['link']}、§引用 {stats['sec']}）",
+    ))
     return 0
 
 # ---------------- main ----------------
 
 def _entity(name):
-    """实体层模块懒加载：未交付时给明确提示（波次进度见 实体图谱任务.md）而非 ImportError 栈。"""
+    """Lazy-load an entity-layer module and report a concise diagnostic on failure."""
     import importlib
     try:
         return importlib.import_module(name)
     except ImportError:
-        print(f"实体层模块 {name}.py 未交付（见 实体图谱任务.md 波次）", file=sys.stderr)
+        print(i18n.text(
+            f"Entity-layer module {name}.py is unavailable.",
+            f"实体层模块 {name}.py 不可用。",
+        ), file=sys.stderr)
         return None
 
 def main(argv):
     as_json = "--json" in argv
-    corpus_dir = gate = baseline = conventions_dir = manifest = kind_arg = None
+    corpus_dir = gate = baseline = conventions_dir = manifest = kind_arg = preset = None
+    lang = "zh-CN"
     classify_mode = fields_arg = None
     brief_mode, brief_budget, verify_migrate = "execute", None, False   # 波13-P1/P2 预开缝旗标
     include_archived = False                                            # DG-59/EG-30 取证开关（默认过滤生效）
@@ -786,6 +802,10 @@ def main(argv):
             baseline = next(it, None)
         elif a == "--conventions":
             conventions_dir = next(it, None)
+        elif a == "--preset":
+            preset = next(it, None)
+        elif a == "--lang":
+            lang = next(it, None)
         elif a == "--manifest":
             manifest = next(it, None)
         elif a == "--pending":
@@ -808,13 +828,18 @@ def main(argv):
             # 未知旗标 fail-closed（EG-9 退出码合同：2=用法错，不静默放过——原 else 分支把未知
             # 旗标吞作位置参数、verify --bogus 等静默照跑，NBL 线 2026-07-17 handback 件②）
             print(f"未知旗标：{a}；已知旗标见无参输出（--json/--corpus/--conventions/--gate/"
-                  f"--baseline/--manifest/--pending/--validate/--mode/--budget/--migrate/"
+                  f"--baseline/--manifest/--preset/--lang/--pending/--validate/--mode/--budget/--migrate/"
                   f"--include-archived/--kind/--fields）", file=sys.stderr)
             return 2
         else:
             args.append(a)
+    try:
+        i18n.set_language(lang)
+    except ValueError:
+        print(f"Unsupported --lang: {lang}; expected en or zh-CN", file=sys.stderr)
+        return 2
     if not args:
-        print(__doc__)
+        print(i18n.help_text(__doc__))
         print(f"docstar v{__version__}")
         return 0
     cmd, rest = args[0], args[1:]
@@ -829,7 +854,10 @@ def main(argv):
     # 约定集先于扫描加载（DG-33；关系通配需 directed_pairs/doc_id_kinds/§标记/aliases 注入 scan）。
     # 非法配置→退非零带诊断，不静默。默认集恒可加载，故任意 md 语料零配置仍出关系图。
     try:
-        conv = conventions.load_conventions(corpus_root=scan_root, explicit_dir=conventions_dir)
+        if conventions_dir and preset:
+            raise conventions.ConventionsError("--conventions and --preset are mutually exclusive")
+        conv = conventions.load_conventions(
+            corpus_root=scan_root, explicit_dir=conventions_dir, preset=preset)
     except conventions.ConventionsError as e:
         print(f"约定配置非法：{e}", file=sys.stderr)
         return 2
@@ -843,7 +871,7 @@ def main(argv):
     if cmd == "id" and rest:
         return cmd_id(g, " ".join(rest), as_json)
     if cmd == "ids":
-        return cmd_ids(g, conv, kind_arg, as_json)
+        return cmd_ids(g, conv, json_contract.to_internal_token(kind_arg), as_json)
     if cmd == "docs":
         fields = [x.strip() for x in fields_arg.split(",") if x.strip()] if fields_arg else []
         return cmd_docs(g, rest[0] if rest else None, fields, as_json)
@@ -856,7 +884,7 @@ def main(argv):
         return mod.cmd_html_entity(g, conv, rest[0] if rest else None) if mod else 2
     if cmd == "dump":
         mod = _entity("entity_extract")
-        return mod.cmd_dump(g, conv, as_json, kind_arg) if mod else 2
+        return mod.cmd_dump(g, conv, as_json, json_contract.to_internal_token(kind_arg)) if mod else 2
     if cmd == "trace" and rest:
         mod = _entity("entity_trace")
         return mod.cmd_trace(g, conv, " ".join(rest), as_json) if mod else 2
@@ -884,7 +912,7 @@ def main(argv):
     if cmd == "harvest":
         mod = _entity("entity_harvest")
         return mod.cmd_harvest(g, conv, as_json, baseline) if mod else 2
-    print(__doc__)
+    print(i18n.help_text(__doc__))
     print(f"docstar v{__version__}")
     return 1
 

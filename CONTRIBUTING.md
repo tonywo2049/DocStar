@@ -1,83 +1,101 @@
 ---
-性质: 记述
+locale: en
+purpose: Define the tests, compatibility rules, and review process for DocStar contributions.
+status: approved
+type: contribution-guide
+nature: normative
 ---
 
-# 贡献指南
+# Contributing to DocStar
 
-> 本文中文优先，英文版随后续英文化里程碑提供。DocStar 是零依赖 stdlib 工具（Python 3.9+），
-> 无需 `pip install`。以下是外部贡献者的最小必要工序，请在提 PR 前逐条对照。
+[简体中文](CONTRIBUTING.zh-CN.md)
 
-## 1. 跑测试（两档）
+`AGENTS.md` tells coding agents how to work in this repository. This guide defines
+the public contribution contract for humans, pull requests, compatibility, and
+golden files.
 
-**常规档（CI 同款，人人可跑）**
+DocStar has no runtime dependencies beyond Python 3.9+.
+
+## Required checks
+
+Run before opening a pull request:
 
 ```bash
-python3 tests.py --skip-slow          # A 逻辑断言 + B golden 逐字节（只读）
+python3 tests.py --skip-slow
 python3 internal/corpus.py --selftest
 python3 conventions/__init__.py --selftest
+python3 docstar.py verify --json
 ```
 
-三条均须 exit 0。`tests.py` 默认 fail-closed：逻辑红、对照红、TDD 待建或 golden 差异任一出现都返回 1；
-`INFO` 不代表失败（详见 `tests.py` 的 `main()` 末尾注释）。
+All commands must exit 0. Maintainers also run `python3 tests.py` locally; its
+performance assertions are intentionally excluded from shared CI runners.
 
-**全量档（仅维护者本机）**
+CI covers Python 3.9 through 3.13. JSON output must be byte-stable across those
+versions.
 
-```bash
-python3 tests.py                       # 含 layer_c 慢断言
-```
+## Engine changes are test-first
 
-`layer_c`（慢档）在克隆自身上做自宿主全量与性能中位断言——任何机器都能跑，但性能断言
-在共享 CI runner 上会因负载抖动误红，故 CI 恒用 `--skip-slow`。贡献者跑 `--skip-slow`
-即可；全量档由维护者合并前在本机补跑。
+For parser, graph, check, or output behavior:
 
-CI 在 Python **3.9–3.13 全矩阵**跑常规档——引擎输出须**跨版本逐字节一致**（`--json`
-在各版本 shasum 相同）。跨版本差异是缺陷信号（先例 DG-60：判定对象序列化在 ≤3.12 与 3.13
-分岔），改动涉输出面时请自查多版本一致。
+1. Add a fixture and an assertion that fails for the missing behavior.
+2. Implement the smallest coherent change.
+3. Add negative and compatibility cases.
+4. Run the required checks.
 
-## 2. golden 工序（逐字节锁定，绝不重写）
+Explain externally observable behavior in the pull request. Internal historical
+`EG-*` and `DG-*` references are not required from outside contributors.
 
-`golden/*.json` 是引擎输出的**逐字节基线**。测试层 B 只读比对，**任何贡献者 / agent 一律不得
-`--bless` 或手改 golden**。
+## Golden files
 
-若你的改动确实改变了某命令的输出面（dump / brief / check / classify / harvest / verify），
-测试层 B 会红——**这是预期信号，不是让你去重写 golden**。正确做法：
+`golden/*.json` lock the public JSON contract byte for byte. Contributors and
+agents must not edit or regenerate them just to make a test green.
 
-1. 在 PR 描述里**说明差异面**（哪个命令、哪些字段变了、为什么）。
-2. 由**维护者亲核后重锁** golden（固定流程：对新旧 golden 做结构化逐字段对比、
-   逐差异面确认符合预期后，由维护者本人重新生成基线）。
+When an approved schema change intentionally changes output:
 
-不要为了让测试变绿而改 golden——那会把真实的输出面回归掩盖掉。
+1. The contributor lists affected commands and fields.
+2. A maintainer reviews the structured old/new difference.
+3. The maintainer runs the guarded generator:
 
-## 3. docs-first（引擎行为改动先落规格）
+   ```bash
+   python3 scripts/update_golden.py --schema <expected-schema>
+   ```
 
-引擎行为（解析、判定、输出）以维护者侧规格库为权威：需求条目编号 `EG-*`、设计条目编号
-`DG-*`（代码注释与 commit 史中的这些编号即指向它）。规格库不随本仓发布。
+4. The maintainer reviews the generated diff and reruns the full test suite.
 
-**外部贡献者不需要接触规格库**：在 PR / issue 里说清三件事即可——动机、可观察的行为变化
-（改前 / 改后的输入输出对照）、配套测试；`EG-*`/`DG-*` 编号与规格落账由维护者承接。
+The script refuses a schema argument that does not match the engine and prints
+top-level additions and removals for every golden.
 
-对外可见的行为契约在仓内自足：JSON 输出形状=`golden/*.json` 字节锁定基线（层 B 逐字节校验），
-命令→顶层键契约表=`references/command-contracts.md`「JSON output contract」节。
+## English and Chinese parity
 
-纯文档 typo 等 trivial 改动豁免本条。
+Public prose has paired files:
 
-## 4. 实质性文档 critic（单轮 + 范围分级）与代码审查
+- English primary: `README.md`, `CONTRIBUTING.md`, and `references/*.md`.
+- Simplified Chinese: `*.zh-CN.md` with the same basename.
 
-新文档、或对既有文档新增 / 修改**结论 / 裁决 / 规格 / 关键数字**的更新，落盘 commit 前先按范围分级判触发：**审**（新裁决 / 验收标准 / 关键数字 / 关账声明）｜**免审走机检**（handoff / 台账 / 状态行等记录型增量，用逐字引用、链接与 commit 存在性比对）｜**豁免**（改名 / 格式 / typo）。
+Both editions must preserve commands, IDs, placeholders, code blocks, allowed
+token sets, warnings, and link targets. Prose may be translated naturally. New
+machine fields and values stay English in both editions.
 
-触发的文档由**独立 agent（非作者）以证伪姿态审一轮**，七维度必查：事实 / 完整性 / 内部一致 / 上下游一致 / 过度设计 / 语态污染 / 可判定性。复核用重放优先（作者附可重放清单，critic 重跑比对即可）；只审改动段、不重读全文。一轮后配两护栏替代第二轮——阻塞项定向复核、处置越界机检。commit message 记 `critic×1`。
+`SKILL.md` is a single executable skill, not two language-specific copies. Its
+trigger description covers both languages and its runtime instructions follow the
+project or user language.
 
-代码改动走**独立代码审查**（不套文档 critic，代码有编译器 / 测试 / CI 作第一验证器）：commit 前一次、三查一不查——查未测面、查测试判别力、查过度设计（5 标签扫增量），不查已被测试覆盖的逻辑。用现成 `/code-review` + `/verify`，只审卡级增量 diff。
+## Conventions compatibility rules
 
-本仓贡献以本节规则为准；维护者侧完整方法论不随公开仓发布。
+New conventions keys must be:
 
-## 5. conventions 新键三铁律
+1. additive and optional;
+2. dormant when absent, with no change to existing golden output;
+3. fail-closed when malformed.
 
-`conventions/` 是外部语料的适配层。新增任何 conventions 键，必须同时满足三条（先例：
-`nature_source` / `task_columns` / `archive_globs`）：
+Add loader self-tests, end-to-end positive and negative cases, and a conventions
+hash assertion in the same change.
 
-1. **additive 可选**——新键是可选项，不填不改变任何既有行为。
-2. **缺席休眠零涟漪**——键缺席时引擎行为与加键前逐字节一致（六 golden 逐字节不变即证）。
-3. **fail-closed 校验**——非法值走硬失败（非零退出 / 明确报错），**绝不静默降级续走**。
+## Review scope
 
-新键的 e2e 覆盖与 selftest 同批补齐，PR 里给出「加键前后 golden 零涟漪」的实证。
+Substantive code changes need an independent code review focused on untested
+surfaces, assertion strength, and unnecessary complexity. Substantive normative
+documentation changes need one independent falsification-oriented review for
+facts, completeness, internal consistency, upstream/downstream consistency,
+over-design, modality, and testability. Typos and formatting-only changes are
+exempt.

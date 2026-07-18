@@ -194,8 +194,17 @@ def code_mask(text, mask_inline=True):
 # 节级 `性质: 规范` 紧随标题→覆盖文档缺省（章节级提升，混合文档不逼整篇二选一）。
 
 NATURE_VALUES = ("规范", "记述")
-_NATURE_LINE_RE = re.compile(r"^\s*性质\s*[：:]\s*(\S+)\s*$")
+NATURE_ALIASES = {
+    "规范": "规范", "normative": "规范",
+    "记述": "记述", "descriptive": "记述",
+}
+_NATURE_LINE_RE = re.compile(r"^\s*(?:性质|nature)\s*[：:]\s*(\S+)\s*$", re.I)
 _BRACKET_BASE_RE = re.compile(r"^(.*?)（[^（）]*）$")
+
+
+def normalize_nature(value):
+    """Return the internal nature token for a canonical or legacy alias."""
+    return NATURE_ALIASES.get(str(value).strip())
 
 
 def doc_nature(meta, conv=None):
@@ -203,23 +212,29 @@ def doc_nature(meta, conv=None):
     conv.nature_source 声明时（DG-53/EG-26）：无显式 `性质` 键才按 {field, map} 映射取值；
     map 未中且声明 normalize="bracket-base"（DG-56/EG-27）时剥括注单次回落再查；
     显式 `性质` 恒最高且短路（键在而值非法→unknown，不被映射掩盖）。conv 缺省=原语义。"""
-    if isinstance(meta, dict) and "性质" in meta:      # 键存在即短路（含空值：填废的显式声明不被映射掩盖，EG-26-AC1）
-        vals = meta["性质"]
-        v = (vals[0] if isinstance(vals, list) and vals else "" if isinstance(vals, list) else str(vals)).strip()
-        return v if v in NATURE_VALUES else "unknown"
+    if isinstance(meta, dict):
+        declared = []
+        for key in ("nature", "性质"):
+            if key not in meta:
+                continue
+            vals = meta[key]
+            raw = vals[0] if isinstance(vals, list) and vals else "" if isinstance(vals, list) else vals
+            declared.append(normalize_nature(raw))
+        if declared:                                  # 显式键存在即短路；双写冲突 fail-closed
+            return declared[0] if declared[0] and len(set(declared)) == 1 else "unknown"
     ns = getattr(conv, "nature_source", None) if conv is not None else None
     if ns and isinstance(meta, dict):
         mv = meta.get(ns["field"])
         if mv:
             raw = mv[0].strip() if isinstance(mv, list) else str(mv).strip()
-            mapped = ns["map"].get(raw)
+            mapped = normalize_nature(ns["map"].get(raw))
             if mapped:
                 return mapped
             if ns.get("normalize") == "bracket-base":      # 单次剥离不递归；仅全角括号（DG-56/EG-27）
                 m = _BRACKET_BASE_RE.match(raw)
                 base = m.group(1).strip() if m else ""
                 if base:
-                    mapped = ns["map"].get(base)
+                    mapped = normalize_nature(ns["map"].get(base))
                     if mapped:
                         return mapped
     return "unknown"
@@ -237,8 +252,9 @@ def section_nature_overrides(lines, heading_re):
             continue
         if pending_anchor is not None:
             nm = _NATURE_LINE_RE.match(ln)
-            if nm and nm.group(1) in NATURE_VALUES:
-                overrides[pending_anchor] = nm.group(1)
+            value = normalize_nature(nm.group(1)) if nm else None
+            if value:
+                overrides[pending_anchor] = value
             if ln.strip():                       # 非空行后不再是「紧随标题」
                 pending_anchor = None
     return overrides

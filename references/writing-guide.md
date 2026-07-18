@@ -1,72 +1,171 @@
 ---
-性质: 规范
+locale: en
+purpose: Define bilingual Markdown metadata, entity syntax, and reusable templates.
+status: approved
+type: writing-guide
+nature: normative
 ---
 
-# DocStar 文档写作指南
+# Bilingual writing guide
 
-## 目录
+[简体中文](writing-guide.zh-CN.md)
 
-- [核心约定](#核心约定)
-- [规格模板](#规格模板)
-- [记录模板](#记录模板)
-- [存量分类](#存量分类)
+## One machine contract, two prose languages
 
-## 核心约定
+Write prose and headings naturally in English or Simplified Chinese. Keep every
+machine-facing field, enum, filename, ID, command, and fixed table header unchanged.
+This lets both editions produce the same DocStar graph and lets agents switch
+language without switching workflow.
 
-1. 一个项目符号只定义一个实体，只加粗实体名。
-2. 把实体放在 `## Requirements`、`## 参数`、`## Tasks`、`## Glossary` 等带类型小节下。
-3. 用 frontmatter、Markdown link、wikilink 或 `<doc> §N` 写真实关系。
-4. 在术语首次定义处标注定义。
-5. 文档出生时声明规范性或记述性。
-6. 编辑后、提交或交接前运行 `verify --json`。
+New graph-governed project documents use these frontmatter keys:
 
-普通散文中的加粗不会成为实体；没有链接的散文提及不会成为边；`status`、日期等纯标量不会被猜成关系。
+| Key | Meaning |
+|---|---|
+| `locale` | `en` or `zh-CN` |
+| `purpose` | One sentence stating what the document answers |
+| `upstream` | Real Markdown links to sources this document consumes |
+| `downstream` | Real Markdown links to consumers this document serves |
+| `status` | `draft`, `pending-approval`, `approved`, or `closed` |
+| `type` | Project document type |
+| `nature` | `normative` or `descriptive` |
 
-## 规格模板
+The GMGN profile fixes `type` to `whitepaper`, `roadmap`, `goal`, `requirement`,
+`design`, `task`, `research`, `decision`, `retrospective`, or `handoff`. Generic
+DocStar projects may declare other types.
+
+Document `status` is not work-item status. GMGN work items use
+`not-started → initiated → in-progress → closed`.
+
+Legacy `目标/上游/下游/状态/类型/性质` and `规范/记述` remain readable migration
+aliases. Do not use them in new files.
+
+## Structural writing rules
+
+1. Define one entity per list item and bold only its identifier or name.
+2. Put definitions under typed headings such as `Requirements`, `Acceptance
+   Criteria`, `Parameters`, `Tasks`, or their Chinese translations.
+3. Express relationships with frontmatter links, Markdown links, wikilinks, or
+   `<document> §N`; do not rely on prose hints.
+4. Mark a term where it is first defined.
+5. Declare `nature` at birth. Missing or conflicting declarations are `unknown`.
+6. Run `verify --json` after editing and before commit or handoff.
+
+Ordinary bold prose is not an entity. Plain scalar metadata such as dates or status
+is not guessed to be a relationship.
+
+## Normative template — English prose
 
 ```markdown
 ---
-性质: 规范
+locale: en
+purpose: <what this document decides or requires>
 upstream:
-  - [the doc this one serves](parent.md)
+  - [<source>](<source>.md)
+downstream:
+  - [<consumer>](<consumer>.md)
+status: draft
+type: requirement
+nature: normative
 ---
 
-# <topic>
+# <Title>
 
 ## Requirements
-- **<verifiable statement, or canonical ID>** — <detail>.
 
-## Tasks
-- **<action>** — <scope>; see [design](design.md).
+- **R1** — <verifiable requirement>.
 
-## Glossary
-- **<coined term>**: <definition>.
+## Acceptance Criteria
+
+- **R1-AC1** — <deterministic acceptance condition>.
 ```
 
-## 记录模板
+## Normative template — Chinese prose
 
 ```markdown
 ---
-性质: 记述
+locale: zh-CN
+purpose: <本文决定或要求什么>
 upstream:
-  - [what this note informs](spec.md)
+  - [<上游显示名>](<source>.md)
+downstream:
+  - [<下游显示名>](<consumer>.md)
+status: draft
+type: requirement
+nature: normative
 ---
 
-# <what happened or was studied>
+# <标题>
 
-Findings reference spec §2 but impose nothing on it.
+## 需求
+
+- **R1** — <可验证需求>。
+
+## 验收标准
+
+- **R1-AC1** — <确定性验收条件>。
 ```
 
-规范文档定义下游必须遵守的义务、标准或裁决；记述文档记录调查、实验、日志或交接，不单独设 gate。需要精确章节关系时用 `<doc> §N`；同 stem 跨目录不唯一时写 `dir/doc §N`。
+The prose differs; keys, enums, filenames, and IDs do not.
 
-## 存量分类
+## Descriptive templates
 
-运行 `classify --pending --json` 获取带机械证据的工作清单。逐篇裁定规范或记述，低置信度上报；一个分片只改 frontmatter。完成后用：
+English:
+
+```markdown
+---
+locale: en
+purpose: Record <investigation, experiment, handoff, or event>.
+upstream: [<subject>](<spec>.md)
+downstream: none (record only)
+status: approved
+type: research
+nature: descriptive
+---
+
+# <What happened or was studied>
+
+The findings reference <spec> §2 but impose no requirement on it.
+```
+
+中文：
+
+```markdown
+---
+locale: zh-CN
+purpose: 记录<调研、实验、交接或事件>。
+upstream: [<对象>](<spec>.md)
+downstream: none (record only)
+status: approved
+type: research
+nature: descriptive
+---
+
+# <发生了什么或研究了什么>
+
+本文引用 <spec> §2，但不对它新增要求。
+```
+
+## GMGN task table
+
+The table header is a machine surface and stays English in both prose editions:
+
+```markdown
+| # | task | spec anchor | prerequisite | failing test | status |
+|---|---|---|---|---|---|
+| **M1-T1** | <localized goal> | R1-AC1 | none | `test_name` | not-started |
+```
+
+Use `--preset gmgn-v1`, or copy the bundled preset into the project's
+`.docstar/conventions/conventions.json` for automatic discovery.
+
+## Classifying an existing corpus
 
 ```bash
+python3 <tool-dir>/docstar.py classify --pending --json --corpus <docs>
 python3 <tool-dir>/docstar.py classify --validate \
-  --baseline <REV> --manifest <SCOPE>
-python3 <tool-dir>/docstar.py check --json
+  --baseline <REV> --manifest <SCOPE> --json --corpus <docs>
+python3 <tool-dir>/docstar.py check --json --corpus <docs>
 ```
 
-直到 `classification_complete` 为真且待办清零。
+Classify one document at a time, change only frontmatter in that batch, and escalate
+low-confidence decisions. Finish when `classification_complete` is true.

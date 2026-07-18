@@ -1,0 +1,74 @@
+{
+  "version": "1",
+  "namespaces": {
+    "prefix_namespaces": {},
+    "kind_namespace": {"需求AC": "Requirement"},
+    "req_doc": "Requirement.md",
+    "param_registry": "Requirement.md",
+    "task_doc_stem": "Task",
+    "mapping_doc_stem": "Design"
+  },
+  "def_forms": {
+    "需求AC": "^-\\s*\\*\\*(R\\d+-AC\\d+)\\*\\*",
+    "参数": "^\\|\\s*`([A-Za-z_][A-Za-z0-9_]*)`[^|]*\\|",
+    "任务": "^\\|\\s*\\*\\*((?:M\\d+-)?T\\d+(?:\\.\\d+)?)\\*\\*"
+  },
+  "term_forms": {
+    "inplace": "\\*\\*([^*]{2,40})\\*\\*\\s*[（(]\\s*(?:定义|def)\\s*[:：]\\s*([^）)]+)\\s*[）)]",
+    "glossary": "^-?\\s*\\*\\*([^*]{2,40})\\*\\*\\s*[:：](.{4,})"
+  },
+  "form_headers": {
+    "ledger": "^\\|\\s*(?:date|日期)\\s*\\|\\s*(?:change|变更)\\s*\\|",
+    "changelist": "^\\|\\s*(?:item|项)\\s*\\|\\s*(?:location|落点|文档与落点)\\b",
+    "glossary_section": "(?i)术语表|名词解释|词汇表|glossary"
+  },
+  "harvest": {
+    "len_range": [2, 40],
+    "exclude": [
+      "^\\d+$",
+      "^\\d{4}-\\d{2}-\\d{2}$",
+      "^v?\\d+(?:\\.\\d+)+[a-z]?$",
+      "^(?:R\\d+(?:-AC\\d+)?|(?:M\\d+-)?T\\d+(?:\\.\\d+)?|M\\d+)$"
+    ]
+  },
+  "doc_id_kinds": [
+    ["需求AC", "(?<![A-Za-z0-9_])R\\d+-AC\\d+(?![A-Za-z0-9_])", "GMGN acceptance criterion Rn-ACn"],
+    ["任务", "(?<![A-Za-z0-9_])(?:M\\d+-)?T\\d+(?:\\.\\d+)?(?![A-Za-z0-9_.])", "GMGN task ID"],
+    ["里程碑", "(?<![A-Za-z0-9_])M\\d+(?![A-Za-z0-9_-])", "GMGN milestone ID"]
+  ],
+  "id_occ_kinds": {},
+  "cooccur_kinds": ["需求AC", "参数", "任务"],
+  "ac_prefix_kinds": {"R": "需求AC"},
+  "task_columns": {
+    "spec": "spec anchor",
+    "prereq": "prerequisite",
+    "red": "failing test",
+    "status": "status"
+  },
+  "edges": {
+    "directed_pairs": [
+      ["upstream", "downstream"],
+      ["上游", "下游"]
+    ],
+    "self_words": ["this document", "this section", "本文", "本节", "详见", "见"],
+    "self_ref_words": ["this document", "this section", "本文", "本节"],
+    "section_ref_marker": "§",
+    "nonlink_prefixes": ["none", "external:", "无", "外部："]
+  },
+  "type_sections": [
+    ["参数", "(?i)参数|parameters?"],
+    ["任务", "(?i)任务|待办|tasks?|to-?dos?"]
+  ],
+  "required_edges": [
+    {
+      "rule": "gmgn-ac-has-task",
+      "src_kinds": ["需求AC"],
+      "edge": "任务声明",
+      "direction": "in",
+      "dst_kinds": ["任务"],
+      "severity": "report"
+    }
+  ],
+  "uncovered_kind_exclusions": ["参数", "测试", "专名", "文档", "节条目", "里程碑"],
+  "aliases": {}
+}

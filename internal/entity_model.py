@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""entity_model — 实体图谱 schema 常量与构造器（需求 r11 §5.0 表A/B + EG-15 注册表的唯一代码转写）。
+"""entity_model — 实体图谱 schema 常量与构造器。
 
-权威=docs/spec/ 下 实体图谱需求.md＋实体图谱设计.md（DG 裁定；现行版本见各文档状态行）；冲突以需求为准。
-唯控制者修改本文件（DG-1）；entity_* 模块只从这里取 schema，不得自立常量。
+对外 schema 由 references/command-contracts.md 与 golden/*.json 共同锁定；entity_* 模块只从这里
+取结构常量，不得自立副本。
 
-r11（eg-2）相对 eg-1：删 需求R kind / corpus_tier / EC 白名单 / 登记册；边三元组(parse,strength,check)
+The current model removes the retired requirement-R kind, corpus tiers, allowlists, and registry layer.
 → (parse, consumers 集合)（DG-24）；删定义于(降属性)/约束/依据/散文/弱共现，加阅读依赖/前置依赖/
 provenance，块内引用→共现索引；专名就地标注(DG-27)；CHECK_REGISTRY 单源+无孤儿自检(DG-34)。
 
@@ -15,9 +15,11 @@ provenance，块内引用→共现索引；专名就地标注(DG-27)；CHECK_REG
 import json
 import re
 
-SCHEMA_VERSION = "eg-2"
+import json_contract
+
+SCHEMA_VERSION = "eg-3"
 HARVEST_ALGO = "h1"   # harvest 算法版本（输出携带）
-TOOL_VERSION = "eg-2"  # 工具版本戳（DG-43 manifest；随 schema 契约版本，无独立 bump 负担）
+TOOL_VERSION = "eg-3"  # 工具版本戳（DG-43 manifest；随 schema 契约版本，无独立 bump 负担）
 
 # ================================================================
 # 表 A·实体 kind 与主键（kind, namespace, canonical_id）
@@ -170,7 +172,7 @@ def edge_sort_key(e):
 
 def emit(obj):
     """全部机器输出统一经此序列化（禁时间戳/绝对路径入 obj）"""
-    return json.dumps(obj, ensure_ascii=False, indent=1)
+    return json.dumps(json_contract.to_public(obj), ensure_ascii=False, indent=1)
 
 
 # ---------------- 可复现 manifest（DG-43；各命令输出顶层单源构造器） ----------------

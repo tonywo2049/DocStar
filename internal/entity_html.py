@@ -20,6 +20,8 @@ from pathlib import Path
 import entity_extract
 import entity_check
 import entity_model as M
+import i18n
+import json_contract
 
 # 输出相对路径按 cwd 解析（独立 CLI 标准行为）
 
@@ -110,12 +112,23 @@ def _payload(g, conv):
 def cmd_html_entity(g, conv, out):
     payload = _payload(g, conv)
     tpl = (Path(__file__).parent / "entity_template.html").read_text(encoding="utf-8")
+    tpl = i18n.localize_html(tpl)
+    display_payload = json_contract.to_public(payload) if i18n.language() == "en" else payload
+    if i18n.language() == "en":
+        for tile in display_payload["verdicts"]["tiles"]:
+            # Check names are values in this compact HTML payload, so the generic
+            # JSON walker cannot infer that they are selector keys.
+            tile["key"] = json_contract.to_public_key(tile["key"])
     html = tpl.replace("/*__DATA__*/null",
-                       json.dumps(payload, ensure_ascii=False).replace("</", "<\\/"))
+                       json.dumps(display_payload, ensure_ascii=False).replace("</", "<\\/"))
     out_path = Path(out) if out else Path("entity_graph.html")
     if not out_path.is_absolute():
         out_path = Path.cwd() / out_path
     out_path.write_text(html, encoding="utf-8")
     c = payload["counts"]
-    print(f"已生成 {out_path}（{c['entities']} 实体 / {c['edges']} 边；搜索+详情+邻域图+判定瓦片）")
+    print(i18n.text(
+        f"Generated {out_path} ({c['entities']} entities / {c['edges']} edges; "
+        "search, details, neighborhood graph, and check tiles)",
+        f"已生成 {out_path}（{c['entities']} 实体 / {c['edges']} 边；搜索+详情+邻域图+判定瓦片）",
+    ))
     return 0

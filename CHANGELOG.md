@@ -1,86 +1,53 @@
 ---
-性质: 记述
+locale: en
+purpose: Record user-visible DocStar release changes.
+status: approved
+type: changelog
+nature: descriptive
 ---
 
 # Changelog
 
-Format loosely follows [Keep a Changelog](https://keepachangelog.com/); versions follow semver.
-The `tool_version` field inside `context_manifest` JSON output is a schema-contract stamp
-(currently `eg-2`), independent of these release versions.
+The format follows [Keep a Changelog](https://keepachangelog.com/) where practical;
+release versions follow semantic versioning. The JSON `tool_version` is a separate
+schema-contract stamp.
+
+中文版本：[CHANGELOG.zh-CN.md](CHANGELOG.zh-CN.md)
+
+## v0.2.0 — unreleased
+
+### Bilingual interface
+
+- Added `--lang en|zh-CN` for help, human-readable CLI output, and both HTML views.
+- Made public documentation available as English-primary and `.zh-CN.md` pairs.
+- Added English and Chinese GMGN fixtures that must produce the same graph semantics.
+
+### eg-3 machine contract
+
+- Replaced the mixed-language `eg-2` JSON surface with stable English keys and tokens.
+- Kept legacy Chinese frontmatter, selectors, and convention values as input aliases.
+- Added English aliases for `--gate`, `--kind`, and `--fields`; `--lang` never changes
+  `--json` output.
+
+### GMGN compatibility
+
+- Added the bundled `gmgn-v1` conventions preset.
+- Standardized GMGN metadata, document types, work status, task-table headers, and
+  Goal → Requirement → Design → Task extraction.
+
+### Maintenance
+
+- Added the guarded `scripts/update_golden.py --schema eg-3` workflow.
+- Replaced obsolete design-process references with public contracts and executable tests.
 
 ## v0.1.1 — 2026-07-18
 
-### Agent compatibility
-- Added a Codex-compatible skill manifest, repository `AGENTS.md`, and installation paths
-  for both Codex and Claude Code.
-- Split detailed command, conventions, and writing contracts into progressive-disclosure
-  references while keeping `SKILL.md` as the concise discovery and routing entry point.
-- Agent control files (`AGENT.md`, `AGENTS.md`, `AGENTS.override.md`, `CLAUDE.md`, and
-  `SKILL.md`, case-insensitive) and `.agents` / `.codex` control trees are excluded from
-  both working-tree and Git-revision corpus scans.
-
-### Safety and CI
-- `html` and `html-entity` now write default output to the caller's working directory,
-  so read-only skill installations remain usable.
-- The test runner now exits non-zero for every real failure, including golden drift and
-  pending TDD cases; GitHub Actions has explicit read-only repository permissions.
+- Added Codex and Claude Code skill entry points and control-file exclusions.
+- Moved detailed command, conventions, and writing rules into progressive-disclosure
+  references.
+- Made HTML output safe for read-only skill installations and tightened CI failure rules.
 
 ## v0.1.0 — 2026-07-17
 
-Initial public release.
-
-### Graph & query layer
-- `graph` / `doc` / `id` / `ids` — frontmatter relationship chains (upstream/downstream +
-  wildcard keyed relations), per-document panorama, identifier occurrence index with
-  open, corpus-defined kinds.
-- `docs [glob] [--fields A,B]` — batch frontmatter projection: one call turns N documents'
-  selected fields into one table (fields missing on a document project as `null`).
-- Name resolution understands same-directory disambiguation and path-qualified references,
-  so corpora using one standard filename set per directory (`Goal.md`, `Requirement.md`, …)
-  resolve correctly.
-
-### Entity layer
-- `dump` — full entity+edge export, byte-stable against the golden baseline.
-  `--kind K` projects to one kind: entities filtered to `key[0]==K`, edges to the incident
-  set (`src[0]==K ∨ dst[0]==K`; the projection is deliberately not a closed graph —
-  edges may reference entities outside the projected list). Corpus-level diagnostics are
-  never filtered.
-- `trace` / `brief` / `verify` / `classify` / `harvest` / `drift` — entity definition
-  lookup, task-closure context bundles with explicit budgets, incremental diff
-  verification, nature classification workflow, table harvesting, value-drift detection.
-
-### Consistency checking
-- `check` — dead links, broken frontmatter references, one-way dependency edges,
-  dangling section anchors, unregistered parameters, entity-level checks; every finding
-  carries file:line provenance.
-- Verdict objects expose a four-state `judgment_status`:
-  `structurally_complete` / `tainted` / `broken` / `dormant` — `dormant` means the policy
-  for that check is not declared in conventions (never armed; not a pass, and never
-  mistakable for one from the data alone).
-- `--gate key1,key2` for CI gating: exits non-zero on failing / tainted / broken checks,
-  exit 2 on unknown keys and unknown flags (fail-closed CLI).
-
-### Machine-readable contract (agent-first)
-- Every query and analysis command except `html` / `html-entity` supports `--json`. The command → top-level-key contract is documented in
-  `references/command-contracts.md` ("JSON output contract") and drift-locked by the test suite against the
-  fixtures corpus.
-- `context_manifest` on analysis commands: corpus revision, conventions hash, output hash —
-  reproducible provenance for machine consumers.
-
-### Conventions (per-project adaptation, zero-config default)
-- Optional `conventions.json` per corpus: entity extraction forms, nature mapping
-  (`nature_source` with bracket-note normalization), archive-subtree exclusion
-  (`archive_globs` + `--include-archived` forensic switch), intentional non-link
-  declarations (`edges.nonlink_prefixes`), task-table column names, required-edge rules.
-- Three iron rules for every key: additive-optional, absent-dormant with zero ripple,
-  fail-closed validation.
-
-### Rendering
-- `html` / `html-entity` — self-contained interactive graph pages (no external assets),
-  with archive filtering honored at the data layer and fail-visible JS defenses.
-
-### Quality baseline
-- Zero dependencies, Python 3.9–3.13 (CI matrix runs all five; `--json` output is
-  byte-identical across versions).
-- Test suite: logic assertions + byte-locked golden baselines + optional slow layer;
-  contributors run `python3 tests.py --skip-slow`.
+Initial public release with document/entity graph queries, structural checks, project
+conventions, deterministic JSON, self-contained HTML, and a Python 3.9–3.13 test matrix.

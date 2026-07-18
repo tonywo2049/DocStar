@@ -29,6 +29,7 @@ from pathlib import Path
 import corpus
 import entity_extract
 import entity_model as M
+import i18n
 
 
 # ==================== baseline 解析（EG-14-AC1） ====================
@@ -180,6 +181,8 @@ def cmd_verify(g, conv, baseline_rev, as_json):
 
     if as_json:
         print(M.emit(out))
+    elif i18n.language() == "en":
+        print(i18n.render_public(out))
     else:
         _print_text(out)
     return 0
@@ -281,6 +284,8 @@ def cmd_verify_migrate(g, conv, baseline_rev, as_json):
         include_archived=getattr(g, "include_archived", False)), **out}
     if as_json:
         print(M.emit(out))
+    elif i18n.language() == "en":
+        print(i18n.render_public(out))
     else:
         _print_migrate_text(out)
     return 0

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""entity_trace — eg-2 trace 实体：primary 定义块全文 + 表B 各边分组（EG-4-AC1/AC2）。
+"""entity_trace — trace entity definitions and grouped relations (eg-3 public output).
 
 schema/定序取自 entity_model；实体与边取自 entity_extract.build(g, conv)（无持久索引，每次即时
 构建，设计 §6）。相对 eg-1：去登记册别名依赖（EG-4；无 M.load_registry/_registry_aliases）；
@@ -16,6 +16,7 @@ from collections import defaultdict
 
 import entity_extract
 import entity_model as M
+import i18n
 
 
 def _fmt_key(key):
@@ -220,6 +221,10 @@ def cmd_trace(g, conv, query, as_json):
             "worktree", conv, "trace", body=top,
             include_archived=getattr(g, "include_archived", False)), **top}  # DG-43
         print(M.emit(top))
+        return 0
+    if i18n.language() == "en":
+        top = _json_top(g, e, groups, query)
+        print(i18n.render_public(top))
         return 0
     _render_human(g, e, groups)
     return 0

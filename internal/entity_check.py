@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""entity_check — 实体层 CHK 纪律机检（r11/eg-2；EG-15 七检查+逐检查真值表 DG-35）。
+"""entity_check — entity-layer structural checks and per-check truth states.
 
 权威=同目录 实体图谱需求.md（EG-15 全 AC / EG-11-AC2）+ 实体图谱设计.md（DG-23/29/34/35）；
 schema 单源=entity_model（CHECK_REGISTRY/ENTITY_CHECK_KEYS/orphan_consumers）；冲突以需求为准。
@@ -192,7 +192,7 @@ def _uncovered_kinds(entities, conv):
         covered |= set(r["src_kinds"])
         if r["dst_kinds"]:
             covered |= set(r["dst_kinds"])
-    present = {e["key"][0] for e in entities}
+    present = {e["key"][0] for e in entities} - set(conv.uncovered_kind_exclusions)
     findings = [{"kind": k} for k in sorted(present - covered)]
     return _verdict(findings, [], [])
 

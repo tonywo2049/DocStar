@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""entity_extract — eg-2 实体+边抽取管线 + dump（波6-TA；schema=需求 r12 §5.0，结构=设计 v2.5）。
+"""entity_extract — entity/edge extraction pipeline and eg-3 dump output.
 
 schema 唯一权威 = entity_model（表A/B 代码化，本文件不自立 schema 常量）；项目约定唯一来自
 conv（entity_model 已无项目常量——命名空间锚/定义形/形态表头/harvest 过滤全经 conv）。
 
-相对 eg-1 破损版（load_registry/key_req_ac/corpus_tier 已失效）的 eg-2 重建：
+The current engine replaces the retired eg-1 registry/corpus-tier implementation:
   · 删 tier 体系 → `性质`（判定参与开关，EG-D10）；删 include_examples；删 registry
   · 删边：定义于（降 entity.primary，DG-20）/约束/依据/散文修订声明/弱共现
   · 加边：阅读依赖(任务→节条目)/前置依赖(任务→任务)/provenance(记述→AC/节/参数)（EG-12-AC1/2/4）
@@ -29,6 +29,7 @@ from pathlib import Path
 
 import corpus
 import entity_model as M
+import i18n
 
 # ================ 抽取用正则（抽取机制，非项目 schema——项目 schema 一律走 conv） ================
 _L = r"(?<![A-Za-z0-9_])"
@@ -1025,6 +1026,9 @@ def cmd_dump(g, conv, as_json, kind=None):
         include_archived=getattr(g, "include_archived", False)), **top}  # DG-43
     if as_json:
         print(M.emit(top))
+        return 0
+    if i18n.language() == "en":
+        print(i18n.render_public(top))
         return 0
     kind_n, type_n = defaultdict(int), defaultdict(int)
     for e in entities:

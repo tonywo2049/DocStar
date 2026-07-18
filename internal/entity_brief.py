@@ -43,6 +43,7 @@ from collections import defaultdict
 
 import entity_extract
 import entity_model as M
+import i18n
 
 # 内容预算：bundle 内容层原文累计字符上限（缺省，可经 --budget 覆写）。命名策略常量非散落魔数。
 CONTENT_BUDGET_CHARS = 16000
@@ -512,6 +513,9 @@ def cmd_brief(g, conv, query, as_json, mode="execute", budget=None):
 
     if as_json:
         print(M.emit(top))
+        return 0
+    if i18n.language() == "en":
+        print(i18n.render_public(top))
         return 0
     _render_human(top)
     return 0

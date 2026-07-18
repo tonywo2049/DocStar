@@ -19,6 +19,7 @@ from pathlib import Path
 
 import corpus
 import entity_model as M
+import i18n
 
 
 def _scope_docs(g, conv, scope):
@@ -77,6 +78,8 @@ def cmd_drift(g, conv, as_json):
         include_archived=getattr(g, "include_archived", False)), **out}
     if as_json:
         print(M.emit(out))
+    elif i18n.language() == "en":
+        print(i18n.render_public(out))
     else:
         _print_text(out)
     return 0

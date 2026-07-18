@@ -1,13 +1,22 @@
 ---
-性质: 记述
+locale: en
+purpose: Explain DocStar internal modules to maintainers.
+status: approved
+type: maintainer-guide
+nature: descriptive
 ---
 
-# internal — DocStar 内部模块
+# DocStar internals
 
-`docstar.py`（仓库根）的实现模块与渲染模板，**不是日常入口**——所有命令经根 `docstar.py <command>` 调用，用法见 [SKILL.md](../SKILL.md)。
+These are implementation modules and rendering templates for the root `docstar.py`
+entry point. They are not separate user commands.
 
-- `corpus.py` — 语料源抽象（文件系统 / git 扫描）
-- `entity_*.py` — 实体层：抽取 / 检查 / 追溯 / 简报 / 校验 / 分类 / 采集 / 建模 / HTML 渲染
-- `*.html` — graph 与 entity 交互页的自包含模板
+- `corpus.py` — filesystem and Git corpus sources.
+- `entity_*.py` — extraction, checks, trace, brief, verify, classify, harvest, model,
+  and HTML rendering.
+- `*_template.html` — self-contained document and entity graph pages.
 
-`docstar.py` 启动时把本目录加入 `sys.path`，故模块间以顶层名互相 import（如 `import corpus`）；带自检的模块可单独运行 `python3 internal/<模块>.py --selftest`。
+`docstar.py` adds this directory to `sys.path`, so internal modules use top-level imports.
+Modules with a self-test can be run with `python3 internal/<module>.py --selftest`.
+
+中文版本：[README.zh-CN.md](README.zh-CN.md)

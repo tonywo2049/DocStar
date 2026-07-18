@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """entity_harvest — 未标注高频词提示（EG-5 harvest 半；波6-TB 交付，改自 eg-1 登记册候选）。
 
-r11（eg-2）用途反转（需求 §5 EG-5 / §7 写作契约「引用符号」行 / EG-11-AC4 引用端）：
+The current harvest mode reports unannotated high-frequency terms as writing hints:
 harvest 不再产「登记册候选」，而是提示语料里**高频出现却从未就地标注/术语表定义**的粗体·
 反引号专名候选——即「该写 `**X**（定义：<锚>）` 或术语表行却没写」的欠账线索（提示级，
 不进任何门禁；无 `[[X]]` 显式引用语法，引用端不可确定性判定，故只提示不判定）。
@@ -25,6 +25,7 @@ from pathlib import Path
 
 import corpus
 import entity_model
+import i18n
 
 # 候选抽取：粗体 **…** 与反引号 `…`（非贪婪，逐行 finditer）
 _BOLD_RE = re.compile(r"\*\*(.+?)\*\*")
@@ -178,6 +179,9 @@ def cmd_harvest(g, conv, as_json, baseline):
         include_archived=getattr(g, "include_archived", False)), **data}
     if as_json:
         print(entity_model.emit(data))
+        return 0
+    if i18n.language() == "en":
+        print(i18n.render_public(data))
         return 0
 
     stat = "  ".join(f"{k}×{v}" for k, v in filtered.items())
