@@ -32,6 +32,49 @@ python3 docstar.py check --json --corpus /path/to/docs
 
 不需要 `pip install`。相对路径都从调用者的当前目录解析。
 
+## 安装为 Codex 或 Claude Code Skill
+
+### Git clone 加软链接
+
+把 DocStar clone 到一个固定的绝对路径，再把同一份 checkout 链接到一个或两个客户端。
+将 `/absolute/path/to/DocStar` 替换成实际 checkout 路径，只执行你所用客户端对应的链接命令。
+
+```bash
+git clone https://github.com/tonywo2049/DocStar.git /absolute/path/to/DocStar
+mkdir -p ~/.codex/skills ~/.claude/skills
+ln -s /absolute/path/to/DocStar ~/.codex/skills/docstar
+ln -s /absolute/path/to/DocStar ~/.claude/skills/docstar
+```
+
+### Release ZIP 或复制目录
+
+从[最新 Release](https://github.com/tonywo2049/DocStar/releases/latest)下载
+`Source code (zip)`，解压后把完整目录放到 `~/.codex/skills/docstar` 或
+`~/.claude/skills/docstar`。
+
+不要把新版文件叠加复制到已有目录。应完整替换已安装的 `docstar` 目录，避免新版已经删除或
+重命名的文件残留自旧版本。
+
+## 升级
+
+如果通过软链接使用 Git clone，只需更新共享 checkout，无需重建链接。
+
+```bash
+git -C /absolute/path/to/DocStar pull --ff-only
+```
+
+如果通过 ZIP 或复制目录安装，下载最新 Release，并完整替换每个已安装的 `docstar` 目录。
+需要备份时先把旧目录移走，不要把新版文件与旧目录合并。
+
+把占位路径换成实际绝对路径，验证 checkout 或安装目录；输出的最后一行会显示已安装的发布版本：
+
+```bash
+python3 /absolute/path/to/DocStar/docstar.py
+```
+
+无论采用哪种升级方式，完成后都要新建 Codex task 或 Claude Code session，让客户端重新加载
+Skill 指令。
+
 ## 命令
 
 | 问题 | 命令 |

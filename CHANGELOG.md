@@ -14,6 +14,18 @@ schema-contract stamp.
 
 中文版本：[CHANGELOG.zh-CN.md](CHANGELOG.zh-CN.md)
 
+## Unreleased
+
+### Added
+
+- Added a standalone `--version` flag that reports the release version without a
+  command or corpus scan.
+
+### Documentation
+
+- Documented Codex and Claude Code Skill installation and upgrade paths for shared
+  Git checkouts and complete-directory ZIP or copied installations.
+
 ## v0.2.0 — 2026-07-19
 
 ### Bilingual interface

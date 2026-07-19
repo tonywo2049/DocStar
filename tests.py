@@ -762,6 +762,31 @@ def a_cli_flags():
     c4, _, _ = run("doc", "契约一-集合凭据与采纳")
     ok("cliflag/positional_intact", c4 == 0,
        "位置参数路径不受影响（doc <名称> 照常）")
+    from docstar import __version__ as release_version
+    with tempfile.TemporaryDirectory() as tmp:
+        conv_dir = Path(tmp) / ".docstar" / "conventions"
+        conv_dir.mkdir(parents=True)
+        (conv_dir / "conventions.json").write_text("{}\n", encoding="utf-8")
+        scan = subprocess.run(
+            [sys.executable, str(DOCSTAR), "graph"],
+            cwd=tmp,
+            capture_output=True,
+            text=True,
+        )
+        p = subprocess.run(
+            [sys.executable, str(DOCSTAR), "--version"],
+            cwd=tmp,
+            capture_output=True,
+            text=True,
+        )
+    ok("cliflag/version_without_command_or_corpus",
+       scan.returncode == 2
+       and "约定配置非法" in scan.stderr
+       and p.returncode == 0
+       and p.stdout == f"docstar v{release_version}\n"
+       and p.stderr == "",
+       "同一空语料的非法 conventions 可使 graph fail-closed；--version 仍在加载配置前退出 0，"
+       "stdout 精确显示当前 __version__，stderr 为空")
 
 
 def a_verdict_json():

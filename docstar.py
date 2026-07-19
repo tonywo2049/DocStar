@@ -5,6 +5,7 @@
 关系(边)通配：任意 Markdown 语料零配置即出关系图；ID 索引/实体识别按 conventions 提供的语法点亮。
 
 用法：
+  python3 docstar.py --version        # 发布版本；无需命令或语料
   python3 docstar.py graph            # 全局：frontmatter 关系链（通配：上下游+任意键关联）
   python3 docstar.py doc <名称>       # 单文档：元信息/出入边/节标题/ID 概览（名称可带目录限定，如 M1/Requirement）
   python3 docstar.py id <ID>          # 一个 ID 的全部出现位置（file:line）
@@ -785,6 +786,9 @@ def _entity(name):
         return None
 
 def main(argv):
+    if argv == ["--version"]:
+        print(f"docstar v{__version__}")
+        return 0
     as_json = "--json" in argv
     corpus_dir = gate = baseline = conventions_dir = manifest = kind_arg = preset = None
     lang = "zh-CN"

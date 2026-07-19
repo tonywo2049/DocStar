@@ -17,6 +17,8 @@ corpus is the current directory. `html` and `html-entity` write `graph.html` and
 `entity_graph.html` there unless given another path.
 
 - `--json`: emit the stable `eg-3` public JSON contract.
+- `--version`: when used by itself, print the release version and exit without
+  scanning a corpus or emitting JSON.
 - `--lang en|zh-CN`: select human-facing labels; never changes JSON.
 - `--corpus DIR`: select the Markdown corpus root.
 - `--conventions DIR`: replace automatic convention discovery.
@@ -38,6 +40,7 @@ corpus is the current directory. `html` and `html-entity` write `graph.html` and
 ## Command forms
 
 ```text
+docstar.py --version
 docstar.py graph
 docstar.py doc <name>
 docstar.py id <ID>

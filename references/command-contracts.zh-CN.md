@@ -16,6 +16,7 @@ nature: normative
 分别写入当前目录的 `graph.html` 和 `entity_graph.html`。
 
 - `--json`：输出稳定的 `eg-3` 公开 JSON 合同。
+- `--version`：单独使用时输出发布版本并退出，不扫描语料，也不输出 JSON。
 - `--lang en|zh-CN`：切换人类可读标签，不改变 JSON。
 - `--corpus DIR`：指定 Markdown 语料根。
 - `--conventions DIR`：覆盖自动发现的 conventions。
@@ -37,6 +38,7 @@ nature: normative
 ## 命令形式
 
 ```text
+docstar.py --version
 docstar.py graph
 docstar.py doc <name>
 docstar.py id <ID>

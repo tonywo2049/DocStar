@@ -34,6 +34,55 @@ python3 docstar.py check --json --corpus /path/to/docs
 There is nothing to install with `pip`. Relative paths are resolved from the
 caller's current directory.
 
+## Install as a Codex or Claude Code Skill
+
+### Git clone with symbolic links
+
+Clone DocStar to a stable absolute path, then link that one checkout into either
+or both clients. Replace `/absolute/path/to/DocStar` with the checkout path you
+chose, and run only the link commands for the clients you use.
+
+```bash
+git clone https://github.com/tonywo2049/DocStar.git /absolute/path/to/DocStar
+mkdir -p ~/.codex/skills ~/.claude/skills
+ln -s /absolute/path/to/DocStar ~/.codex/skills/docstar
+ln -s /absolute/path/to/DocStar ~/.claude/skills/docstar
+```
+
+### Release ZIP or copied directory
+
+Download `Source code (zip)` from the
+[latest release](https://github.com/tonywo2049/DocStar/releases/latest), extract
+it, and place the complete extracted directory at `~/.codex/skills/docstar` or
+`~/.claude/skills/docstar`.
+
+Do not overlay a new release onto an existing copied directory. Replace the
+complete installed `docstar` directory so files removed or renamed by the new
+release cannot survive from the old version.
+
+## Upgrade
+
+For a Git clone used through symbolic links, update the shared checkout. The
+links do not need to be recreated.
+
+```bash
+git -C /absolute/path/to/DocStar pull --ff-only
+```
+
+For a ZIP or copied installation, download the latest release and fully replace
+each installed `docstar` directory. Move the old directory aside first if you
+need a backup; never merge the new files over it.
+
+Verify the checkout or installed directory, replacing the placeholder with its
+actual absolute path. The final output line shows the installed release version:
+
+```bash
+python3 /absolute/path/to/DocStar/docstar.py
+```
+
+After either upgrade method, start a new Codex task or Claude Code session so
+the client reloads the Skill instructions.
+
 ## Commands
 
 | Question | Command |

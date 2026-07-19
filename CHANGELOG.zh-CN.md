@@ -13,6 +13,17 @@ JSON 中的 `tool_version` 是独立的 schema 契约版本。
 
 English: [CHANGELOG.md](CHANGELOG.md)
 
+## 未发布
+
+### 新增
+
+- 增加独立的 `--version` 旗标，无需命令或扫描语料即可输出发布版本。
+
+### 文档
+
+- 补充 Codex 与 Claude Code Skill 的安装和升级方式，覆盖共享 Git checkout，以及完整替换目录的
+  ZIP 或复制安装。
+
 ## v0.2.0 — 2026-07-19
 
 ### 双语界面
