@@ -47,7 +47,7 @@ codex plugin list
 
 ### 手工安装 Skill（可选）
 
-### Git clone 加软链接
+#### Git clone 加软链接
 
 只在未安装 marketplace 插件时使用本方式。把 DocStar clone 到固定的绝对路径，再把该
 checkout 链接到 Codex 或 Claude Code。将 `/absolute/path/to/DocStar` 替换成实际路径。
@@ -59,7 +59,7 @@ ln -s /absolute/path/to/DocStar ~/.codex/skills/docstar
 ln -s /absolute/path/to/DocStar ~/.claude/skills/docstar
 ```
 
-### Release ZIP 或复制目录
+#### Release ZIP 或复制目录
 
 从[最新 Release](https://github.com/tonywo2049/DocStar/releases/latest)下载
 `Source code (zip)`，解压后把完整目录放到 `~/.codex/skills/docstar` 或

@@ -848,9 +848,18 @@ def a_codex_plugin_package():
            "installation": "AVAILABLE", "authentication": "ON_INSTALL"}
        and isinstance(entry.get("category"), str) and bool(entry.get("category")),
        "DocStar marketplace 唯一 entry 指向仓库根，并含完整 policy/category")
+    versions = (plugin.get("version"), entry.get("version"), release_version)
+    semver = re.compile(
+        r"^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)"
+        r"(?:-(?:0|[1-9]\d*|[0-9A-Za-z-]*[A-Za-z-][0-9A-Za-z-]*)"
+        r"(?:\.(?:0|[1-9]\d*|[0-9A-Za-z-]*[A-Za-z-][0-9A-Za-z-]*))*)?"
+        r"(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$"
+    )
     ok("plugin/version-consistency",
-       plugin.get("version") == entry.get("version") == release_version == "0.2.2",
-       "plugin manifest、marketplace entry 与 docstar.py 三处版本同为 0.2.2")
+       isinstance(versions[0], str)
+       and all(version == versions[0] for version in versions[1:])
+       and semver.fullmatch(versions[0]) is not None,
+       "plugin manifest、marketplace entry 与 docstar.py 三处版本一致，且为严格 SemVer")
 
 
 def a_verdict_json():

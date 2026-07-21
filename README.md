@@ -50,7 +50,7 @@ because they produce duplicate triggers.
 
 ### Manual Skill installation (optional)
 
-### Git clone with symbolic links
+#### Git clone with symbolic links
 
 Use this only when the marketplace installation is not present. Clone DocStar to
 a stable absolute path, then link that checkout into Codex or Claude Code. Replace
@@ -63,7 +63,7 @@ ln -s /absolute/path/to/DocStar ~/.codex/skills/docstar
 ln -s /absolute/path/to/DocStar ~/.claude/skills/docstar
 ```
 
-### Release ZIP or copied directory
+#### Release ZIP or copied directory
 
 Download `Source code (zip)` from the
 [latest release](https://github.com/tonywo2049/DocStar/releases/latest), extract
