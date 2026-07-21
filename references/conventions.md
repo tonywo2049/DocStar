@@ -60,8 +60,10 @@ intentionally forks the contract.
   `canonical_task_table_only` switch. When absent, execution-log extraction is dormant.
   When present, links must be relative Markdown links; the log must declare
   `type: execution-log` and `nature: descriptive`, its filename must match the task ID,
-  and `latest_event` must resolve to an anchor in that same file. Invalid declarations
-  appear in `execution_log_diagnostics` and `brief` omissions.
+  and `latest_event` must resolve to an anchor in that same file. Configured card-field
+  names accept `=`, ASCII `:`, or full-width `：` as the separator. Anchors inside inline
+  code, fenced code, or HTML comments do not resolve. Invalid declarations appear in
+  `execution_log_diagnostics` and `brief` omissions.
 - `nature_source`: migration mapping from an existing metadata field to
   `normative` or `descriptive`; explicit `nature`/`性质` wins.
 - `required_edges`: cross-kind policies and report/gate severity.

@@ -19,6 +19,9 @@ nature: normative
 | **T5** | Current-card happy path | none | none | `red_t5` | in-progress |
 | **T6** | Invalid log metadata | none | none | `red_t6` | in-progress |
 | **T7** | Explicitly no execution history yet | none | none | `red_t7` | not-started |
+| **T8** | Malformed card field separator | none | none | `red_t8` | in-progress |
+| **T10** | Inline-code anchor must be ignored | none | none | `red_t10` | in-progress |
+| **T11** | HTML-comment anchor must be ignored | none | none | `red_t11` | in-progress |
 | **TA2.11b** | Project-local ID remains outside gmgn-v1 | none | none | `red_ta` | in-progress |
 
 | legacy id | note |
@@ -38,7 +41,14 @@ nature: normative
 | `T4` | [T4](execution/WRONG.md) | [event-1](execution/WRONG.md#event-1) |
 | `T6` | [T6](execution/T6.md) | [event-1](execution/T6.md#event-1) |
 | `T7` | none | none |
+| `T10` | [T10](execution/T10.md) | [ghost](execution/T10.md#ghost) |
+| `T11` | [T11](execution/T11.md) | [ghost](execution/T11.md#ghost) |
 
 ## T5 Current card
 
-- `execution_log`=[T5](execution/T5.md); `latest_event`=[event-1](execution/T5.md#event-1).
+- `execution_log`: [T5](execution/T5.md); `latest_event`： [event-1](execution/T5.md#event-1).
+
+## T8 Malformed current card
+
+- `execution_log` -> [T8](execution/T8.md)
+- `latest_event`: [event-1](execution/T8.md#event-1)

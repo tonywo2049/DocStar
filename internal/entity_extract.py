@@ -351,11 +351,25 @@ def _heading_slug(title):
     return re.sub(r"\s+", "-", text).strip("-")
 
 
+def _mask_html_comments(text):
+    """HTML comment 全跨度置空且保换行/列，避免注释内伪锚改变溯源行号。"""
+    return re.sub(
+        r"<!--.*?(?:-->|$)",
+        lambda m: re.sub(r"[^\n]", " ", m.group(0)),
+        text,
+        flags=re.S,
+    )
+
+
 def _event_primary(lines, anchor):
-    """定位 latest_event 锚并返回事件 heading 块，不返回整份日志。"""
+    """定位 latest_event 锚并返回事件 heading 块；代码与 HTML comment 内伪锚不参与。"""
+    heading_text = _mask_html_comments(
+        corpus.code_mask("\n".join(lines), mask_inline=False))
+    heading_lines = heading_text.split("\n")
+    explicit_lines = corpus.code_mask(heading_text, mask_inline=True).split("\n")
     explicit, headings = [], []
-    for i, line in enumerate(lines, 1):
-        for m in _HTML_ANCHOR_RE.finditer(line):
+    for i, line in enumerate(heading_lines, 1):
+        for m in _HTML_ANCHOR_RE.finditer(explicit_lines[i - 1]):
             if m.group(2) == anchor:
                 explicit.append(i)
         hm = _ANY_HEADING_RE.match(line)
@@ -363,8 +377,8 @@ def _event_primary(lines, anchor):
             headings.append((i, len(hm.group(1)), hm.group(2)))
     if explicit:
         anchor_line = explicit[0]
-        next_nonblank = next((i for i in range(anchor_line + 1, len(lines) + 1)
-                              if lines[i - 1].strip()), None)
+        next_nonblank = next((i for i in range(anchor_line + 1, len(heading_lines) + 1)
+                              if heading_lines[i - 1].strip()), None)
         start = (next_nonblank if next_nonblank is not None
                  and any(line == next_nonblank for line, _depth, _title in headings)
                  else anchor_line)
@@ -375,9 +389,11 @@ def _event_primary(lines, anchor):
     heading = next(((line, depth) for line, depth, _title in headings if line == start), None)
     if heading:
         _line, depth = heading
-        end = next((line - 1 for line, d, _title in headings if line > start and d <= depth), len(lines))
+        end = next((line - 1 for line, d, _title in headings if line > start and d <= depth),
+                   len(heading_lines))
     else:
-        end = next((line - 1 for line, _d, _title in headings if line > start), len(lines))
+        end = next((line - 1 for line, _d, _title in headings if line > start),
+                   len(heading_lines))
     return {"line": start, "line_end": end}
 
 
@@ -415,8 +431,8 @@ def _scan_task_execution(g, S, conv):
     def field_value(block, names):
         for line_no, line in block:
             for name in names:
-                marker = re.compile(r"(?:`|\*\*)?" + re.escape(name)
-                                    + r"(?:`|\*\*)?\s*=\s*", re.I)
+                marker = re.compile(r"(?<![A-Za-z0-9_])(?:`|\*\*)?" + re.escape(name)
+                                    + r"(?:`|\*\*)?\s*(?:=|:|：)\s*", re.I)
                 m = marker.search(line)
                 if not m:
                     continue
@@ -517,8 +533,7 @@ def _scan_task_execution(g, S, conv):
             diagnostic(tid, rel, line, "invalid_log_metadata", log_rel)
             continue
         log_lines = S.striplines.get(log_rel, [])
-        anchor_lines = corpus.code_mask("\n".join(log_lines), mask_inline=False).splitlines()
-        event_primary = _event_primary(anchor_lines, event_anchor)
+        event_primary = _event_primary(log_lines, event_anchor)
         if event_primary is None:
             diagnostic(tid, rel, line, "latest_event_anchor_missing", event_value[2])
             continue

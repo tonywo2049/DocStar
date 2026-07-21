@@ -14,6 +14,7 @@ provenance，块内引用→共现索引；专名就地标注(DG-27)；CHECK_REG
 
 import json
 import re
+from collections import defaultdict
 
 import json_contract
 
@@ -121,7 +122,8 @@ def make_edge(etype, src, dst, file, line, method, attrs=None):
 # ================================================================
 
 CHECK_REGISTRY = {
-    "brief":            {"kind": "查询", "输入边": {"任务声明", "阅读依赖", "前置依赖", "任务测试声明"},
+    "brief":            {"kind": "查询", "输入边": {"任务声明", "阅读依赖", "前置依赖", "任务测试声明",
+                                                   "执行日志", "最新事件"},
                          "判定状态": None, "严重度": None, "AC": "EG-13"},
     "CHK-2覆盖缺口":    {"kind": "门禁", "输入边": {"任务声明", "验证声明"},
                          "判定状态": "report", "严重度": "报告级", "AC": "EG-15-AC2"},
@@ -149,6 +151,22 @@ def orphan_consumers():
     for _parse, consumers in EDGE_TYPES.values():
         used |= consumers
     return sorted(used - declared)
+
+
+def consumer_input_edge_mismatches():
+    """consumer 注册的输入边须等于 EDGE_TYPES 反向投影；空列表=双向一致。"""
+    actual = defaultdict(set)
+    for edge_type, (_parse, consumers) in EDGE_TYPES.items():
+        for consumer in consumers:
+            actual[consumer].add(edge_type)
+    mismatches = []
+    for consumer in sorted(set(CHECK_REGISTRY) | set(actual)):
+        declared = set(CHECK_REGISTRY.get(consumer, {}).get("输入边", set()))
+        if declared != actual[consumer]:
+            mismatches.append({"consumer": consumer,
+                               "declared": sorted(declared),
+                               "actual": sorted(actual[consumer])})
+    return mismatches
 
 # ---------------- 报告与 check 键（EG-15 七检查 + 抽取报告） ----------------
 
@@ -221,6 +239,9 @@ def _schema_selfcheck():
     orphans = orphan_consumers()
     if orphans:
         issues.append(f"孤儿 consumer（EDGE_TYPES 用了但 CHECK_REGISTRY 未注册）：{orphans}")
+    mismatches = consumer_input_edge_mismatches()
+    if mismatches:
+        issues.append(f"consumer 输入边与 EDGE_TYPES 反向投影不一致：{mismatches}")
     # 每个门禁/提示 check 键须在 CHECK_REGISTRY
     for k in ENTITY_CHECK_KEYS:
         if k not in CHECK_REGISTRY:
@@ -253,6 +274,7 @@ if __name__ == "__main__":
         print(f"CHECK_REGISTRY ({len(CHECK_REGISTRY)}): {list(CHECK_REGISTRY)}")
         print(f"ENTITY_CHECK_KEYS ({len(ENTITY_CHECK_KEYS)}): {ENTITY_CHECK_KEYS}")
         print(f"孤儿 consumer: {orphan_consumers() or '无'}")
+        print(f"consumer 输入边反向不一致: {consumer_input_edge_mismatches() or '无'}")
         # 冒烟：越出 DEFAULT_KINDS 的开放 kind 照常构造、不报「非法 kind」（DG-38）
         make_entity(("决策", "某设计", "D-7"), "D-7", 性质="规范")
         edge = make_edge("映射", ("需求AC", "requirements", "REQ-7"),

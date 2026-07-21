@@ -20,6 +20,7 @@ runner 打印「N 绿 / M 待建 / K 逻辑红」。退出码：逻辑红>0 或 
 
 import json
 import re
+import shutil
 import statistics
 import subprocess
 import sys
@@ -215,6 +216,22 @@ def a_schema():
         EM.EDGE_TYPES["共现索引"] = saved
     ok("schema/orphan_detects", detected,
        "注入未注册 consumer 名 → orphan_consumers 检出（工具对自己 schema 跑 CHK）")
+    ok("schema/consumer-input-edges-reverse-consistent",
+       EM.consumer_input_edge_mismatches() == [],
+       "CHECK_REGISTRY consumer 输入边与 EDGE_TYPES consumers 反向投影完全一致")
+    saved_brief_inputs = EM.CHECK_REGISTRY["brief"]["输入边"]
+    try:
+        EM.CHECK_REGISTRY["brief"]["输入边"] = saved_brief_inputs - {"最新事件"}
+        reverse_detected = any(
+            x.get("consumer") == "brief" and "最新事件" in x.get("actual", [])
+            for x in EM.consumer_input_edge_mismatches())
+    finally:
+        EM.CHECK_REGISTRY["brief"]["输入边"] = saved_brief_inputs
+    ok("schema/consumer-input-edges-reverse-detects", reverse_detected,
+       "注入 brief 输入边漏项 → 反向一致性自检检出")
+    ok("schema/brief-execution-input-edges",
+       {"执行日志", "最新事件"} <= EM.CHECK_REGISTRY["brief"]["输入边"],
+       "brief 注册输入边包含执行日志与最新事件")
     ok("schema/check_keys_registered",
        all(k in EM.CHECK_REGISTRY for k in EM.ENTITY_CHECK_KEYS),
        "ENTITY_CHECK_KEYS 八键全在 CHECK_REGISTRY 注册")
@@ -2237,7 +2254,7 @@ def a_execution_logs():
     ok("execution-log/current-card-fields",
        bool(find_edge(dump, "执行日志", src_cid="T5", dst_cid="execution/T5.md"))
        and bool(find_edge(dump, "最新事件", src_cid="execution/T5.md", dst_cid="event-1")),
-       "T5 从当前卡 execution_log/latest_event 字段建两跳关系")
+       "T5 从当前卡字段建两跳关系，ASCII 冒号与中文冒号分隔符均生效")
     trace_code, event_trace, _ = run_json(
         "trace", "event-2", "--preset", "gmgn-v1", corpus=EXECUTION_LOG)
     ok("execution-log/latest-event-queryable",
@@ -2248,10 +2265,21 @@ def a_execution_logs():
     # 坏链接、坏锚、卡/log ID 不匹配、坏 metadata 不静默。
     diagnostics = dump.get("reports", {}).get("执行日志诊断", [])
     for tid, reason in (("T2", "log_target_missing"), ("T3", "latest_event_anchor_missing"),
-                        ("T4", "card_log_id_mismatch"), ("T6", "invalid_log_metadata")):
+                        ("T4", "card_log_id_mismatch"), ("T6", "invalid_log_metadata"),
+                        ("T8", "invalid_pointer"), ("T10", "latest_event_anchor_missing"),
+                        ("T11", "latest_event_anchor_missing")):
         ok(f"execution-log/diagnostic-{tid.lower()}",
            any(x.get("task") == tid and x.get("reason") == reason for x in diagnostics),
            f"{tid} 失败显式进入 execution_log_diagnostics：{reason}")
+    ok("execution-log/malformed-separator-no-edge",
+       not find_edge(dump, "执行日志", src_cid="T8")
+       and not find_edge(dump, "最新事件", src_cid="execution/T8.md"),
+       "箭头等畸形卡字段分隔符不被接受，且不入图")
+    for tid in ("T10", "T11"):
+        ok(f"execution-log/ghost-anchor-no-graph-{tid.lower()}",
+           not find_edge(dump, "执行日志", src_cid=tid)
+           and not find_edge(dump, "最新事件", src_cid=f"execution/{tid}.md"),
+           f"{tid} 的伪锚不生成 task→log→event 图")
     ok("execution-log/none-pointer-is-clean",
        not any(x.get("task") == "T7" for x in diagnostics)
        and not find_edge(dump, "执行日志", src_cid="T7"),
@@ -2288,6 +2316,13 @@ def a_execution_logs():
        c2 == 0 and list_has((b2 or {}).get("diagnostics"), "log_target_missing")
        and list_has((b2 or {}).get("omitted"), "log_target_missing"),
        "坏 execution log 链接在 brief diagnostics/omitted 双显式")
+    for tid in ("T10", "T11"):
+        cb, bb, _ = run_json("brief", tid, "--preset", "gmgn-v1", corpus=EXECUTION_LOG)
+        ok(f"execution-log/ghost-anchor-brief-explicit-{tid.lower()}",
+           cb == 0
+           and list_has((bb or {}).get("diagnostics"), "latest_event_anchor_missing")
+           and list_has((bb or {}).get("omitted"), "latest_event_anchor_missing"),
+           f"{tid} 伪锚坏指针在 brief diagnostics/omitted 双显式")
 
     # gmgn-v1 任务实体仅来自 canonical task table：重复加粗标签不成任务；T1 保留；TA 不扩语法。
     task_ids = {e["key"][2] for e in dump.get("entities", []) if e["key"][0] == "任务"}
@@ -2298,7 +2333,8 @@ def a_execution_logs():
     ok("execution-log/gmgn-does-not-expand-local-ids", "TA2.11b" not in task_ids,
        "gmgn-v1 仍不识别项目自定义 TA/TG/RPL ID")
     ok("execution-log/pointer-card-id-not-parameter",
-       not ({"T1", "T2", "T3", "T4", "T5", "T6", "T7"}
+       not (({"T1", "T2", "T3", "T4", "T5", "T6", "T7"}
+             | {"T8", "T10", "T11"})
             & {e["key"][2] for e in dump.get("entities", []) if e["key"][0] == "参数"}),
        "execution pointer table 的 card_id 不被参数 def_form 误识别")
 
@@ -2329,6 +2365,31 @@ def a_execution_logs():
         ok("execution-log/config-invalid-fail-closed",
            bad_code == 2 and "task_execution" in bad_err,
            "task_execution 非法形状 exit 2，不回落默认")
+
+        alias_cfg = copy.deepcopy(preset_raw)
+        alias_cfg["task_execution"]["card_fields"] = {
+            "execution_log": ["run log"],
+            "latest_event": ["last event"],
+        }
+        alias_dir = Path(tmp) / "alias"
+        alias_dir.mkdir()
+        (alias_dir / "conventions.json").write_text(
+            json.dumps(alias_cfg), encoding="utf-8")
+        alias_corpus = Path(tmp) / "alias-corpus"
+        shutil.copytree(EXECUTION_LOG, alias_corpus)
+        alias_task = alias_corpus / "Task.md"
+        alias_task.write_text(
+            alias_task.read_text(encoding="utf-8")
+            .replace("`execution_log`:", "`run log`:")
+            .replace("`latest_event`：", "`last event`："),
+            encoding="utf-8")
+        alias_code, alias_dump, alias_err = run_json(
+            "dump", "--conventions", str(alias_dir), corpus=str(alias_corpus))
+        ok("execution-log/configured-card-field-aliases",
+           alias_code == 0
+           and bool(find_edge(alias_dump, "执行日志", src_cid="T5", dst_cid="execution/T5.md"))
+           and bool(find_edge(alias_dump, "最新事件", src_cid="execution/T5.md", dst_cid="event-1")),
+           f"卡字段名来自配置别名，不硬写 execution_log/latest_event：{alias_err}")
 
         without = copy.deepcopy(preset_raw)
         without.pop("task_execution", None)
