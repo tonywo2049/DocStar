@@ -43,7 +43,7 @@ from fnmatch import fnmatchcase
 from pathlib import Path
 from urllib.parse import unquote
 
-__version__ = "0.2.0"   # 发布版本（语义化）；与 manifest 的 tool_version="eg-3"（schema 契约戳）正交
+__version__ = "0.2.1"   # 发布版本（语义化）；与 manifest 的 tool_version="eg-3"（schema 契约戳）正交
 
 sys.path.insert(0, str(Path(__file__).resolve().parent / "internal"))  # 内部模块（corpus/entity_*）迁入 internal/
 
