@@ -15,14 +15,23 @@ English: [CHANGELOG.md](CHANGELOG.md)
 
 ## 未发布
 
+## v0.2.3 — 2026-07-21
+
 ### 新增
 
 - 增加独立的 `--version` 旗标，无需命令或扫描语料即可输出发布版本。
+- 增加 `brief --baseline REV`，从精确 Git commit 生成任务证据包，并在上下文清单中记录解析后的
+  完整 SHA。
+
+### 修复
+
+- 历史快照内的链接改为只按快照成员解析，不再借用当前文件系统。
 
 ### 文档
 
 - 补充 Codex 与 Claude Code Skill 的安装和升级方式，覆盖共享 Git checkout，以及完整替换目录的
   ZIP 或复制安装。
+- 明确 brief 只是起始上下文；证据或指针不足时，agent 可以定向读取原文。
 
 ## v0.2.0 — 2026-07-19
 

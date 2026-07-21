@@ -27,7 +27,8 @@ corpus is the current directory. `html` and `html-entity` write `graph.html` and
 - `--kind K`: project `ids` or `dump` to one kind; accepts eg-3 English tokens.
 - `--fields A,B`: project frontmatter; accepts canonical or legacy aliases.
 - `--gate key1,key2`: gate named `check` top-level keys; accepts eg-3 keys.
-- `--baseline`: set the comparison baseline for `verify`, `classify`, or `harvest`.
+- `--baseline`: make `brief` read an exact Git commit; set the comparison baseline
+  for `verify` or `classify`; or select the prior output file for `harvest`.
 
 `--conventions` and `--preset` are mutually exclusive.
 
@@ -50,7 +51,7 @@ docstar.py docs [glob] [--fields A,B]
 docstar.py check [--gate key1,key2]
 docstar.py dump [--kind K]
 docstar.py trace <entity>
-docstar.py brief <task> [--mode execute|impact|review] [--budget N]
+docstar.py brief <task> [--mode execute|impact|review] [--budget N] [--baseline REV]
 docstar.py verify [--baseline REV] [--migrate]
 docstar.py classify --pending
 docstar.py classify --validate --baseline REV --manifest SCOPE
@@ -63,6 +64,12 @@ docstar.py html-entity [output]
 Name resolution uses path-qualified suffix, exact stem, alias, prefix, and
 substring matching. Multiple matches are listed and exit 1. CI should pass an
 explicit `verify --baseline`.
+
+For `brief`, `--baseline REV` must resolve to a commit. DocStar reads tracked
+Markdown bytes from that snapshot, ignores tracked and untracked worktree changes,
+and writes the resolved full SHA to `context_manifest.corpus_revision`. An invalid
+revision exits 2. Omitting the flag preserves worktree behavior and the revision
+token `worktree`.
 
 When conventions enable `task_execution`, default/`execute` and `review` briefs
 follow only the validated `latest_event` anchor and include that event's verbatim

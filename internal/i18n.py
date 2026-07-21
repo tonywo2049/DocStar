@@ -199,7 +199,7 @@ Usage:
   python3 docstar.py check [--gate key1,key2]
   python3 docstar.py dump [--kind K]
   python3 docstar.py trace <entity>
-  python3 docstar.py brief <task> [--mode execute|impact|review] [--budget N]
+  python3 docstar.py brief <task> [--mode execute|impact|review] [--budget N] [--baseline REV]
   python3 docstar.py verify [--baseline REV] [--migrate]
   python3 docstar.py classify --pending|--validate
   python3 docstar.py harvest [--baseline FILE]

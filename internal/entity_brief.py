@@ -504,7 +504,8 @@ def _render_human(top):
 
 # ---------------- 命令入口 ----------------
 
-def cmd_brief(g, conv, query, as_json, mode="execute", budget=None):
+def cmd_brief(g, conv, query, as_json, mode="execute", budget=None,
+              corpus_revision="worktree"):
     # docstar dispatch 透传 mode（execute|impact|review，DG-45）与 budget（--budget，解释权在本模块）。
     query = (query or "").strip()
     if mode not in MODES:
@@ -540,7 +541,7 @@ def cmd_brief(g, conv, query, as_json, mode="execute", budget=None):
                         data["reports"].get("执行日志诊断", []))
     # context_manifest（DG-43；mode/budget 入 manifest，接 EG-22-AC1）：body=top（不含 manifest 自身）→ output_hash。
     top = {"context_manifest": M.context_manifest(
-        "worktree", conv, f"brief:{mode}", budget=eff_budget, body=top,
+        corpus_revision, conv, f"brief:{mode}", budget=eff_budget, body=top,
         include_archived=getattr(g, "include_archived", False)), **top}
 
     if as_json:

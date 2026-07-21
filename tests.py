@@ -1595,6 +1595,60 @@ def a_wave13_p1():
        "未知 brief 模式→退出码 2（确定性契约，非静默降级），DG-45")
 
 
+def a_brief_baseline():
+    """brief --baseline must compile one exact Git snapshot, independent of worktree edits."""
+    layer("logic")
+    with tempfile.TemporaryDirectory() as td:
+        repo = Path(td)
+        docs = repo / "docs"
+        shutil.copytree(HERE / "fixtures" / "briefmode", docs)
+        env = {**dict(__import__("os").environ),
+               "GIT_AUTHOR_NAME": "DocStar Test", "GIT_AUTHOR_EMAIL": "test@example.invalid",
+               "GIT_COMMITTER_NAME": "DocStar Test", "GIT_COMMITTER_EMAIL": "test@example.invalid"}
+        subprocess.run(["git", "init", "-q"], cwd=repo, check=True, env=env)
+        subprocess.run(["git", "add", "docs"], cwd=repo, check=True, env=env)
+        subprocess.run(["git", "commit", "-qm", "baseline"], cwd=repo, check=True, env=env)
+        commit = subprocess.run(
+            ["git", "rev-parse", "HEAD^{commit}"], cwd=repo, check=True,
+            capture_output=True, text=True, env=env).stdout.strip()
+
+        c1, before, e1 = run_json("brief", "T1", "--baseline", "HEAD", corpus=str(docs))
+        req = docs / "需求.md"
+        original = req.read_text(encoding="utf-8")
+        req.write_text(original.replace("记账并放行", "工作树污染"), encoding="utf-8")
+        (docs / "untracked.md").write_text(
+            "---\nnature: normative\n---\n\n## 任务\n\n| # | task | spec anchor | prerequisite | failing test | status |\n"
+            "|---|---|---|---|---|---|\n| T99 | untracked | none | none | none | not-started |\n",
+            encoding="utf-8")
+        c2, after, e2 = run_json("brief", "T1", "--baseline", "HEAD", corpus=str(docs))
+        cw, worktree, _ = run_json("brief", "T1", corpus=str(docs))
+
+        def source_text(bundle, cid):
+            if not isinstance(bundle, dict):
+                return ""
+            return next((s.get("原文") or "" for s in bundle.get("segments", [])
+                         if s.get("key", [None])[-1] == cid), "")
+
+        ok("brief-baseline/exact-commit",
+           c1 == c2 == 0 and not e1 and not e2
+           and before["context_manifest"]["corpus_revision"] == commit
+           and after["context_manifest"]["corpus_revision"] == commit,
+           "brief --baseline resolves the requested revision to the full commit SHA")
+        ok("brief-baseline/dirty-independent",
+           before["context_manifest"]["output_hash"] == after["context_manifest"]["output_hash"]
+           and "记账并放行" in source_text(after, "R1-AC1")
+           and "工作树污染" not in source_text(after, "R1-AC1"),
+           "baseline brief reads committed bytes and ignores tracked/untracked worktree changes")
+        ok("brief-baseline/default-still-worktree",
+           cw == 0 and worktree["context_manifest"]["corpus_revision"] == "worktree"
+           and "工作树污染" in source_text(worktree, "R1-AC1"),
+           "brief without --baseline preserves worktree behavior")
+        bad, _, bad_err = run_json("brief", "T1", "--baseline", "missing-revision", corpus=str(docs))
+        ok("brief-baseline/invalid-fails-closed",
+           bad == 2 and "baseline" in bad_err.lower(),
+           "an invalid brief baseline exits 2 with a diagnostic")
+
+
 def a_wave13_p2():
     """波13-P2 分区：EG-20 收缩 required_edges（DG-47）/EG-24 drift（DG-48）/EG-25 migrate（DG-49）。owner=P2 agent。"""
     layer("logic")
@@ -2688,6 +2742,7 @@ def main():
     a_dump_kind()       # EG-31/DG-62 dump --kind 投影语义功能锁定（critic 轮1 处置 A-M1/B-M1）
     a_docs()            # EG-31/DG-62 docs 命令功能语义锁定（critic 轮1 处置 A-M1）
     a_wave13_p1()       # 波13-P1 分区（EG-23 上下文编译器；owner=P1 agent）
+    a_brief_baseline()  # brief --baseline 绑定精确 Git commit，不受工作树污染
     a_wave13_p2()       # 波13-P2 分区（EG-20 收缩/EG-24/EG-25；owner=P2 agent）
     a_selfsec()         # DG-51 同文档自引 § 断锚（EG-20-AC1 r17 注；缺陷 D1）
     a_ledger_conv()     # DG-52 分区（底账表头 conv.ledger_header 单源；原自号 DG-51 撞号改号）

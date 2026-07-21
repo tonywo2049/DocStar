@@ -17,7 +17,7 @@
   python3 docstar.py html-entity      # 实体图谱交互页（ego 邻域视图+统计）
   python3 docstar.py dump [--kind K]  # 实体图谱全量导出（实体层；--kind 投影单类实体+触及边）
   python3 docstar.py trace <实体>     # 实体：定义块全文+全部关系边（实体层）
-  python3 docstar.py brief <任务>     # 任务闭包+边界指针（EG-13，实体层）
+  python3 docstar.py brief <任务> [--baseline REV]  # 任务闭包+边界指针；可绑定精确 Git commit
   python3 docstar.py verify           # 增量差分+进图自查（EG-14，实体层）
   python3 docstar.py classify --pending|--validate  # 文档性质分类（EG-11-AC6）
   python3 docstar.py harvest          # 未标注高频词提示（实体层）
@@ -29,7 +29,7 @@
     dump/ids --kind K     投影单一 kind（dump：实体 key[0]==K + 触及边 src/dst[0]==K；ids：该类计数）
     docs --fields A,B     逗号分隔字段名（保序）投影 frontmatter；字段缺失=null
     check --gate 键1,键2  指定判定项非空→退出码 1；键名拼错→退出码 2（fail-closed）
-    verify --baseline REV 差分基线 git revision；classify --validate --baseline REV --manifest SCOPE
+    brief --baseline REV  从该 Git commit 读取语料；verify --baseline REV 差分基线 git revision；classify --validate --baseline REV --manifest SCOPE
     harvest --baseline F  对上次输出文件做差量视图
   实体层 JSON 形状权威=golden/*.json 字节锁定基线（tests.py 层 B 逐字节校验；命令→顶层键契约表见 references/command-contracts.md）。
 """
@@ -43,7 +43,7 @@ from fnmatch import fnmatchcase
 from pathlib import Path
 from urllib.parse import unquote
 
-__version__ = "0.2.2"   # 发布版本（语义化）；与 manifest 的 tool_version="eg-3"（schema 契约戳）正交
+__version__ = "0.2.3"   # 发布版本（语义化）；与 manifest 的 tool_version="eg-3"（schema 契约戳）正交
 
 sys.path.insert(0, str(Path(__file__).resolve().parent / "internal"))  # 内部模块（corpus/entity_*）迁入 internal/
 
@@ -230,10 +230,21 @@ class Graph:
                 return hits
         return [rel for rel in self.docs if q.lower() in rel.lower()]
 
-def resolve_link(src_rel, raw, root=None):
+def resolve_link(src_rel, raw, root=None, snapshot_docs=None):
     """链接目标解析：相对本文目录 > 相对语料根。返回 rel str 或 None。"""
     raw = unquote(raw.strip())
     if raw.startswith(("http://", "https://")):
+        return None
+    if snapshot_docs is not None:
+        import posixpath
+        if raw.startswith("/"):
+            return None
+        for base in (posixpath.dirname(src_rel), ""):
+            cand = posixpath.normpath(posixpath.join(base, raw))
+            if cand == ".." or cand.startswith("../"):
+                continue
+            if cand in snapshot_docs:
+                return cand
         return None
     root = Path(root if root is not None else corpus.ROOT)
     for base in (root / Path(src_rel).parent, root):
@@ -246,17 +257,17 @@ def resolve_link(src_rel, raw, root=None):
     return None
 
 
-def _fm_refs(g, src_rel, entry, root):
+def _fm_refs(g, src_rel, entry, root, snapshot_docs=None):
     """frontmatter 值 → [(dst|None, raw)]（通配机会式，非声明键用）：
     显式 Markdown/wiki 链接一律算引用（dst 可 None，供断链标注）；裸路径形仅解析成功才算
     （不臆测）；普通标量（日期、状态词、纯文本）返回 []（不当引用）。"""
     out = []
     for _txt, raw in LINK_RE.findall(entry):
-        out.append((resolve_link(src_rel, raw, root), raw))
+        out.append((resolve_link(src_rel, raw, root, snapshot_docs), raw))
     for tgt in WIKILINK_RE.findall(entry):
         out.append((g.wikilink_target(tgt), f"[[{tgt}]]"))
     if not out and _FM_LINKISH.search(entry):
-        dst = resolve_link(src_rel, entry.strip(), root)
+        dst = resolve_link(src_rel, entry.strip(), root, snapshot_docs)
         if dst:
             out.append((dst, entry.strip()))
     return out
@@ -297,6 +308,9 @@ def scan(source, conv, include_archived=False):
                 headings.setdefault(hm.group(2), (i, (hm.group(3) or "").strip()))
         g.docs[rel] = {"stem": Path(rel).stem, "meta": meta, "headings": headings,
                        "has_fm": bool(meta), "body_start": body_start}
+    # Git 快照必须只用快照成员解析链接，不能让当前文件系统污染历史图。
+    # FileSource 保留既有文件系统解析语义，避免默认工作树输出变化。
+    snapshot_docs = frozenset(source.paths()) if isinstance(source, corpus.GitSource) else None
     # 第二遍：需要 docs 全集（解析链接目标与 § 前缀、wiki 目标）
     for rel, text in texts.items():
         lines = text.splitlines()
@@ -309,7 +323,7 @@ def scan(source, conv, include_archived=False):
         for key, entries in meta.items():
             direction = directed.get(key)                # 声明的上下游键→方向；其它键→None
             for entry in entries:
-                refs = _fm_refs(g, rel, entry, root)   # Markdown/wiki/路径形引用（dst 可 None=断链）
+                refs = _fm_refs(g, rel, entry, root, snapshot_docs)   # Markdown/wiki/路径形引用（dst 可 None=断链）
                 if direction is not None:
                     # 声明链接键（上游/下游…）：无任何引用即「无链接条目」（依赖须落引用，断链纪律）
                     if not refs:
@@ -326,7 +340,7 @@ def scan(source, conv, include_archived=False):
             # frontmatter 行不重复抽链接边（已作 fm 边），但仍抽 ID 与 § 引用
             if i > g.docs[rel]["body_start"]:
                 for _txt, raw in LINK_RE.findall(link_ln):
-                    g.body_links.append((rel, resolve_link(rel, raw, root), raw, i))
+                    g.body_links.append((rel, resolve_link(rel, raw, root, snapshot_docs), raw, i))
                 for tgt in WIKILINK_RE.findall(link_ln):  # 通用 wiki 链接 [[目标]]（Obsidian/Foam/Logseq）
                     g.body_links.append((rel, g.wikilink_target(tgt), f"[[{tgt}]]", i))
             claimed = []
@@ -865,7 +879,15 @@ def main(argv):
     except conventions.ConventionsError as e:
         print(f"约定配置非法：{e}", file=sys.stderr)
         return 2
-    g = scan(corpus.FileSource(scan_root), conv, include_archived=include_archived)
+    corpus_revision = "worktree"
+    source = corpus.FileSource(scan_root)
+    if cmd == "brief" and baseline:
+        try:
+            source, corpus_revision = corpus.git_snapshot(scan_root, baseline)
+        except corpus.SourceError as e:
+            print(str(e), file=sys.stderr)
+            return 2
+    g = scan(source, conv, include_archived=include_archived)
 
     # 文档层（关系通配，零配置可用）
     if cmd == "graph":
@@ -895,7 +917,8 @@ def main(argv):
     if cmd == "brief" and rest:
         mod = _entity("entity_brief")
         return mod.cmd_brief(g, conv, " ".join(rest), as_json,
-                             mode=brief_mode, budget=brief_budget) if mod else 2
+                             mode=brief_mode, budget=brief_budget,
+                             corpus_revision=corpus_revision) if mod else 2
     if cmd == "verify":
         mod = _entity("entity_verify")
         if verify_migrate:                                 # DG-49（波13-P2 交付 cmd_verify_migrate）

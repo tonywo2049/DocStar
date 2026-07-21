@@ -209,7 +209,8 @@ def _output_hash(body):
 def context_manifest(corpus_revision, conv, mode, budget=None, body=None, include_archived=False):
     """DG-43 可复现 manifest（挂各命令输出顶层）：绑定 语料 revision + 工具版本 + conventions hash。
     corpus_revision=语料 revision 戳：工作树扫描='worktree'（稳定符号，非逐 commit 变的 SHA——沿 verify
-      golden 用符号先例，SHA 会破 golden 可复现）；GitSource（verify --baseline）=rev 符号。
+      golden 用符号先例，SHA 会破 golden 可复现）；快照输出由调用方传已解析 revision，
+      `brief --baseline` 使用完整 commit SHA。
     conventions_hash=conv 规范化 sha256（防配置成不可见第二事实源，EG-22-AC1/清单15：配置变→hash 变→可解释差异）。
     body=输出体（**不含 manifest 自身**）→ output_hash：同输入（corpus_rev+tool+conv+body）必同 hash（可复现判据）。
     include_archived=True 时落 "include_archived": true（DG-59/EG-30 取证开关条件字段；默认 False 不写

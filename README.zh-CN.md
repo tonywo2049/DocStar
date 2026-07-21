@@ -129,7 +129,7 @@ codex plugin marketplace remove DocStar
 | 批量投影 frontmatter | `docs [glob] [--fields A,B]` |
 | 运行结构检查 | `check [--gate key1,key2]` |
 | 导出或追踪实体图 | `dump [--kind K]` / `trace <entity>` |
-| 生成确定性任务上下文 | `brief <task>` |
+| 生成确定性任务上下文 | `brief <task> [--baseline REV]` |
 | 对比基线检查编辑 | `verify [--baseline REV]` |
 | 补文档性质 | `classify --pending` / `classify --validate` |
 | 找未定义高频术语 | `harvest` |
@@ -138,6 +138,10 @@ codex plugin marketplace remove DocStar
 
 查询和分析命令加 `--json`。完整旗标、退出码和 JSON 合同见
 [references/command-contracts.zh-CN.md](references/command-contracts.zh-CN.md)。
+
+`brief --baseline REV` 从该 Git commit 精确读取 Markdown 语料，并把解析后的完整 commit SHA
+写入 `context_manifest.corpus_revision`。不传 `--baseline` 时仍读取当前工作树。brief 是起始
+上下文，不是阅读限制；证据不足时，应跟随其指针或直接读取引用文件。
 
 ## 多语言模型
 

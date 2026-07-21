@@ -2,7 +2,7 @@
 """corpus — 语料源抽象与语料边界原语（波5 地基；控制者唯一写者，DG-1）。
 
 承载需求 r9 / 设计 v2 的四个机制，全部是「机制」不含项目 schema（具体锚表注入）：
-  1. Source        扫描源抽象：文件系统根 | 指定 git revision（DG-21；verify --baseline 复用）
+  1. Source        扫描源抽象：文件系统根 | 指定 git revision（DG-21；brief/verify --baseline 复用）
   2. strip_strike  删除线剔除（EG-11-AC5；文内级语料边界，保行号）
   3. nature        性质读取：frontmatter + 节级覆盖；缺→unknown（EG-11-AC2/AC3，非缺省记述）
   4. namespace     命名空间作用域解析（DG-28：文档>节>表列，一函数替四补丁）
@@ -79,8 +79,9 @@ class GitSource:
             ["git", "-C", str(self.repo), *args],
             capture_output=True, text=True, check=True).stdout
 
-    def docs(self):
-        # -z：NUL 分隔、禁 core.quotepath 八进制转义（非 ASCII 路径会带引号，破 .md 判定）
+    def paths(self):
+        """All tracked file paths in the snapshot, relative to ``scan_root``."""
+        # -z：NUL 分隔、禁 core.quotepath 八进制转义（非 ASCII 路径会带引号）。
         try:
             listing = self._git("ls-tree", "-r", "--name-only", "-z",
                                  self.revision, "--", self.scan_root)
@@ -89,13 +90,15 @@ class GitSource:
         out = []
         prefix = self.scan_root + "/"
         for path in listing.split("\0"):
-            if not path.endswith(".md"):
+            if not path:
                 continue
             rel = path[len(prefix):] if path.startswith(prefix) else path
-            if excluded_doc(rel):
-                continue
             out.append(rel)
         return sorted(out)
+
+    def docs(self):
+        return [rel for rel in self.paths()
+                if rel.endswith(".md") and not excluded_doc(rel)]
 
     def text(self, rel):
         full = f"{self.scan_root}/{rel}" if self.scan_root else rel
@@ -103,6 +106,34 @@ class GitSource:
             return self._git("show", f"{self.revision}:{full}")
         except (subprocess.CalledProcessError, FileNotFoundError):
             return None
+
+
+class SourceError(ValueError):
+    """A requested corpus snapshot cannot be resolved safely."""
+
+
+def git_snapshot(root, revision):
+    """Resolve ``revision`` to an exact commit and return ``(GitSource, full_sha)``.
+
+    ``root`` may be the repository root or a corpus subdirectory.  The returned
+    source exposes paths relative to that corpus root, matching ``FileSource``.
+    """
+    root = Path(root).resolve()
+    try:
+        repo_text = subprocess.run(
+            ["git", "-C", str(root), "rev-parse", "--show-toplevel"],
+            capture_output=True, text=True, check=True).stdout.strip()
+        repo = Path(repo_text).resolve()
+        scan_root = root.relative_to(repo).as_posix()
+        sha = subprocess.run(
+            ["git", "-C", str(repo), "rev-parse", "--verify", "--quiet",
+             f"{revision}^{{commit}}"],
+            capture_output=True, text=True, check=True).stdout.strip()
+    except (OSError, ValueError, subprocess.CalledProcessError):
+        raise SourceError(f"baseline 无法解析为 commit：{revision}")
+    if not sha:
+        raise SourceError(f"baseline 无法解析为 commit：{revision}")
+    return GitSource(sha, scan_root=scan_root, repo=repo), sha
 
 
 # ==================== 2. 删除线剔除（EG-11-AC5） ====================
@@ -444,6 +475,18 @@ def _selftest():
             git_docs = set(GitSource("HEAD", repo=probe).docs())
             check("GitSource：与 FileSource 同语义排除控制文档与根 agents/",
                   git_docs == included and git_docs == file_docs)
+            snapshot, sha = git_snapshot(probe / "nested", "HEAD")
+            (probe / "nested" / "keep.md").write_text("# dirty worktree\n", encoding="utf-8")
+            check("git_snapshot：解析完整 commit SHA",
+                  bool(re.fullmatch(r"[0-9a-f]{40}", sha)))
+            check("git_snapshot：子目录路径相对且读取 commit 原文",
+                  snapshot.docs() == ["keep.md"] and snapshot.text("keep.md") == "# nested/keep.md\n")
+            try:
+                git_snapshot(probe, "missing-revision")
+                invalid_failed = False
+            except SourceError:
+                invalid_failed = True
+            check("git_snapshot：非法 revision fail-closed", invalid_failed)
         except (subprocess.CalledProcessError, FileNotFoundError):
             check("GitSource：自验证临时仓可用", False)
 

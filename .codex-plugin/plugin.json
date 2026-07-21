@@ -1,6 +1,6 @@
 {
   "name": "docstar",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "DocStar queries Markdown document graphs, IDs, dependencies, task context, and structural diagnostics.",
   "author": {
     "name": "Tony",

@@ -16,15 +16,26 @@ schema-contract stamp.
 
 ## Unreleased
 
+## v0.2.3 — 2026-07-21
+
 ### Added
 
 - Added a standalone `--version` flag that reports the release version without a
   command or corpus scan.
+- Added `brief --baseline REV` to compile a task evidence bundle from one exact
+  Git commit, with the resolved full SHA recorded in the context manifest.
+
+### Fixed
+
+- Made historical snapshot link resolution use snapshot members instead of the
+  current filesystem.
 
 ### Documentation
 
 - Documented Codex and Claude Code Skill installation and upgrade paths for shared
   Git checkouts and complete-directory ZIP or copied installations.
+- Clarified that a brief is starting context and agents may perform targeted source
+  reads when its evidence or pointers are insufficient.
 
 ## v0.2.0 — 2026-07-19
 

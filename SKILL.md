@@ -38,7 +38,7 @@ Pass it explicitly when DocStar is installed inside another project.
 | See the global document graph | `graph` |
 | Project frontmatter fields | `docs [glob] [--fields A,B]` |
 | Check links, anchors, reciprocity, and declared entity rules | `check [--gate key1,key2]` |
-| Compile deterministic task context | `brief <task> [--mode execute|impact|review]` |
+| Compile deterministic task context | `brief <task> [--mode execute|impact|review] [--baseline REV]` |
 | Inspect the current edit against a baseline | `verify [--baseline REV]` |
 | Export or trace the entity graph | `dump [--kind K]` / `trace <entity>` |
 | Classify document nature or find undefined terms | `classify --pending` / `harvest` |
@@ -59,8 +59,11 @@ Do not read the whole corpus and reconstruct relationships by hand. Start with t
 smallest DocStar query, then follow returned `file:line` pointers when more source
 text is needed.
 
-Before delegating a concrete task, run `brief <task> --json` and pass that bundle as
-the starting context. The recipient may use `id`, `doc`, or `trace` to expand it.
+Before delegating a concrete task, run `brief <task> --json --baseline <commit>` and
+pass that bundle as the starting context. The recipient may use `id`, `doc`, or
+`trace`, follow `omitted` and `boundary_pointers`, or directly read targeted source
+files and line ranges when the brief is insufficient. A brief reduces repeated
+discovery; it never prohibits independent source reading.
 
 ## Interpret verdicts
 

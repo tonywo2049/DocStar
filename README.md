@@ -140,7 +140,7 @@ you created. Do not leave both installation forms present.
 | Project frontmatter fields | `docs [glob] [--fields A,B]` |
 | Run structural checks | `check [--gate key1,key2]` |
 | Export or trace the entity graph | `dump [--kind K]` / `trace <entity>` |
-| Build a deterministic task context | `brief <task>` |
+| Build a deterministic task context | `brief <task> [--baseline REV]` |
 | Inspect changes against a baseline | `verify [--baseline REV]` |
 | Classify document nature | `classify --pending` / `classify --validate` |
 | Find undefined recurring terms | `harvest` |
@@ -149,6 +149,12 @@ you created. Do not leave both installation forms present.
 
 Add `--json` to query and analysis commands. The complete flag and exit-code
 contract is in [references/command-contracts.md](references/command-contracts.md).
+
+`brief --baseline REV` reads the Markdown corpus from that exact Git commit and
+records the resolved full commit SHA in `context_manifest.corpus_revision`. Without
+`--baseline`, `brief` reads the current worktree. A brief is starting context, not a
+reading restriction: follow its pointers or read the referenced files directly when
+the included evidence is insufficient.
 
 ## Language model
 

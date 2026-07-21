@@ -25,7 +25,8 @@ nature: normative
 - `--kind K`：投影 `ids` 或 `dump`，接受 eg-3 英文 token。
 - `--fields A,B`：投影 frontmatter，接受正式键或旧别名。
 - `--gate key1,key2`：按 `check` 顶层键设门禁，接受 eg-3 英文键。
-- `--baseline`：设置 `verify`、`classify` 或 `harvest` 的比较基线。
+- `--baseline`：让 `brief` 读取精确 Git commit；设置 `verify` 或 `classify` 的比较基线；
+  或为 `harvest` 指定上次输出文件。
 
 `--conventions` 与 `--preset` 互斥。
 
@@ -48,7 +49,7 @@ docstar.py docs [glob] [--fields A,B]
 docstar.py check [--gate key1,key2]
 docstar.py dump [--kind K]
 docstar.py trace <entity>
-docstar.py brief <task> [--mode execute|impact|review] [--budget N]
+docstar.py brief <task> [--mode execute|impact|review] [--budget N] [--baseline REV]
 docstar.py verify [--baseline REV] [--migrate]
 docstar.py classify --pending
 docstar.py classify --validate --baseline REV --manifest SCOPE
@@ -60,6 +61,11 @@ docstar.py html-entity [output]
 
 名称解析依次使用路径限定后缀、精确 stem、alias、前缀和子串。多命中时列出候选并退出 1。
 CI 应显式传 `verify --baseline`。
+
+对 `brief` 而言，`--baseline REV` 必须解析到 commit。DocStar 从该快照读取已跟踪的 Markdown
+字节，忽略工作树内已跟踪和未跟踪的改动，并把解析后的完整 SHA 写入
+`context_manifest.corpus_revision`。非法 revision 退出 2。省略该旗标时保留工作树行为，
+revision 标记为 `worktree`。
 
 conventions 启用 `task_execution` 后，默认／`execute` 与 `review` brief 只跟随已验证的
 `latest_event` 锚并纳入该事件的原文块，不会用整份记述性执行日志代替最新事件。`impact` 不跟随
