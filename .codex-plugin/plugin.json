@@ -1,0 +1,37 @@
+{
+  "name": "docstar",
+  "version": "0.2.2",
+  "description": "DocStar queries Markdown document graphs, IDs, dependencies, task context, and structural diagnostics.",
+  "author": {
+    "name": "Tony",
+    "email": "tonywo2049@gmail.com",
+    "url": "https://github.com/tonywo2049"
+  },
+  "homepage": "https://github.com/tonywo2049/DocStar",
+  "repository": "https://github.com/tonywo2049/DocStar",
+  "license": "MIT",
+  "keywords": [
+    "markdown",
+    "documentation",
+    "document-graph",
+    "structural-checks",
+    "task-context"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "DocStar",
+    "shortDescription": "Query and verify Markdown documentation graphs.",
+    "longDescription": "Query Markdown document relationships, definitions, references, task context, and structural diagnostics without a persistent index or model calls.",
+    "developerName": "Tony",
+    "category": "Productivity",
+    "capabilities": [
+      "Read"
+    ],
+    "websiteURL": "https://github.com/tonywo2049/DocStar",
+    "defaultPrompt": [
+      "Use DocStar to inspect this project's document dependencies.",
+      "Use DocStar to check this documentation tree before handoff.",
+      "用 DocStar 获取这张任务卡的精确上下文。"
+    ]
+  }
+}

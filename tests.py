@@ -812,6 +812,47 @@ def a_cli_flags():
        "stdout 精确显示当前 __version__，stderr 为空")
 
 
+def a_codex_plugin_package():
+    """Codex plugin/marketplace 元数据与发布版本必须机械一致。"""
+    layer("logic")
+    from docstar import __version__ as release_version
+
+    plugin_path = HERE / ".codex-plugin" / "plugin.json"
+    marketplace_path = HERE / ".agents" / "plugins" / "marketplace.json"
+    plugin = json.loads(plugin_path.read_text(encoding="utf-8"))
+    marketplace = json.loads(marketplace_path.read_text(encoding="utf-8"))
+    entries = [x for x in marketplace.get("plugins", []) if x.get("name") == "docstar"]
+    entry = entries[0] if len(entries) == 1 else {}
+
+    ok("plugin/manifest-shape",
+       plugin.get("name") == "docstar"
+       and plugin.get("author", {}).get("url") == "https://github.com/tonywo2049"
+       and plugin.get("repository") == "https://github.com/tonywo2049/DocStar"
+       and plugin.get("interface", {}).get("displayName") == "DocStar"
+       and not ({"apps", "mcpServers", "hooks"} & set(plugin)),
+       "plugin manifest 使用真实作者/仓库/interface，且不声明不存在的 apps/mcp/hooks")
+    skill_decl = plugin.get("skills")
+    skill_path = HERE / "skills" / "docstar" / "SKILL.md"
+    skill_shim = skill_path.read_text(encoding="utf-8") if skill_path.is_file() else ""
+    canonical_skill = (skill_path.parent / "../../SKILL.md").resolve()
+    ok("plugin/skill-path",
+       skill_decl == "./skills/" and skill_path.is_file()
+       and canonical_skill == (HERE / "SKILL.md").resolve() and canonical_skill.is_file()
+       and "../../SKILL.md" in skill_shim
+       and "sole authority" in " ".join(skill_shim.split()),
+       "validator 兼容 discovery shim 引用现有根 SKILL.md，不复制技能正文")
+    ok("plugin/marketplace-entry",
+       marketplace.get("name") == "DocStar" and len(entries) == 1
+       and entry.get("source") == {"source": "local", "path": "./"}
+       and entry.get("policy") == {
+           "installation": "AVAILABLE", "authentication": "ON_INSTALL"}
+       and isinstance(entry.get("category"), str) and bool(entry.get("category")),
+       "DocStar marketplace 唯一 entry 指向仓库根，并含完整 policy/category")
+    ok("plugin/version-consistency",
+       plugin.get("version") == entry.get("version") == release_version == "0.2.2",
+       "plugin manifest、marketplace entry 与 docstar.py 三处版本同为 0.2.2")
+
+
 def a_verdict_json():
     """DG-60 跨版本回归：判定对象（entity_check._Verdict, dict 子类）不得谎报 __bool__——
     谎报会撞 `json.dumps(indent=1)` 纯 Python 缩进编码器 `if not dct: yield '{}'`（Python ≤3.12）
@@ -2623,6 +2664,7 @@ def main():
     a_gate()
     a_verdict_json()    # DG-60 判定对象 __bool__ 不谎报 + emit 全键序列化（跨版本 JSON 吞键回归位）
     a_cli_flags()       # 未知旗标 fail-closed exit 2 + --kind 收编（EG-9 合同；handback 件②）
+    a_codex_plugin_package()  # Codex plugin/marketplace 结构、skill 路径与三处版本一致
     a_regression()
     a_wildcard()
     a_typesection()

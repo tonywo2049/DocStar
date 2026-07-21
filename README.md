@@ -34,13 +34,27 @@ python3 docstar.py check --json --corpus /path/to/docs
 There is nothing to install with `pip`. Relative paths are resolved from the
 caller's current directory.
 
-## Install as a Codex or Claude Code Skill
+## Install
+
+### Codex marketplace (recommended)
+
+```bash
+codex plugin marketplace add tonywo2049/DocStar
+codex plugin add docstar@DocStar
+codex plugin list
+```
+
+Start a new Codex task after installation. Do not also place a manual `docstar`
+copy under `~/.codex/skills`; marketplace and manual installations must not coexist
+because they produce duplicate triggers.
+
+### Manual Skill installation (optional)
 
 ### Git clone with symbolic links
 
-Clone DocStar to a stable absolute path, then link that one checkout into either
-or both clients. Replace `/absolute/path/to/DocStar` with the checkout path you
-chose, and run only the link commands for the clients you use.
+Use this only when the marketplace installation is not present. Clone DocStar to
+a stable absolute path, then link that checkout into Codex or Claude Code. Replace
+`/absolute/path/to/DocStar` with the checkout path you chose.
 
 ```bash
 git clone https://github.com/tonywo2049/DocStar.git /absolute/path/to/DocStar
@@ -62,6 +76,25 @@ release cannot survive from the old version.
 
 ## Upgrade
 
+### Codex marketplace installation
+
+Refresh the marketplace and check the installed version:
+
+```bash
+codex plugin marketplace upgrade DocStar
+codex plugin list
+```
+
+If the old version is still listed, reinstall from the refreshed marketplace:
+
+```bash
+codex plugin remove docstar@DocStar
+codex plugin add docstar@DocStar
+codex plugin list
+```
+
+### Manual ZIP or source installation
+
 For a Git clone used through symbolic links, update the shared checkout. The
 links do not need to be recreated.
 
@@ -80,8 +113,21 @@ actual absolute path. The final output line shows the installed release version:
 python3 /absolute/path/to/DocStar/docstar.py
 ```
 
-After either upgrade method, start a new Codex task or Claude Code session so
+Manual installations are optional and must not coexist with the Codex marketplace
+plugin. After either upgrade method, start a new Codex task or Claude Code session so
 the client reloads the Skill instructions.
+
+## Uninstall
+
+For a Codex marketplace installation:
+
+```bash
+codex plugin remove docstar@DocStar
+codex plugin marketplace remove DocStar
+```
+
+For a manual installation, remove only the `docstar` directory or symbolic link
+you created. Do not leave both installation forms present.
 
 ## Commands
 

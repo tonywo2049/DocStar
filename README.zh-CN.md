@@ -32,12 +32,25 @@ python3 docstar.py check --json --corpus /path/to/docs
 
 不需要 `pip install`。相对路径都从调用者的当前目录解析。
 
-## 安装为 Codex 或 Claude Code Skill
+## 安装
+
+### Codex marketplace（推荐）
+
+```bash
+codex plugin marketplace add tonywo2049/DocStar
+codex plugin add docstar@DocStar
+codex plugin list
+```
+
+安装后新建 Codex 任务。不要再把手工 `docstar` 副本放入 `~/.codex/skills`；marketplace
+安装与手工安装不得并存，否则会重复触发。
+
+### 手工安装 Skill（可选）
 
 ### Git clone 加软链接
 
-把 DocStar clone 到一个固定的绝对路径，再把同一份 checkout 链接到一个或两个客户端。
-将 `/absolute/path/to/DocStar` 替换成实际 checkout 路径，只执行你所用客户端对应的链接命令。
+只在未安装 marketplace 插件时使用本方式。把 DocStar clone 到固定的绝对路径，再把该
+checkout 链接到 Codex 或 Claude Code。将 `/absolute/path/to/DocStar` 替换成实际路径。
 
 ```bash
 git clone https://github.com/tonywo2049/DocStar.git /absolute/path/to/DocStar
@@ -57,6 +70,25 @@ ln -s /absolute/path/to/DocStar ~/.claude/skills/docstar
 
 ## 升级
 
+### 通过 Codex marketplace 安装
+
+先刷新 marketplace，再检查已安装版本：
+
+```bash
+codex plugin marketplace upgrade DocStar
+codex plugin list
+```
+
+如果仍显示旧版本，从刷新后的 marketplace 重新安装：
+
+```bash
+codex plugin remove docstar@DocStar
+codex plugin add docstar@DocStar
+codex plugin list
+```
+
+### 手工 ZIP 或源码安装
+
 如果通过软链接使用 Git clone，只需更新共享 checkout，无需重建链接。
 
 ```bash
@@ -72,8 +104,19 @@ git -C /absolute/path/to/DocStar pull --ff-only
 python3 /absolute/path/to/DocStar/docstar.py
 ```
 
-无论采用哪种升级方式，完成后都要新建 Codex task 或 Claude Code session，让客户端重新加载
-Skill 指令。
+手工安装是可选方式，不得与 Codex marketplace 插件并存。无论采用哪种升级方式，完成后都要
+新建 Codex task 或 Claude Code session，让客户端重新加载 Skill 指令。
+
+## 卸载
+
+通过 Codex marketplace 安装时：
+
+```bash
+codex plugin remove docstar@DocStar
+codex plugin marketplace remove DocStar
+```
+
+手工安装时，只删除自己创建的 `docstar` 目录或软链接，不要残留两种安装方式。
 
 ## 命令
 
