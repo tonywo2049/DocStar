@@ -29,6 +29,8 @@ TOOL_VERSION = "eg-3"  # 工具版本戳（DG-43 manifest；随 schema 契约版
 # 越出它的 kind 照原样处理、不报「非法 kind」、不静默丢弃、不做同义归并）。项目专有 kind
 # （如老语料的契约AC/审计AC/评审项/治理期权）由该项目 conventions 声明获得，不在引擎内置。
 DEFAULT_KINDS = ("需求AC", "参数", "任务", "测试", "专名", "文档", "节条目")
+# 仅在 conventions 显式启用相应机制时出现的内置辅助 kind；不进入通用默认词表，确保零配置输出不变。
+AUXILIARY_KINDS = ("执行日志", "最新事件")
 
 # 通用 key 构造器（namespace 或为传入 doc_stem、或为泛化标签，无项目硬编码）。
 # 带固定项目命名空间锚的 kind 经 conv.namespace_for(kind, cid) 取锚，再 make_entity((kind, ns, cid))；
@@ -36,6 +38,8 @@ DEFAULT_KINDS = ("需求AC", "参数", "任务", "测试", "专名", "文档", "
 def key_param(name):    return ("参数", "全局", name)
 def key_test(name):     return ("测试", "测试名", name)
 def key_doc(rel):       return ("文档", "路径", rel)
+def key_execution_log(rel): return ("执行日志", "路径", rel)
+def key_latest_event(rel, anchor): return ("最新事件", rel, anchor)
 
 def key_section(doc_stem, anchor):
     """namespace=所在文档 stem，canonical_id={doc}§<锚>。`### R{n}` 标题也走此 kind（r11 折入）。"""
@@ -77,6 +81,8 @@ EDGE_TYPES = {
     "映射":            ("确定", frozenset({"CHK-2映射缺口", "共现完备性"})),  # 需求AC↔下游AC（跨层映射，边/检查语义属块2）
     "阅读依赖":        ("高",   frozenset({"brief"})),               # 任务→节条目（新）
     "前置依赖":        ("高",   frozenset({"brief", "CHK-环检测"})),  # 任务→任务（新，多消费者）
+    "执行日志":        ("高",   frozenset({"brief"})),               # 任务→按卡执行日志（可选）
+    "最新事件":        ("高",   frozenset({"brief"})),               # 执行日志→最新事件锚（可选）
     "provenance":      ("中",   frozenset()),                        # 记述文档/节→AC/节/参数（新，不进门禁）
     "共现索引":        ("确定", frozenset({"共现完备性"})),          # 实体→实体（原块内引用正名）
 }
@@ -221,9 +227,14 @@ def _schema_selfcheck():
             issues.append(f"ENTITY_CHECK_KEYS「{k}」未在 CHECK_REGISTRY 注册")
     # 通用 key 构造器须都产出内置默认 kind（项目专有 kind 经 conv 声明、直接构造，不走这些构造器）
     for fn2, args in ((key_param, ("X",)), (key_test, ("X",)),
-                      (key_section, ("d", "1")), (key_term, ("d", "X")), (key_doc, ("p",))):
-        if fn2(*args)[0] not in DEFAULT_KINDS:
+                      (key_section, ("d", "1")), (key_term, ("d", "X")), (key_doc, ("p",)),
+                      (key_execution_log, ("p",)), (key_latest_event, ("p", "e"))):
+        if fn2(*args)[0] not in DEFAULT_KINDS + AUXILIARY_KINDS:
             issues.append(f"构造器 {fn2.__name__} 产出非默认 kind")
+    expected_tokens = {"执行日志": "execution-log", "最新事件": "latest-event"}
+    for internal, public in expected_tokens.items():
+        if json_contract.TOKENS.get(internal) != public:
+            issues.append(f"辅助 token 缺 machine mapping：{internal}→{public}")
     return (not issues), issues
 
 

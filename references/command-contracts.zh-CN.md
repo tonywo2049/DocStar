@@ -61,6 +61,10 @@ docstar.py html-entity [output]
 名称解析依次使用路径限定后缀、精确 stem、alias、前缀和子串。多命中时列出候选并退出 1。
 CI 应显式传 `verify --baseline`。
 
+conventions 启用 `task_execution` 后，默认／`execute` 与 `review` brief 只跟随已验证的
+`latest_event` 锚并纳入该事件的原文块，不会用整份记述性执行日志代替最新事件。`impact` 不跟随
+执行日志边。坏指针会同时进入 `diagnostics` 与 `omitted`。
+
 ## eg-3 JSON 顶层键
 
 所有合同键和内置枚举 token 都是英文。源路径、文档标题、原文、ID 和项目自定义 kind 属于源数据，

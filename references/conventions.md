@@ -37,6 +37,10 @@ python3 docstar.py check --preset gmgn-v1 --json --corpus <project>
 - `Rn-ACn` acceptance criteria and `(Mn-)Tn` task IDs;
 - the canonical task-table layout `# | task | spec anchor | prerequisite | failing test |
   status` in both English and Chinese prose editions;
+- task entities only from that canonical task table, not repeated bold field labels or
+  other tables;
+- configured `execution_log` and `latest_event` Markdown links from current task-card
+  fields or a pointer table, producing `task → execution-log → latest-event`;
 - `none`, `external:`, `无`, and `外部：` as declared non-link prefixes;
 - the policy that every requirement AC needs an incoming task declaration.
 
@@ -52,6 +56,12 @@ intentionally forks the contract.
 - `type_sections`, `def_forms`, `doc_id_kinds`: typed sections and project ID forms.
 - `task_columns`, `id_occ_kinds`, `cooccur_kinds`, `ac_prefix_kinds`: task-table and
   ID participation rules.
+- `task_execution`: optional pointer-table/card-field aliases and the
+  `canonical_task_table_only` switch. When absent, execution-log extraction is dormant.
+  When present, links must be relative Markdown links; the log must declare
+  `type: execution-log` and `nature: descriptive`, its filename must match the task ID,
+  and `latest_event` must resolve to an anchor in that same file. Invalid declarations
+  appear in `execution_log_diagnostics` and `brief` omissions.
 - `nature_source`: migration mapping from an existing metadata field to
   `normative` or `descriptive`; explicit `nature`/`性质` wins.
 - `required_edges`: cross-kind policies and report/gate severity.

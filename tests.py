@@ -42,6 +42,7 @@ NONLINK = str(HERE / "fixtures" / "nonlink")          # 有意非链接声明微
 ARCHIVED = str(HERE / "fixtures" / "archived" / "corpus")  # 归档子树语料级过滤语料（EG-30/DG-59：段匹配排除/取证开关/KeyError 守卫；README 置 corpus/ 外，同 METH 布局，防其计入分母）
 GMGN_EN = str(HERE / "fixtures" / "gmgn" / "en")
 GMGN_ZH = str(HERE / "fixtures" / "gmgn" / "zh-CN")
+EXECUTION_LOG = str(HERE / "fixtures" / "executionlog")
 GOLDEN = HERE / "golden"                          # 只读；控制者波8 --bless 重锁
 # 自宿主语料=工具自己的 md 文档（README/SKILL/四份规格）。独立工具无「那个真实仓」概念，
 # 故凡「非 fixture 的真语料」断言一律显式指向 SELF——绝不用默认语料（默认=cwd，会随 cwd 漂）。
@@ -191,13 +192,18 @@ def a_schema():
     # （原 schema/kinds_11_no_reqR 断言 len==11 的封闭结构随 kind 集开放失效——spec 依据 r12→r13 新增 EG-19-AC3。）
     ok("schema/default_kinds_generic",
        set(EM.DEFAULT_KINDS) == {"需求AC", "参数", "任务", "测试", "专名", "文档", "节条目"}
+       and set(EM.AUXILIARY_KINDS) == {"执行日志", "最新事件"}
        and not ({"契约AC", "审计AC", "评审项", "治理期权", "需求R"} & set(EM.DEFAULT_KINDS)),
        "DEFAULT_KINDS=7 内置通用词表；4 project-specific kinds 与 需求R 均不在内（EG-19-AC3）")
-    ok("schema/edges_10_deleted", len(EM.EDGE_TYPES) == 10
+    ok("schema/edges_12_deleted", len(EM.EDGE_TYPES) == 12
        and all(x not in EM.EDGE_TYPES for x in ("定义于", "约束", "依据", "散文修订声明", "弱共现")),
-       "EDGE_TYPES 10 类；定义于/约束/依据/散文/弱共现 5 边已删")
-    ok("schema/edges_added", all(x in EM.EDGE_TYPES for x in ("阅读依赖", "前置依赖", "provenance", "共现索引")),
-       "阅读依赖/前置依赖/provenance/共现索引 4 新边在册")
+       "EDGE_TYPES 12 类；定义于/约束/依据/散文/弱共现 5 边已删")
+    ok("schema/edges_added", all(x in EM.EDGE_TYPES for x in
+                                  ("阅读依赖", "前置依赖", "provenance", "共现索引", "执行日志", "最新事件")),
+       "阅读依赖/前置依赖/provenance/共现索引/执行日志/最新事件在册")
+    ok("schema/execution_log_tokens",
+       JC.TOKENS.get("执行日志") == "execution-log" and JC.TOKENS.get("最新事件") == "latest-event",
+       "execution-log/latest-event kind 与 edge token 有稳定 eg-3 英文 mapping")
     ok("schema/orphan_empty", EM.orphan_consumers() == [],
        "冻结 schema 无孤儿 consumer（EDGE_TYPES.consumers 全在 CHECK_REGISTRY 注册）")
     # DG-34 无孤儿自检的检出力：注入未注册 consumer → orphan_consumers 报之（in-process 反例，还原）
@@ -2201,6 +2207,141 @@ def a_ledger_conv():
        "DG-51：同构语料仅表头语言不同 → 边数一致（表头假设单源于 conv.ledger_header）")
 
 
+def a_execution_logs():
+    """可选 GMGN task execution-log 关系：缺席休眠、非法 fail-closed、brief 只取最新事件。"""
+    layer("logic")
+
+    # 配置缺席即休眠：通用默认不认识执行日志实体/边，现有输出面不增加专用 report。
+    code0, dormant, _ = run_json("dump", corpus=EXECUTION_LOG)
+    dormant_kinds = {e["key"][0] for e in (dormant or {}).get("entities", [])}
+    dormant_edges = {e["type"] for e in (dormant or {}).get("edges", [])}
+    ok("execution-log/config-absent-dormant",
+       code0 == 0 and not ({"执行日志", "最新事件"} & dormant_kinds)
+       and not ({"执行日志", "最新事件"} & dormant_edges)
+       and "执行日志诊断" not in (dormant or {}).get("reports", {}),
+       "缺 task_execution 配置时执行日志机制休眠，默认 dump 不增加实体、边或诊断键")
+
+    code, dump, err = run_json("dump", "--preset", "gmgn-v1", corpus=EXECUTION_LOG)
+    ok("execution-log/dump-runs", code == 0 and isinstance(dump, dict),
+       f"gmgn-v1 execution-log fixture 可导出：{err}")
+    if not dump:
+        return
+
+    # 结构关系 task → execution_log → latest_event；卡内容与 pointer table 两路都生效。
+    ok("execution-log/task-to-log-edge",
+       bool(find_edge(dump, "执行日志", src_cid="T1", dst_cid="execution/T1.md")),
+       "T1 从独立 pointer table 建 task→execution_log")
+    ok("execution-log/log-to-event-edge",
+       bool(find_edge(dump, "最新事件", src_cid="execution/T1.md", dst_cid="event-2")),
+       "T1 建 execution_log→latest_event，事件实体锚定 event-2")
+    ok("execution-log/current-card-fields",
+       bool(find_edge(dump, "执行日志", src_cid="T5", dst_cid="execution/T5.md"))
+       and bool(find_edge(dump, "最新事件", src_cid="execution/T5.md", dst_cid="event-1")),
+       "T5 从当前卡 execution_log/latest_event 字段建两跳关系")
+    trace_code, event_trace, _ = run_json(
+        "trace", "event-2", "--preset", "gmgn-v1", corpus=EXECUTION_LOG)
+    ok("execution-log/latest-event-queryable",
+       trace_code == 0 and (event_trace or {}).get("resolved", [None])[0] == "最新事件"
+       and list_has((event_trace or {}).get("edges", {}).get("最新事件"), "execution/T1.md"),
+       "latest-event 可由 trace 查询，并保留 execution-log→latest-event 入边")
+
+    # 坏链接、坏锚、卡/log ID 不匹配、坏 metadata 不静默。
+    diagnostics = dump.get("reports", {}).get("执行日志诊断", [])
+    for tid, reason in (("T2", "log_target_missing"), ("T3", "latest_event_anchor_missing"),
+                        ("T4", "card_log_id_mismatch"), ("T6", "invalid_log_metadata")):
+        ok(f"execution-log/diagnostic-{tid.lower()}",
+           any(x.get("task") == tid and x.get("reason") == reason for x in diagnostics),
+           f"{tid} 失败显式进入 execution_log_diagnostics：{reason}")
+    ok("execution-log/none-pointer-is-clean",
+       not any(x.get("task") == "T7" for x in diagnostics)
+       and not find_edge(dump, "执行日志", src_cid="T7"),
+       "execution_log=none/latest_event=none 表示尚无日志，不产生诊断或边")
+
+    # execute 是默认 brief；execute/review 纳入 latest event，impact 不纳入。
+    outputs = {}
+    for label, args in (("default", ("brief", "T1", "--preset", "gmgn-v1")),
+                        ("execute", ("brief", "T1", "--mode", "execute", "--preset", "gmgn-v1")),
+                        ("review", ("brief", "T1", "--mode", "review", "--preset", "gmgn-v1")),
+                        ("impact", ("brief", "T1", "--mode", "impact", "--preset", "gmgn-v1"))):
+        c, d, e = run_json(*args, corpus=EXECUTION_LOG)
+        ok(f"execution-log/brief-{label}-runs", c == 0 and isinstance(d, dict),
+           f"brief {label} 跑通：{e}")
+        outputs[label] = d or {}
+
+    def source_texts(bundle):
+        return "\n".join(str(s.get("原文") or "") for s in bundle.get("segments", []))
+
+    for mode in ("default", "execute", "review"):
+        text = source_texts(outputs[mode])
+        ok(f"execution-log/{mode}-latest-only",
+           "LATEST_EVENT_ONLY" in text and "OLD_EVENT_MUST_NOT_ENTER_BRIEF" not in text,
+           f"{mode} 只纳入 latest event 原文，不吞完整执行日志")
+    ok("execution-log/impact-excludes-log",
+       "LATEST_EVENT_ONLY" not in source_texts(outputs["impact"])
+       and not any(s.get("key", [None])[0] in ("执行日志", "最新事件")
+                   for s in outputs["impact"].get("segments", [])),
+       "impact 不纳入 execution-log/latest-event")
+
+    # 失败指针在 brief 同时形成 diagnostics 与 omitted，不能只在 dump 报告。
+    c2, b2, _ = run_json("brief", "T2", "--preset", "gmgn-v1", corpus=EXECUTION_LOG)
+    ok("execution-log/brief-bad-pointer-explicit",
+       c2 == 0 and list_has((b2 or {}).get("diagnostics"), "log_target_missing")
+       and list_has((b2 or {}).get("omitted"), "log_target_missing"),
+       "坏 execution log 链接在 brief diagnostics/omitted 双显式")
+
+    # gmgn-v1 任务实体仅来自 canonical task table：重复加粗标签不成任务；T1 保留；TA 不扩语法。
+    task_ids = {e["key"][2] for e in dump.get("entities", []) if e["key"][0] == "任务"}
+    ok("execution-log/gmgn-canonical-task-table-only",
+       "T1" in task_ids and "Ownership, DAG, and three anchors" not in task_ids
+       and "T9" not in task_ids,
+       "gmgn-v1 不把重复加粗字段标签或非 canonical 表行识别为任务实体")
+    ok("execution-log/gmgn-does-not-expand-local-ids", "TA2.11b" not in task_ids,
+       "gmgn-v1 仍不识别项目自定义 TA/TG/RPL ID")
+    ok("execution-log/pointer-card-id-not-parameter",
+       not ({"T1", "T2", "T3", "T4", "T5", "T6", "T7"}
+            & {e["key"][2] for e in dump.get("entities", []) if e["key"][0] == "参数"}),
+       "execution pointer table 的 card_id 不被参数 def_form 误识别")
+
+    # task_execution 非法必须 fail-closed；键存在还必须改变 conventions_hash。
+    import copy
+    from conventions import PRESETS_DIR
+    preset_raw = json.loads((PRESETS_DIR / "gmgn-v1.json").read_text(encoding="utf-8"))
+    expected_task_execution = {
+        "pointer_columns": {
+            "card_id": ["card_id", "card"],
+            "execution_log": ["execution_log", "execution log"],
+            "latest_event": ["latest_event"],
+        },
+        "card_fields": {
+            "execution_log": ["execution_log"],
+            "latest_event": ["latest_event"],
+        },
+        "canonical_task_table_only": True,
+    }
+    with tempfile.TemporaryDirectory() as tmp:
+        cfg = Path(tmp) / "cfg"
+        cfg.mkdir()
+        bad = copy.deepcopy(preset_raw)
+        bad["task_execution"] = copy.deepcopy(expected_task_execution)
+        bad["task_execution"]["pointer_columns"]["card_id"] = "card_id"
+        (cfg / "conventions.json").write_text(json.dumps(bad), encoding="utf-8")
+        bad_code, _out, bad_err = run("dump", "--conventions", str(cfg), corpus=EXECUTION_LOG)
+        ok("execution-log/config-invalid-fail-closed",
+           bad_code == 2 and "task_execution" in bad_err,
+           "task_execution 非法形状 exit 2，不回落默认")
+
+        without = copy.deepcopy(preset_raw)
+        without.pop("task_execution", None)
+        cfg2 = Path(tmp) / "without"
+        cfg2.mkdir()
+        (cfg2 / "conventions.json").write_text(json.dumps(without), encoding="utf-8")
+        _, no_feature, _ = run_json("dump", "--conventions", str(cfg2), corpus=EXECUTION_LOG)
+        ok("execution-log/conventions-hash-changes",
+           dump["context_manifest"]["conventions_hash"]
+           != no_feature["context_manifest"]["conventions_hash"],
+           "增删 task_execution 会改变 conventions_hash")
+
+
 # ================= conventions 祖先走查分区（DG-55；语料根空手上行至 git 边界取祖先项目约定，最近者胜） =================
 
 def a_convwalk():
@@ -2407,6 +2548,7 @@ def main():
     a_wave13_p2()       # 波13-P2 分区（EG-20 收缩/EG-24/EG-25；owner=P2 agent）
     a_selfsec()         # DG-51 同文档自引 § 断锚（EG-20-AC1 r17 注；缺陷 D1）
     a_ledger_conv()     # DG-52 分区（底账表头 conv.ledger_header 单源；原自号 DG-51 撞号改号）
+    a_execution_logs()  # 可选 GMGN execution_log/latest_event 图与 brief 分流
     a_dupstem()         # doc 名称解析：同 stem 多命中列候选 exit 1（SKILL.md 合同回归）
     a_methodology()     # EG-26/DG-53 nature_source e2e + Methodology 兼容预设（规格链 CHK-2）
     a_nonlink()         # EG-29/DG-58 有意非链接声明分桶（fixtures/nonlink 微语料 entry 级两桶分流）

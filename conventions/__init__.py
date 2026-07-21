@@ -99,6 +99,21 @@ class Conventions:
         tc = raw.get("task_columns")
         self.task_columns = ({k: v.strip() for k, v in tc.items()} if tc is not None else
                              {"spec": "spec 锚", "prereq": "前置", "red": "红先测试", "status": "状态"})
+        # task_execution：GMGN Task 当前快照到按卡执行日志的可选结构关系。
+        # 缺席→None（完全休眠）；存在时只接受真实 Markdown 链接，并由抽取层验证日志
+        # type=execution-log、nature=descriptive 与 latest_event 锚。字段/表头别名来自配置，
+        # 引擎不写死项目措辞。canonical_task_table_only=true 时，任务实体仅由 canonical task table 产生。
+        te = raw.get("task_execution")
+        if te is not None:
+            self.task_execution = {
+                "pointer_columns": {k: [v.strip() for v in te["pointer_columns"][k]]
+                                    for k in ("card_id", "execution_log", "latest_event")},
+                "card_fields": {k: [v.strip() for v in te["card_fields"][k]]
+                                for k in ("execution_log", "latest_event")},
+                "canonical_task_table_only": te["canonical_task_table_only"],
+            }
+        else:
+            self.task_execution = None
         # option_rows：表格行形自定义实体（如「决策记录表 D{n} 行」），每项 {kind, doc, row, id}
         #   doc=角色名（req_doc/param_registry/task_doc/mapping_doc）限定生效文档；None=任意文档
         #   id=正则替换模板（m.expand），如 "E-D\\1" 由 row 的捕获组构造 canonical_id
@@ -289,6 +304,51 @@ class Conventions:
             tvals = {v.strip() for v in tc.values()}
             if len(tvals) != 4 or "#" in tvals:
                 raise ConventionsError('task_columns 列名不得互撞、不得为 "#"（任务表首列识别标记）')
+        # task_execution：可选、整键封闭。别名列表必须非空且角色间不互撞，避免同一列/字段
+        # 同时承担两个语义而被静默误连；非法即 fail-closed。
+        te = raw.get("task_execution")
+        if te is not None:
+            if not isinstance(te, dict) or set(te) != {
+                    "pointer_columns", "card_fields", "canonical_task_table_only"}:
+                raise ConventionsError(
+                    "task_execution 须为完整三键 {pointer_columns, card_fields, canonical_task_table_only}")
+            pc, cf = te.get("pointer_columns"), te.get("card_fields")
+            if not isinstance(pc, dict) or set(pc) != {"card_id", "execution_log", "latest_event"}:
+                raise ConventionsError(
+                    "task_execution.pointer_columns 须为完整三键 {card_id, execution_log, latest_event}")
+            if not isinstance(cf, dict) or set(cf) != {"execution_log", "latest_event"}:
+                raise ConventionsError(
+                    "task_execution.card_fields 须为完整两键 {execution_log, latest_event}")
+
+            def valid_aliases(value):
+                return (isinstance(value, list) and bool(value)
+                        and all(isinstance(x, str) and x.strip() for x in value))
+
+            if any(not valid_aliases(v) for v in pc.values()):
+                raise ConventionsError(
+                    "task_execution.pointer_columns 各角色须为非空字符串列表")
+            if any(not valid_aliases(v) for v in cf.values()):
+                raise ConventionsError(
+                    "task_execution.card_fields 各角色须为非空字符串列表")
+
+            def aliases_disjoint(groups):
+                seen = set()
+                for values in groups:
+                    normalized = {x.strip().casefold() for x in values}
+                    if len(normalized) != len(values) or seen & normalized:
+                        return False
+                    seen |= normalized
+                return True
+
+            if not aliases_disjoint(pc.values()):
+                raise ConventionsError(
+                    "task_execution.pointer_columns 别名不得在角色内重复或跨角色互撞")
+            if not aliases_disjoint(cf.values()):
+                raise ConventionsError(
+                    "task_execution.card_fields 别名不得在角色内重复或跨角色互撞")
+            if not isinstance(te.get("canonical_task_table_only"), bool):
+                raise ConventionsError(
+                    "task_execution.canonical_task_table_only 须为 boolean")
 
     # ---------------- 只读访问（波6/7 唯一取约定入口） ----------------
 
@@ -322,6 +382,12 @@ class Conventions:
             if rx.search(title):
                 return kind
         return None
+
+    def allows_type_section_definition(self, kind):
+        """类型小节自然条目是否可促成实体。GMGN task_execution 可把任务实体收窄到 canonical table；
+        配置缺席或开关为 false 时保持既有类型小节行为。"""
+        return not (kind == "任务" and self.task_execution
+                    and self.task_execution["canonical_task_table_only"])
 
     def harvest_excluded(self, word):
         """EG-5：ID 形/日期/版本号等结构化 token 不作专名候选（长度筛由 harvest_len_range 另判）。"""
@@ -452,11 +518,17 @@ def _selftest():
     check("gmgn-v1 固定英文任务表头",
           gmgn.task_columns == {"spec": "spec anchor", "prereq": "prerequisite",
                                 "red": "failing test", "status": "status"})
+    check("gmgn-v1 启用 task_execution 两跳关系",
+          gmgn.task_execution is not None
+          and gmgn.task_execution["pointer_columns"]["card_id"] == ["card_id", "card"])
+    check("gmgn-v1 任务实体仅来自 canonical task table",
+          not gmgn.allows_type_section_definition("任务")
+          and gmgn.allows_type_section_definition("参数"))
     check("gmgn-v1 只把 Rn-ACn 当需求 AC",
           gmgn.type_of_heading("Requirements") is None)
     check("gmgn-v1 辅助 kind 不进入 AC→Task 策略网",
           set(gmgn.uncovered_kind_exclusions)
-          == {"参数", "测试", "专名", "文档", "节条目", "里程碑"})
+          == {"参数", "测试", "专名", "文档", "节条目", "里程碑", "执行日志", "最新事件"})
     check("未知预设 fail-closed", raises(lambda: load_conventions(preset="missing-preset")))
 
     # 2. namespace_for（通用默认值 + 前缀机制配置驱动，不点名具体 kind）
@@ -573,6 +645,31 @@ def _selftest():
     bad_tc5 = copy.deepcopy(good)
     bad_tc5["task_columns"] = {"spec": "#", "prereq": "前置", "red": "红先测试", "status": "状态"}
     check("非法：task_columns 列名取 # 报错（首列识别标记）", raises(lambda: validate(bad_tc5)))
+    # task_execution：可选、缺席休眠、非法 fail-closed、声明入 hash。
+    check("task_execution：缺席→None（休眠）", validate(copy.deepcopy(good)).task_execution is None)
+    te_proj = copy.deepcopy(good)
+    te_proj["task_execution"] = {
+        "pointer_columns": {"card_id": ["card_id", "card"],
+                            "execution_log": ["execution_log"],
+                            "latest_event": ["latest_event"]},
+        "card_fields": {"execution_log": ["execution_log"],
+                        "latest_event": ["latest_event"]},
+        "canonical_task_table_only": True,
+    }
+    te_conv = validate(te_proj)
+    check("task_execution：声明→解析", te_conv.task_execution == te_proj["task_execution"])
+    check("task_execution 声明入 hash", te_conv.hash() != conv.hash())
+    check("task_execution canonical-only 开关生效",
+          not te_conv.allows_type_section_definition("任务"))
+    bad_te1 = copy.deepcopy(te_proj)
+    bad_te1["task_execution"]["pointer_columns"]["card_id"] = "card_id"
+    check("非法：task_execution alias 非列表报错", raises(lambda: validate(bad_te1)))
+    bad_te2 = copy.deepcopy(te_proj)
+    bad_te2["task_execution"]["pointer_columns"]["latest_event"] = ["execution_log"]
+    check("非法：task_execution 角色别名互撞报错", raises(lambda: validate(bad_te2)))
+    bad_te3 = copy.deepcopy(te_proj)
+    bad_te3["task_execution"]["canonical_task_table_only"] = "true"
+    check("非法：task_execution canonical 开关非 boolean 报错", raises(lambda: validate(bad_te3)))
     # config-free 类型小节（默认词表通用中英）
     check("类型小节：需求标题→需求AC", conv.type_of_heading("需求") == "需求AC"
           and conv.type_of_heading("Requirements") == "需求AC")

@@ -151,11 +151,13 @@ def _suggest_tasks(entities, query, limit=10):
 
 # ---------------- 候选生成（每模式确定性取材面） ----------------
 
-def _cand(key, tier, layer, reason, prov=None, summary=False, is_subject=False):
+def _cand(key, tier, layer, reason, prov=None, summary=False, is_subject=False,
+          descriptive_latest_event=False):
     """一个纳入候选：key=对端主键；tier=预算档；layer=content|pointer；reason=inclusion_reason；
     prov=触发边的溯源（无边=None）；summary=指针层是否附一行摘要（前置依赖用）。"""
     return {"key": tuple(key), "tier": tier, "layer": layer, "reason": reason,
-            "prov": prov, "summary": summary, "is_subject": is_subject}
+            "prov": prov, "summary": summary, "is_subject": is_subject,
+            "descriptive_latest_event": descriptive_latest_event}
 
 
 def _edge_reason(edge, direction, depth):
@@ -168,7 +170,7 @@ def _subject_cand(subject_key):
                  {"边": "(自身)", "从": [], "深度": 0}, is_subject=True)
 
 
-def _gen_execute(subject_key, out_by_type):
+def _gen_execute(subject_key, out_by_type, latest_by_log):
     """execute 遍历面（EG-13-AC1 五行逐字）：任务行(根) + 任务声明→AC(根,正文) + 阅读依赖→§(邻居,正文)
     + 前置依赖→任务(前置,坐标+摘要) + 任务测试→红测试(前置,坐标)。映射/共现不入（非 brief 消费边）。"""
     cands = [_subject_cand(subject_key)]
@@ -181,6 +183,13 @@ def _gen_execute(subject_key, out_by_type):
                            prov=e["prov"], summary=True))
     for e in out_by_type.get("任务测试声明", []):
         cands.append(_cand(e["dst"], TIER_PREREQ, "pointer", _edge_reason(e, "出", 1), prov=e["prov"]))
+    # 可选执行日志只取明确 latest_event 第二跳；不把 execution log 整文作为候选。
+    for log_edge in out_by_type.get("执行日志", []):
+        for event_edge in latest_by_log.get(tuple(log_edge["dst"]), []):
+            reason = _edge_reason(event_edge, "出", 2)
+            reason["via"] = list(log_edge["dst"])
+            cands.append(_cand(event_edge["dst"], TIER_PREREQ, "content", reason,
+                               prov=event_edge["prov"], descriptive_latest_event=True))
     return cands
 
 
@@ -197,10 +206,10 @@ def _gen_impact(subject_key, in_by_type):
     return cands
 
 
-def _gen_review(subject_key, subject, out_by_type, incident, entities):
+def _gen_review(subject_key, subject, out_by_type, incident, entities, latest_by_log):
     """review：execute 闭包 + 同 namespace 兄弟断言（携状态，superseded 显式可见）+ 结构邻居（全部相邻
     图邻居）+ unknown/歧义节点（经 性质门 落 omitted 显式报告）。答「评审这块要看的确定性材料」。"""
-    cands = _gen_execute(subject_key, out_by_type)
+    cands = _gen_execute(subject_key, out_by_type, latest_by_log)
     kind, ns, _ = subject_key
     for e in entities:                                  # 同 namespace 同 kind 兄弟断言（superseded 靠状态列显式）
         k = tuple(e["key"])
@@ -320,7 +329,8 @@ def _assemble(g, subject, cands, mode, budget, idx):
                 if ent:                                        # 无定义块＝真 provenance 缺口，诊断照发（AC3 ⑤）
                     diagnostics.append(_diag_nodef(ent, cand)) # （性质随 primary 后无定义块必 unknown，诊断随迁）
             continue
-        if nature == "记述" and mode == "execute":             # 记述 Evidence 不自动纳入（EG-13-AC3），显式列出
+        if (nature == "记述" and mode == "execute"
+                and not cand.get("descriptive_latest_event")): # 仅显式 latest_event 可作为 execute 记述例外
             omitted.append(_omit(key, ent, "记述来源(模式外)", cand))
             continue
 
@@ -362,11 +372,13 @@ def _boundary(idx, incident, subject_key, surfaced):
 
 # ---------------- bundle 顶层 ----------------
 
-def _build_bundle(g, subject, entities, edges, mode, budget, classification_complete, query):
+def _build_bundle(g, subject, entities, edges, mode, budget, classification_complete, query,
+                  execution_diagnostics=None):
     idx = {tuple(e["key"]): e for e in entities}
     subject_key = tuple(subject["key"])
 
     out_by_type, in_by_type, incident = defaultdict(list), defaultdict(list), []
+    latest_by_log = defaultdict(list)
     for e in edges:
         s, d = tuple(e["src"]), tuple(e["dst"])
         if s == subject_key:
@@ -375,16 +387,32 @@ def _build_bundle(g, subject, entities, edges, mode, budget, classification_comp
             in_by_type[e["type"]].append(e)
         if s == subject_key or d == subject_key:
             incident.append(e)
+        if e["type"] == "最新事件":
+            latest_by_log[s].append(e)
 
     if mode == "impact":
         cands = _gen_impact(subject_key, in_by_type)
     elif mode == "review":
-        cands = _gen_review(subject_key, subject, out_by_type, incident, entities)
+        cands = _gen_review(subject_key, subject, out_by_type, incident, entities, latest_by_log)
     else:                                                     # execute（默认）
-        cands = _gen_execute(subject_key, out_by_type)
+        cands = _gen_execute(subject_key, out_by_type, latest_by_log)
 
     segments, omitted, diagnostics, judgment, tainted_by, truncated = _assemble(
         g, subject, cands, mode, budget, idx)
+
+    # 已声明但坏掉的执行指针必须在 brief 同时进入 diagnostics 与 omitted；impact 不消费执行日志。
+    task_execution_diags = ([d for d in (execution_diagnostics or [])
+                             if d.get("task") == subject_key[2]] if mode != "impact" else [])
+    for d in task_execution_diags:
+        target = d.get("target") or subject_key[2]
+        diagnostics.append({"诊断型": "execution_log", "源文件": d.get("file"),
+                            "行": d.get("line"), "原文": target,
+                            "规则": d.get("reason"), "目标": list(subject_key)})
+        omitted.append({"key": ["执行日志", "路径", target], "display": target,
+                        "性质": "unknown", "原因": d.get("reason"), "指针": None,
+                        "inclusion_reason": {"规则": "task_execution", "深度": 1}})
+    if task_execution_diags:
+        judgment = "broken"
 
     surfaced = {tuple(s["key"]) for s in segments} | {tuple(o["key"]) for o in omitted}
     boundary = _boundary(idx, incident, subject_key, surfaced)
@@ -408,8 +436,11 @@ def _build_bundle(g, subject, entities, edges, mode, budget, classification_comp
     if judgment == "tainted":
         top["tainted_by"] = tainted_by
     if judgment == "broken":
-        top["broken_reason"] = (f"任务来源非规范（性质={subject['性质']}）：无规范来源边可遍历，闭包不作结构结论；"
-                                f"依赖已列 omitted 显式可见（EG-23-AC1 部分降级，替代旧全空闭包）。")
+        if task_execution_diags:
+            top["broken_reason"] = "任务声明的 execution_log/latest_event 指针无效；详见 diagnostics 与 omitted。"
+        else:
+            top["broken_reason"] = (f"任务来源非规范（性质={subject['性质']}）：无规范来源边可遍历，闭包不作结构结论；"
+                                    f"依赖已列 omitted 显式可见（EG-23-AC1 部分降级，替代旧全空闭包）。")
     return top
 
 
@@ -505,7 +536,8 @@ def cmd_brief(g, conv, query, as_json, mode="execute", budget=None):
 
     subject = res
     top = _build_bundle(g, subject, entities, data["edges"], mode, eff_budget,
-                        data["classification_complete"], query)
+                        data["classification_complete"], query,
+                        data["reports"].get("执行日志诊断", []))
     # context_manifest（DG-43；mode/budget 入 manifest，接 EG-22-AC1）：body=top（不含 manifest 自身）→ output_hash。
     top = {"context_manifest": M.context_manifest(
         "worktree", conv, f"brief:{mode}", budget=eff_budget, body=top,

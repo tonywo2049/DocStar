@@ -64,6 +64,12 @@ Name resolution uses path-qualified suffix, exact stem, alias, prefix, and
 substring matching. Multiple matches are listed and exit 1. CI should pass an
 explicit `verify --baseline`.
 
+When conventions enable `task_execution`, default/`execute` and `review` briefs
+follow only the validated `latest_event` anchor and include that event's verbatim
+block. They never substitute the complete descriptive execution log. `impact`
+does not follow execution-log edges. Broken pointers appear in both `diagnostics`
+and `omitted`.
+
 ## eg-3 JSON top-level keys
 
 All contract keys and built-in enum tokens are English. Source paths, document
