@@ -61,8 +61,11 @@ intentionally forks the contract.
   When present, links must be relative Markdown links; the log must declare
   `type: execution-log` and `nature: descriptive`, its filename must match the task ID,
   and `latest_event` must resolve to an anchor in that same file. Configured card-field
-  names accept `=`, ASCII `:`, or full-width `：` as the separator. Anchors inside inline
-  code, fenced code, or HTML comments do not resolve. Invalid declarations appear in
+  names accept `=`, ASCII `:`, or full-width `：` as the separator. The field name alone
+  may be inline code; a Markdown-link assignment inside an inline-code span or HTML
+  comment is invalid. The non-link `none`/`无` sentinel may remain in a code-formatted
+  execution index because it cannot create a graph edge. Anchors inside inline code,
+  fenced code, or HTML comments do not resolve. Invalid declarations appear in
   `execution_log_diagnostics` and `brief` omissions.
 - `nature_source`: migration mapping from an existing metadata field to
   `normative` or `descriptive`; explicit `nature`/`性质` wins.

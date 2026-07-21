@@ -22,6 +22,10 @@ nature: normative
 | **T8** | Malformed card field separator | none | none | `red_t8` | in-progress |
 | **T10** | Inline-code anchor must be ignored | none | none | `red_t10` | in-progress |
 | **T11** | HTML-comment anchor must be ignored | none | none | `red_t11` | in-progress |
+| **T12** | Whole assignments in code spans are invalid | none | none | `red_t12` | in-progress |
+| **T13** | Assignments in HTML comments are invalid | none | none | `red_t13` | in-progress |
+| **T14** | Equals-separated current-card happy path | none | none | `red_t14` | in-progress |
+| **T15** | Code-formatted explicit no-history sentinel | none | none | `red_t15` | not-started |
 | **TA2.11b** | Project-local ID remains outside gmgn-v1 | none | none | `red_ta` | in-progress |
 
 | legacy id | note |
@@ -52,3 +56,24 @@ nature: normative
 
 - `execution_log` -> [T8](execution/T8.md)
 - `latest_event`: [event-1](execution/T8.md#event-1)
+
+## T12 Code-span assignments
+
+- `execution_log: [T12](execution/T12.md)`
+- `latest_event: [event-1](execution/T12.md#event-1)`
+
+## T13 Commented assignments
+
+<!--
+- `execution_log`: [T13](execution/T13.md)
+- `latest_event`: [event-1](execution/T13.md#event-1)
+-->
+
+## T14 Equals-separated current card
+
+- `execution_log`=[T14](execution/T14.md)
+- `latest_event`=[event-1](execution/T14.md#event-1)
+
+## T15 Code-formatted no-history sentinel
+
+- `execution_index: execution_log=none; latest_event=none`

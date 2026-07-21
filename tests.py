@@ -2255,6 +2255,10 @@ def a_execution_logs():
        bool(find_edge(dump, "执行日志", src_cid="T5", dst_cid="execution/T5.md"))
        and bool(find_edge(dump, "最新事件", src_cid="execution/T5.md", dst_cid="event-1")),
        "T5 从当前卡字段建两跳关系，ASCII 冒号与中文冒号分隔符均生效")
+    ok("execution-log/current-card-equals-fields",
+       bool(find_edge(dump, "执行日志", src_cid="T14", dst_cid="execution/T14.md"))
+       and bool(find_edge(dump, "最新事件", src_cid="execution/T14.md", dst_cid="event-1")),
+       "T14 从仅字段名代码化的等号字段建两跳关系")
     trace_code, event_trace, _ = run_json(
         "trace", "event-2", "--preset", "gmgn-v1", corpus=EXECUTION_LOG)
     ok("execution-log/latest-event-queryable",
@@ -2267,7 +2271,8 @@ def a_execution_logs():
     for tid, reason in (("T2", "log_target_missing"), ("T3", "latest_event_anchor_missing"),
                         ("T4", "card_log_id_mismatch"), ("T6", "invalid_log_metadata"),
                         ("T8", "invalid_pointer"), ("T10", "latest_event_anchor_missing"),
-                        ("T11", "latest_event_anchor_missing")):
+                        ("T11", "latest_event_anchor_missing"), ("T12", "invalid_pointer"),
+                        ("T13", "invalid_pointer")):
         ok(f"execution-log/diagnostic-{tid.lower()}",
            any(x.get("task") == tid and x.get("reason") == reason for x in diagnostics),
            f"{tid} 失败显式进入 execution_log_diagnostics：{reason}")
@@ -2280,10 +2285,29 @@ def a_execution_logs():
            not find_edge(dump, "执行日志", src_cid=tid)
            and not find_edge(dump, "最新事件", src_cid=f"execution/{tid}.md"),
            f"{tid} 的伪锚不生成 task→log→event 图")
+    for tid in ("T12", "T13"):
+        ok(f"execution-log/excluded-card-assignment-no-graph-{tid.lower()}",
+           not find_edge(dump, "执行日志", src_cid=tid)
+           and not find_edge(dump, "最新事件", src_cid=f"execution/{tid}.md"),
+           f"{tid} 的代码 span／HTML comment 赋值不生成 task→log→event 图")
+    task_fixture_lines = Path(EXECUTION_LOG, "Task.md").read_text(encoding="utf-8").splitlines()
+    expected_invalid_lines = {
+        "T12": next(i for i, line in enumerate(task_fixture_lines, 1)
+                    if "execution_log: [T12]" in line),
+        "T13": next(i for i, line in enumerate(task_fixture_lines, 1)
+                    if "`execution_log`: [T13]" in line),
+    }
+    for tid, expected_line in expected_invalid_lines.items():
+        item = next((x for x in diagnostics if x.get("task") == tid), {})
+        ok(f"execution-log/excluded-card-assignment-line-{tid.lower()}",
+           item.get("file") == "Task.md" and item.get("line") == expected_line,
+           f"{tid} 坏声明诊断保留原始 Task.md:{expected_line} 行号")
     ok("execution-log/none-pointer-is-clean",
-       not any(x.get("task") == "T7" for x in diagnostics)
-       and not find_edge(dump, "执行日志", src_cid="T7"),
-       "execution_log=none/latest_event=none 表示尚无日志，不产生诊断或边")
+       not any(x.get("task") in {"T7", "T15"} for x in diagnostics)
+       and not find_edge(dump, "执行日志", src_cid="T7")
+       and not find_edge(dump, "执行日志", src_cid="T15"),
+       "表格或聚合 code span 内的 execution_log=none/latest_event=none 均表示尚无日志，"
+       "不产生诊断或边")
 
     # execute 是默认 brief；execute/review 纳入 latest event，impact 不纳入。
     outputs = {}
@@ -2309,6 +2333,11 @@ def a_execution_logs():
        and not any(s.get("key", [None])[0] in ("执行日志", "最新事件")
                    for s in outputs["impact"].get("segments", [])),
        "impact 不纳入 execution-log/latest-event")
+    c14, b14, e14 = run_json(
+        "brief", "T14", "--mode", "execute", "--preset", "gmgn-v1", corpus=EXECUTION_LOG)
+    ok("execution-log/equals-separator-brief-e2e",
+       c14 == 0 and "EQUALS_SEPARATOR_LATEST_EVENT" in source_texts(b14 or {}),
+       f"等号分隔字段端到端进入 execute brief 的 latest event：{e14}")
 
     # 失败指针在 brief 同时形成 diagnostics 与 omitted，不能只在 dump 报告。
     c2, b2, _ = run_json("brief", "T2", "--preset", "gmgn-v1", corpus=EXECUTION_LOG)
@@ -2316,13 +2345,15 @@ def a_execution_logs():
        c2 == 0 and list_has((b2 or {}).get("diagnostics"), "log_target_missing")
        and list_has((b2 or {}).get("omitted"), "log_target_missing"),
        "坏 execution log 链接在 brief diagnostics/omitted 双显式")
-    for tid in ("T10", "T11"):
+    for tid, reason in (("T10", "latest_event_anchor_missing"),
+                        ("T11", "latest_event_anchor_missing"),
+                        ("T12", "invalid_pointer"), ("T13", "invalid_pointer")):
         cb, bb, _ = run_json("brief", tid, "--preset", "gmgn-v1", corpus=EXECUTION_LOG)
-        ok(f"execution-log/ghost-anchor-brief-explicit-{tid.lower()}",
+        ok(f"execution-log/excluded-pointer-brief-explicit-{tid.lower()}",
            cb == 0
-           and list_has((bb or {}).get("diagnostics"), "latest_event_anchor_missing")
-           and list_has((bb or {}).get("omitted"), "latest_event_anchor_missing"),
-           f"{tid} 伪锚坏指针在 brief diagnostics/omitted 双显式")
+           and list_has((bb or {}).get("diagnostics"), reason)
+           and list_has((bb or {}).get("omitted"), reason),
+           f"{tid} 被排除的坏指针在 brief diagnostics/omitted 双显式：{reason}")
 
     # gmgn-v1 任务实体仅来自 canonical task table：重复加粗标签不成任务；T1 保留；TA 不扩语法。
     task_ids = {e["key"][2] for e in dump.get("entities", []) if e["key"][0] == "任务"}
@@ -2334,7 +2365,7 @@ def a_execution_logs():
        "gmgn-v1 仍不识别项目自定义 TA/TG/RPL ID")
     ok("execution-log/pointer-card-id-not-parameter",
        not (({"T1", "T2", "T3", "T4", "T5", "T6", "T7"}
-             | {"T8", "T10", "T11"})
+             | {"T8", "T10", "T11", "T12", "T13", "T14", "T15"})
             & {e["key"][2] for e in dump.get("entities", []) if e["key"][0] == "参数"}),
        "execution pointer table 的 card_id 不被参数 def_form 误识别")
 

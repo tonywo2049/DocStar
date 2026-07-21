@@ -55,8 +55,9 @@ Preset 文件是 [conventions/presets/gmgn-v1.json](../conventions/presets/gmgn-
   执行日志抽取休眠；存在时，链接必须是真实的相对 Markdown 链接，日志必须声明
   `type: execution-log` 与 `nature: descriptive`，文件名必须匹配任务 ID，且 `latest_event`
   必须解析到同一文件内的锚。配置声明的卡片字段名可用 `=`、ASCII `:` 或中文 `：` 分隔；
-  行内代码、围栏代码或 HTML 注释里的锚不参与解析。非法声明会显式进入
-  `execution_log_diagnostics` 和 `brief` 的 omitted 清单。
+  只有字段名可以写成行内代码，含 Markdown 链接的整条赋值位于行内代码／HTML 注释内属非法；
+  不可能成图的 `none`／`无` 空值可保留在代码化执行索引中。行内代码、围栏代码或 HTML 注释
+  里的锚也不参与解析。非法声明会显式进入 `execution_log_diagnostics` 和 `brief` 的 omitted 清单。
 - `nature_source`：把存量元信息映射为 `normative` 或 `descriptive`；显式 `nature`/`性质` 优先。
 - `required_edges`：跨 kind 策略和 report/gate 级别。
 - `uncovered_kind_exclusions`：明确不属于这些策略的通用 kind 或辅助 kind；不能用它

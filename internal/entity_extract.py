@@ -429,27 +429,41 @@ def _scan_task_execution(g, S, conv):
     pointers = defaultdict(list)
 
     def field_value(block, names):
-        for line_no, line in block:
+        invalid_line = None
+        for line_no, line, raw_line in block:
             for name in names:
                 marker = re.compile(r"(?<![A-Za-z0-9_])(?:`|\*\*)?" + re.escape(name)
                                     + r"(?:`|\*\*)?\s*(?:=|:|：)\s*", re.I)
                 m = marker.search(line)
                 if not m:
+                    # 注释内形不参与抽取，但保留一次明确的坏声明诊断和原始行号。
+                    if raw_line != line and marker.search(raw_line) and invalid_line is None:
+                        invalid_line = line_no
                     continue
                 tail = line[m.end():]
                 lm = _MD_LINK_RE.match(tail)
                 if lm:
+                    link_start, link_end = m.end() + lm.start(), m.end() + lm.end()
+                    inline_masked = corpus.code_mask(line, mask_inline=True)
+                    # 仅字段名代码化合法；链接落在代码 span 内表示整条赋值或链接只是示例。
+                    if inline_masked[link_start:link_end] != line[link_start:link_end]:
+                        invalid_line = invalid_line or line_no
+                        continue
                     return line_no, _pointer_value(lm.group(0))
                 token = re.match(r"`?(?:none|无)`?", tail, re.I)
                 if token:
+                    # `none`/`无` 不可能成图；允许既有聚合 code span 把“尚无历史”写成
+                    # execution_log=none，避免把安全的显式空值误报成伪链接。
                     return line_no, _pointer_value(token.group(0))
-                return line_no, ("invalid", None, None)
-        return None, None
+                invalid_line = invalid_line or line_no
+        return ((invalid_line, ("invalid", None, None))
+                if invalid_line is not None else (None, None))
 
     for rel in sorted(task_ids_by_rel):
         local_task_ids = task_ids_by_rel[rel]
         lines = S.striplines.get(rel, [])
-        scan_lines = corpus.code_mask("\n".join(lines), mask_inline=False).splitlines()
+        raw_scan_lines = corpus.code_mask("\n".join(lines), mask_inline=False).split("\n")
+        scan_lines = _mask_html_comments("\n".join(raw_scan_lines)).split("\n")
         table_header = None
         for i, line in enumerate(scan_lines, 1):
             if not line.startswith("|"):
@@ -485,7 +499,8 @@ def _scan_task_execution(g, S, conv):
             if len(hits) != 1:
                 continue
             end = next((line - 1 for line, d, _t in headings[idx + 1:] if d <= depth), len(scan_lines))
-            block = list(enumerate(scan_lines[start:end], start + 1))
+            block = [(line_no, scan_lines[line_no - 1], raw_scan_lines[line_no - 1])
+                     for line_no in range(start + 1, end + 1)]
             log_line, log_val = field_value(block, field_aliases["execution_log"])
             event_line, event_val = field_value(block, field_aliases["latest_event"])
             if log_val is not None or event_val is not None:
