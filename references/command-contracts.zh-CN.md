@@ -67,9 +67,9 @@ CI 应显式传 `verify --baseline`。
 `context_manifest.corpus_revision`。非法 revision 退出 2。省略该旗标时保留工作树行为，
 revision 标记为 `worktree`。
 
-conventions 启用 `task_execution` 后，默认／`execute` 与 `review` brief 只跟随已验证的
-`latest_event` 锚并纳入该事件的原文块，不会用整份记述性执行日志代替最新事件。`impact` 不跟随
-执行日志边。坏指针会同时进入 `diagnostics` 与 `omitted`。
+conventions 启用 `task_execution` 后，默认／`execute` 与 `review` brief 纳入已验证的规范 Card，
+并经 Log 只跟随到已验证的 `latest_event` 原文块，不会用整份记述性执行日志代替最新事件。
+`impact` 不跟随执行链。坏指针会同时进入 `diagnostics` 与 `omitted`。
 
 ## eg-3 JSON 顶层键
 

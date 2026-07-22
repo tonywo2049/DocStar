@@ -84,8 +84,9 @@ project IDs, directed keys, archive filters, or cross-kind policies, read
 [references/conventions.md](references/conventions.md) and create
 `<corpus>/.docstar/conventions/conventions.json`.
 
-For a GMGN document chain, use `--preset gmgn-v1`; a project-local copy of the same
-preset enables automatic discovery.
+For a GMGN document chain, use `--preset gmgn-v1`; it recognizes the compact Task table and
+optional `Task → Card → Log → latest_event` chain. A project-local copy of the same preset
+enables automatic discovery.
 
 ## Author documents
 

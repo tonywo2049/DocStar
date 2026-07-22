@@ -81,9 +81,9 @@ section, prose language matches `locale`, and `verify --json` reports no introdu
 The table header is a machine surface and stays English in both prose editions:
 
 ```markdown
-| # | task | spec anchor | prerequisite | failing test | status |
+| # | task | spec anchor | prerequisite | status | execution |
 |---|---|---|---|---|---|
-| **M1-T1** | <localized goal> | R1-AC1 | none | `test_name` | not-started |
+| **M1-T1** | <localized goal> | R1-AC1 | none | not-started | none |
 ```
 
 Use `--preset gmgn-v1`, or copy the bundled preset into the project's

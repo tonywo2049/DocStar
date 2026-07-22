@@ -137,6 +137,8 @@ TOKENS = {
     "专名": "term",
     "文档": "document",
     "节条目": "section-item",
+    "任务卡": "task-card",
+    "执行卡": "execution-card",
     "执行日志": "execution-log",
     "最新事件": "latest-event",
     "契约AC": "contract-ac",

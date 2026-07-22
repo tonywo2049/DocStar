@@ -12,6 +12,6 @@ nature: normative
 
 ## 1 Tasks
 
-| # | task | spec anchor | prerequisite | failing test | status |
+| # | task | spec anchor | prerequisite | status | execution |
 |---|---|---|---|---|---|
-| **M1-T1** | Prove locale parity | R1-AC1 | none | `test_locale_parity` | closed |
+| **M1-T1** | Prove locale parity | R1-AC1 | none | closed | none |

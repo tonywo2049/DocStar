@@ -208,8 +208,9 @@ python3 docstar.py check --preset gmgn-v1 --json --corpus /path/to/project
 ```
 
 The GMGN preset understands the stable `Goal.md → Requirement.md → Design.md →
-Task.md` chain, `Rn-ACn` acceptance criteria, GMGN task IDs, and the shared metadata
-contract. Details are in [references/conventions.md](references/conventions.md).
+Task.md` chain, `Rn-ACn` acceptance criteria, GMGN task IDs, and the optional
+`Task → Card → Log → latest_event` execution chain. Details are in
+[references/conventions.md](references/conventions.md).
 
 ## Reading check results
 

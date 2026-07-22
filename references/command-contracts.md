@@ -71,11 +71,10 @@ and writes the resolved full SHA to `context_manifest.corpus_revision`. An inval
 revision exits 2. Omitting the flag preserves worktree behavior and the revision
 token `worktree`.
 
-When conventions enable `task_execution`, default/`execute` and `review` briefs
-follow only the validated `latest_event` anchor and include that event's verbatim
-block. They never substitute the complete descriptive execution log. `impact`
-does not follow execution-log edges. Broken pointers appear in both `diagnostics`
-and `omitted`.
+When conventions enable `task_execution`, default/`execute` and `review` briefs include the
+validated normative Card and follow through Log only to the validated `latest_event` block.
+They never substitute the complete descriptive execution log. `impact` does not follow the
+execution chain. Broken pointers appear in both `diagnostics` and `omitted`.
 
 ## eg-3 JSON top-level keys
 

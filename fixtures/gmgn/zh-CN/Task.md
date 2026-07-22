@@ -12,6 +12,6 @@ nature: normative
 
 ## 1 任务
 
-| # | task | spec anchor | prerequisite | failing test | status |
+| # | task | spec anchor | prerequisite | status | execution |
 |---|---|---|---|---|---|
-| **M1-T1** | 证明语言等价 | R1-AC1 | none | `test_locale_parity` | closed |
+| **M1-T1** | 证明语言等价 | R1-AC1 | none | closed | none |

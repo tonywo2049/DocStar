@@ -1,79 +1,20 @@
 ---
 locale: en
-purpose: Exercise configured task execution-log pointers.
+purpose: Exercise Task to Card to Log execution pointers.
 status: approved
-type: task-plan
+type: task
 nature: normative
 ---
 
 # Task
 
-## Tasks
-
-| # | task | spec anchor | prerequisite | failing test | status |
+| # | task | spec anchor | prerequisite | status | execution |
 |---|---|---|---|---|---|
-| **T1** | Pointer-table happy path | none | none | `red_t1` | in-progress |
-| **T2** | Missing log target | none | none | `red_t2` | in-progress |
-| **T3** | Missing latest-event anchor | none | none | `red_t3` | in-progress |
-| **T4** | Card/log ID mismatch | none | none | `red_t4` | in-progress |
-| **T5** | Current-card happy path | none | none | `red_t5` | in-progress |
-| **T6** | Invalid log metadata | none | none | `red_t6` | in-progress |
-| **T7** | Explicitly no execution history yet | none | none | `red_t7` | not-started |
-| **T8** | Malformed card field separator | none | none | `red_t8` | in-progress |
-| **T10** | Inline-code anchor must be ignored | none | none | `red_t10` | in-progress |
-| **T11** | HTML-comment anchor must be ignored | none | none | `red_t11` | in-progress |
-| **T12** | Whole assignments in code spans are invalid | none | none | `red_t12` | in-progress |
-| **T13** | Assignments in HTML comments are invalid | none | none | `red_t13` | in-progress |
-| **T14** | Equals-separated current-card happy path | none | none | `red_t14` | in-progress |
-| **T15** | Code-formatted explicit no-history sentinel | none | none | `red_t15` | not-started |
-| **TA2.11b** | Project-local ID remains outside gmgn-v1 | none | none | `red_ta` | in-progress |
+| **T1** | Healthy execution chain | none | none | active | [Card](execution/T1/Card.md) |
+| **T2** | Not materialized yet | none | none | not-started | none |
+| **T3** | Missing Card target | none | none | prepared | [Card](execution/T3/Card.md) |
+| **T4** | Missing latest event anchor | none | none | active | [Card](execution/T4/Card.md) |
 
 | legacy id | note |
 |---|---|
 | **T9** | Non-canonical tombstone row must not define a task. |
-
-- **Ownership, DAG, and three anchors**: first repeated field label.
-- **Ownership, DAG, and three anchors**: second repeated field label.
-
-## Execution pointers
-
-| card_id | execution_log | latest_event |
-|---|---|---|
-| `T1` | [T1](execution/T1.md) | [event-2](execution/T1.md#event-2) |
-| `T2` | [T2](execution/missing.md) | [event-1](execution/missing.md#event-1) |
-| `T3` | [T3](execution/T3.md) | [missing-event](execution/T3.md#missing-event) |
-| `T4` | [T4](execution/WRONG.md) | [event-1](execution/WRONG.md#event-1) |
-| `T6` | [T6](execution/T6.md) | [event-1](execution/T6.md#event-1) |
-| `T7` | none | none |
-| `T10` | [T10](execution/T10.md) | [ghost](execution/T10.md#ghost) |
-| `T11` | [T11](execution/T11.md) | [ghost](execution/T11.md#ghost) |
-
-## T5 Current card
-
-- `execution_log`: [T5](execution/T5.md); `latest_event`： [event-1](execution/T5.md#event-1).
-
-## T8 Malformed current card
-
-- `execution_log` -> [T8](execution/T8.md)
-- `latest_event`: [event-1](execution/T8.md#event-1)
-
-## T12 Code-span assignments
-
-- `execution_log: [T12](execution/T12.md)`
-- `latest_event: [event-1](execution/T12.md#event-1)`
-
-## T13 Commented assignments
-
-<!--
-- `execution_log`: [T13](execution/T13.md)
-- `latest_event`: [event-1](execution/T13.md#event-1)
--->
-
-## T14 Equals-separated current card
-
-- `execution_log`=[T14](execution/T14.md)
-- `latest_event`=[event-1](execution/T14.md#event-1)
-
-## T15 Code-formatted no-history sentinel
-
-- `execution_index: execution_log=none; latest_event=none`

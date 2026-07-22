@@ -284,7 +284,7 @@ class _Sites:
         self.term_sites = defaultdict(list)  # (stem,name) -> [(rel,line,定义锚|None)]（专名 DG-27）
         self.review_sites = defaultdict(list)  # (stem,cid) -> [(rel,line)]（review_item 登记源 ID 形）
         self.test_sites = defaultdict(list)  # name -> [(rel,line)]
-        self.task_rows = []                  # (rel,line,tid,spec_cell,prereq_cell,red_tokens,状态)
+        self.task_rows = []                  # (..., spec, prereq, red_tokens, 状态, execution_value)
         self.map_rows = []                   # (rel,line,req_acid,[(cid,展开)])
         self.ledger_rows = []                # (rel,line,日期,r版本,targets,引用集,摘要)
         self.decl_rows = []                  # (rel,line,src_key,targets,落点原文)
@@ -296,8 +296,8 @@ class _Sites:
         self.striplines = {}                 # rel -> 剥删除线后的行（EG-11-AC5 实体侧过滤用）
         self.unresolved = []                 # (来源符号, 期望token, rel, line, 规则)（EG-15/DG-42 携溯源+诊断型）
         self.ambiguous = []                  # (来源符号, rel, line)（EG-12-AC5/DG-42 ambiguous_reference）
-        self.execution_links = []            # 已验证 (task_key, log_key, event_key, pointer rel/line)
-        self.execution_entities = {}         # key -> 实体骨架（执行日志 frontmatter / latest event 块）
+        self.execution_links = []            # 已验证 task→Card→Log→latest_event 关系及各跳溯源
+        self.execution_entities = {}         # key -> Card / Log / latest-event 实体骨架
         self.execution_diags = []            # task execution 指针失败（配置启用时显式报告）
 
 
@@ -330,11 +330,13 @@ def _pointer_value(value):
     return "link", m.group(1).strip(), href
 
 
-def _resolve_execution_href(own_rel, href):
+def _resolve_execution_href(own_rel, href, *, allow_self=False):
     """相对 Markdown href → (语料相对目标, fragment)|None。拒绝 URL、绝对路径、查询串和越界。"""
     parsed = urlsplit(href)
-    if parsed.scheme or parsed.netloc or parsed.query or not parsed.path or parsed.path.startswith("/"):
+    if parsed.scheme or parsed.netloc or parsed.query or parsed.path.startswith("/"):
         return None
+    if not parsed.path:
+        return (own_rel, unquote(parsed.fragment)) if allow_self and parsed.fragment else None
     path = unquote(parsed.path)
     if not path.casefold().endswith(".md"):
         return None
@@ -402,170 +404,136 @@ def _meta_first(meta, key):
     return values[0].strip() if isinstance(values, list) and values else ""
 
 
-def _execution_pointer_columns(cells, cfg):
-    """配置表头别名命中三角色时返回列索引；否则 None。"""
-    if cfg is None:
-        return None
-    alias_roles = {name.casefold(): role
-                   for role, names in cfg["pointer_columns"].items() for name in names}
-    roles = [alias_roles.get(_plain_pointer_cell(cell).casefold()) for cell in cells]
-    required = ("card_id", "execution_log", "latest_event")
-    if not all(role in roles for role in required):
-        return None
-    return {role: roles.index(role) for role in required}
+def _execution_field(lines, names):
+    """Read one non-example Markdown-link field and retain the first malformed line."""
+    raw_lines = corpus.code_mask("\n".join(lines), mask_inline=False).split("\n")
+    scan_lines = _mask_html_comments("\n".join(raw_lines)).split("\n")
+    invalid_line = None
+    for line_no, (line, raw_line) in enumerate(zip(scan_lines, raw_lines), 1):
+        for name in names:
+            marker = re.compile(r"(?<![A-Za-z0-9_])(?:`|\*\*)?" + re.escape(name)
+                                + r"(?:`|\*\*)?\s*(?:=|:|：)\s*", re.I)
+            match = marker.search(line)
+            if not match:
+                if raw_line != line and marker.search(raw_line) and invalid_line is None:
+                    invalid_line = line_no
+                continue
+            tail = line[match.end():]
+            link = _MD_LINK_RE.match(tail)
+            if link:
+                start, end = match.end() + link.start(), match.end() + link.end()
+                if corpus.code_mask(line, mask_inline=True)[start:end] == line[start:end]:
+                    return line_no, _pointer_value(link.group(0))
+            token = re.match(r"`?(?:none|无)`?", tail, re.I)
+            if token:
+                return line_no, _pointer_value(token.group(0))
+            invalid_line = invalid_line or line_no
+    return ((invalid_line, ("invalid", None, None))
+            if invalid_line is not None else (None, None))
 
 
 def _scan_task_execution(g, S, conv):
-    """配置启用时，从 Task pointer table 或当前卡字段收集并验证两跳执行关系。"""
+    """Validate Task.execution → Card.execution_log → Log.latest_event."""
     cfg = conv.task_execution
     if cfg is None:
         return
-    task_ids_by_rel = defaultdict(set)
-    for rel, _line, tid, *_rest in S.task_rows:
-        task_ids_by_rel[rel].add(tid)
-    if not task_ids_by_rel:
-        return
-    field_aliases = cfg["card_fields"]
-    pointers = defaultdict(list)
-
-    def field_value(block, names):
-        invalid_line = None
-        for line_no, line, raw_line in block:
-            for name in names:
-                marker = re.compile(r"(?<![A-Za-z0-9_])(?:`|\*\*)?" + re.escape(name)
-                                    + r"(?:`|\*\*)?\s*(?:=|:|：)\s*", re.I)
-                m = marker.search(line)
-                if not m:
-                    # 注释内形不参与抽取，但保留一次明确的坏声明诊断和原始行号。
-                    if raw_line != line and marker.search(raw_line) and invalid_line is None:
-                        invalid_line = line_no
-                    continue
-                tail = line[m.end():]
-                lm = _MD_LINK_RE.match(tail)
-                if lm:
-                    link_start, link_end = m.end() + lm.start(), m.end() + lm.end()
-                    inline_masked = corpus.code_mask(line, mask_inline=True)
-                    # 仅字段名代码化合法；链接落在代码 span 内表示整条赋值或链接只是示例。
-                    if inline_masked[link_start:link_end] != line[link_start:link_end]:
-                        invalid_line = invalid_line or line_no
-                        continue
-                    return line_no, _pointer_value(lm.group(0))
-                token = re.match(r"`?(?:none|无)`?", tail, re.I)
-                if token:
-                    # `none`/`无` 不可能成图；允许既有聚合 code span 把“尚无历史”写成
-                    # execution_log=none，避免把安全的显式空值误报成伪链接。
-                    return line_no, _pointer_value(token.group(0))
-                invalid_line = invalid_line or line_no
-        return ((invalid_line, ("invalid", None, None))
-                if invalid_line is not None else (None, None))
-
-    for rel in sorted(task_ids_by_rel):
-        local_task_ids = task_ids_by_rel[rel]
-        lines = S.striplines.get(rel, [])
-        raw_scan_lines = corpus.code_mask("\n".join(lines), mask_inline=False).split("\n")
-        scan_lines = _mask_html_comments("\n".join(raw_scan_lines)).split("\n")
-        table_header = None
-        for i, line in enumerate(scan_lines, 1):
-            if not line.startswith("|"):
-                table_header = None
-                continue
-            cells = _split_row(line)
-            if _is_sep(cells):
-                continue
-            pointer_columns = _execution_pointer_columns(cells, cfg)
-            if pointer_columns is not None:
-                table_header = pointer_columns
-                continue
-            if table_header is None:
-                continue
-            tid_i, log_i, event_i = (table_header[k] for k in
-                                     ("card_id", "execution_log", "latest_event"))
-            tid = _plain_pointer_cell(cells[tid_i] if tid_i < len(cells) else "")
-            if tid not in local_task_ids:
-                continue
-            pointers[tid].append((rel, i,
-                                  _pointer_value(cells[log_i] if log_i < len(cells) else ""),
-                                  _pointer_value(cells[event_i] if event_i < len(cells) else "")))
-
-        headings = []
-        for i, line in enumerate(scan_lines, 1):
-            hm = _ANY_HEADING_RE.match(line)
-            if hm:
-                headings.append((i, len(hm.group(1)), hm.group(2)))
-        for idx, (start, depth, title) in enumerate(headings):
-            hits = [tid for tid in local_task_ids
-                    if re.search(r"(?<![A-Za-z0-9_.-])" + re.escape(tid)
-                                 + r"(?![A-Za-z0-9_.-])", title)]
-            if len(hits) != 1:
-                continue
-            end = next((line - 1 for line, d, _t in headings[idx + 1:] if d <= depth), len(scan_lines))
-            block = [(line_no, scan_lines[line_no - 1], raw_scan_lines[line_no - 1])
-                     for line_no in range(start + 1, end + 1)]
-            log_line, log_val = field_value(block, field_aliases["execution_log"])
-            event_line, event_val = field_value(block, field_aliases["latest_event"])
-            if log_val is not None or event_val is not None:
-                source_line = min(x for x in (log_line, event_line) if x is not None)
-                pointers[hits[0]].append((rel, source_line,
-                                          log_val or ("invalid", None, None),
-                                          event_val or ("invalid", None, None)))
 
     def diagnostic(tid, rel, line, reason, target=None):
         S.execution_diags.append({"task": tid, "file": rel, "line": line,
                                   "reason": reason, "target": target})
 
-    for tid in sorted(pointers):
-        entries = sorted(pointers[tid], key=lambda x: (x[0], x[1]))
-        # 链接 label 仅展示，不参与目标一致性；同 href 的表格/卡片双投影视为同一指针。
-        signatures = {(x[2][0], x[2][2], x[3][0], x[3][2]) for x in entries}
-        rel, line, log_value, event_value = entries[-1]
-        if len(signatures) > 1:
-            diagnostic(tid, rel, line, "conflicting_pointers")
+    for rel, line, tid, _spec, _prereq, _red, _status, card_value in S.task_rows:
+        if card_value is None:
+            diagnostic(tid, rel, line, "missing_execution_column")
             continue
-        if log_value[0] == event_value[0] == "none":
+        if card_value[0] == "none":
             continue
-        if log_value[0] != "link" or event_value[0] != "link":
-            diagnostic(tid, rel, line, "invalid_pointer")
+        if card_value[0] != "link":
+            diagnostic(tid, rel, line, "invalid_card_pointer")
             continue
-        log_resolved = _resolve_execution_href(rel, log_value[2])
-        event_resolved = _resolve_execution_href(rel, event_value[2])
-        if log_resolved is None or event_resolved is None:
-            diagnostic(tid, rel, line, "invalid_relative_markdown_link")
+        card_resolved = _resolve_execution_href(rel, card_value[2])
+        if card_resolved is None:
+            diagnostic(tid, rel, line, "invalid_card_link", card_value[2])
+            continue
+        card_rel, card_fragment = card_resolved
+        if card_fragment:
+            diagnostic(tid, rel, line, "card_fragment_not_allowed", card_value[2])
+            continue
+        if card_rel not in g.docs:
+            diagnostic(tid, rel, line, "card_target_missing", card_rel)
+            continue
+        card_path = Path(card_rel)
+        if card_path.name != "Card.md" or card_path.parent.name != tid:
+            diagnostic(tid, rel, line, "card_path_mismatch", card_rel)
+            continue
+        card_meta = g.docs[card_rel]["meta"]
+        if (_meta_first(card_meta, "type") != "task-card"
+                or _meta_first(card_meta, "nature") != "normative"):
+            diagnostic(tid, card_rel, 1, "invalid_card_metadata", card_rel)
+            continue
+
+        log_line, log_value = _execution_field(
+            S.striplines.get(card_rel, []), cfg["card_fields"]["execution_log"])
+        if log_value is None or log_value[0] != "link":
+            diagnostic(tid, card_rel, log_line or 1, "invalid_log_pointer", card_rel)
+            continue
+        log_resolved = _resolve_execution_href(card_rel, log_value[2])
+        if log_resolved is None:
+            diagnostic(tid, card_rel, log_line, "invalid_log_link", log_value[2])
             continue
         log_rel, log_fragment = log_resolved
+        if log_fragment or log_rel not in g.docs:
+            diagnostic(tid, card_rel, log_line, "log_target_missing", log_rel)
+            continue
+        log_path = Path(log_rel)
+        if log_path.name != "Log.md" or log_path.parent != card_path.parent:
+            diagnostic(tid, card_rel, log_line, "log_path_mismatch", log_rel)
+            continue
+        log_meta = g.docs[log_rel]["meta"]
+        if (_meta_first(log_meta, "type") != "execution-log"
+                or _meta_first(log_meta, "nature") != "descriptive"):
+            diagnostic(tid, log_rel, 1, "invalid_log_metadata", log_rel)
+            continue
+
+        event_line, event_value = _execution_field(
+            S.striplines.get(log_rel, []), cfg["log_fields"]["latest_event"])
+        if event_value is None or event_value[0] != "link":
+            diagnostic(tid, log_rel, event_line or 1, "invalid_latest_event", log_rel)
+            continue
+        event_resolved = _resolve_execution_href(log_rel, event_value[2], allow_self=True)
+        if event_resolved is None:
+            diagnostic(tid, log_rel, event_line, "invalid_event_link", event_value[2])
+            continue
         event_rel, event_anchor = event_resolved
-        if log_fragment or not event_anchor or event_rel != log_rel:
-            diagnostic(tid, rel, line, "pointer_target_mismatch", event_value[2])
+        if event_rel != log_rel or not event_anchor:
+            diagnostic(tid, log_rel, event_line, "event_target_mismatch", event_value[2])
             continue
-        if log_rel not in g.docs:
-            diagnostic(tid, rel, line, "log_target_missing", log_rel)
-            continue
-        if Path(log_rel).stem != tid:
-            diagnostic(tid, rel, line, "card_log_id_mismatch", log_rel)
-            continue
-        meta = g.docs[log_rel]["meta"]
-        if (_meta_first(meta, "type") != "execution-log"
-                or _meta_first(meta, "nature") != "descriptive"):
-            diagnostic(tid, rel, line, "invalid_log_metadata", log_rel)
-            continue
-        log_lines = S.striplines.get(log_rel, [])
-        event_primary = _event_primary(log_lines, event_anchor)
+        event_primary = _event_primary(S.striplines.get(log_rel, []), event_anchor)
         if event_primary is None:
-            diagnostic(tid, rel, line, "latest_event_anchor_missing", event_value[2])
+            diagnostic(tid, log_rel, event_line, "latest_event_anchor_missing", event_value[2])
             continue
 
         task_key = ("任务", conv.namespace_for("任务", tid), tid)
+        card_key = tuple(M.key_task_card(card_rel))
         log_key = tuple(M.key_execution_log(log_rel))
         event_key = tuple(M.key_latest_event(log_rel, event_anchor))
-        body_start = g.docs[log_rel]["body_start"]
+        S.execution_entities[card_key] = {
+            "key": list(card_key), "display": card_rel, "性质": "规范",
+            "primary": {"doc": card_rel, "line": 1,
+                        "line_end": max(1, len(S.striplines.get(card_rel, [])))},
+            "candidates": [], "状态": None, "attrs": {}}
         S.execution_entities[log_key] = {
             "key": list(log_key), "display": log_rel, "性质": "记述",
-            "primary": {"doc": log_rel, "line": 1, "line_end": max(1, body_start)},
+            "primary": {"doc": log_rel, "line": 1,
+                        "line_end": max(1, g.docs[log_rel]["body_start"])},
             "candidates": [], "状态": None, "attrs": {}}
         S.execution_entities[event_key] = {
             "key": list(event_key), "display": event_anchor, "性质": "记述",
             "primary": {"doc": log_rel, **event_primary}, "candidates": [],
             "状态": None, "attrs": {"锚": event_anchor}}
-        S.execution_links.append((task_key, log_key, event_key, rel, line))
+        S.execution_links.append((
+            task_key, card_key, log_key, event_key,
+            (rel, line), (card_rel, log_line), (log_rel, event_line)))
 
 
 def _scan(g, conv):
@@ -650,8 +618,7 @@ def _scan(g, conv):
 
         # 主循环
         hidx, stack = 0, []          # stack=[(depth, sec_key|None)]
-        cur_task_hdr = None          # {"spec":i,"prereq":j|None,"red":k|None,"状态":s|None}
-        execution_pointer_hdr = None # task_execution pointer table 列角色；启用时其数据行不走通用 def_forms
+        cur_task_hdr = None          # spec/prereq/red/status/execution 列索引
         in_ledger, decl_hdr = False, None   # decl_hdr={"落点":i,"项":0}
 
         def innermost():
@@ -724,7 +691,7 @@ def _scan(g, conv):
 
         for i, ln in enumerate(lines, 1):
             if i in fenced:
-                in_ledger, decl_hdr, cur_task_hdr, execution_pointer_hdr = False, None, None, None
+                in_ledger, decl_hdr, cur_task_hdr = False, None, None
                 continue
             # 标题行：更新节栈（需求R 折入 节条目——`### R{n}` 非数字锚，天然不产 节条目）
             if hidx < len(headings) and headings[hidx][0] == i:
@@ -734,7 +701,7 @@ def _scan(g, conv):
                     stack.pop()
                 key = tuple(M.key_section(stem, norm)) if norm else None
                 stack.append((depth, key))
-                in_ledger, decl_hdr, cur_task_hdr, execution_pointer_hdr = False, None, None, None
+                in_ledger, decl_hdr, cur_task_hdr = False, None, None
                 add_term(i, ln)
                 add_ver(i, ln)
                 add_cooccur(i, key or innermost())
@@ -746,11 +713,6 @@ def _scan(g, conv):
                 task_m = _df(conv, "任务").match(ln)
                 # ---- 表头识别 ----
                 if not task_m and not sep:
-                    pointer_columns = _execution_pointer_columns(cells, conv.task_execution)
-                    if pointer_columns is not None:
-                        execution_pointer_hdr = pointer_columns
-                        cur_task_hdr = None
-                        continue
                     if is_ledger and conv.ledger_header.match(ln):  # 表头=conv.ledger_header 单源（DG-52）
                         in_ledger, decl_hdr = True, None
                         continue
@@ -765,12 +727,13 @@ def _scan(g, conv):
                         cur_task_hdr = {
                             "spec": cells.index(tcols["spec"]),
                             "prereq": cells.index(tcols["prereq"]) if tcols["prereq"] in cells else None,
-                            "red": cells.index(tcols["red"]) if tcols["red"] in cells else None,
+                            "red": (cells.index(tcols["red"])
+                                    if tcols.get("red") in cells else None),
+                            "execution": (cells.index(tcols["execution"])
+                                          if tcols.get("execution") in cells else None),
                             "状态": cells.index(tcols["status"]) if tcols["status"] in cells else None}
                         continue
                 if sep:
-                    continue
-                if execution_pointer_hdr is not None:
                     continue
                 # ---- 修订落账（DG-12）：底账数据行 ----
                 if in_ledger:
@@ -839,7 +802,11 @@ def _scan(g, conv):
                                 if "_" in tok and TEST_NAME_RE.match(tok):
                                     red.append(tok)
                                     S.test_sites[tok].append((rel, i))
-                        S.task_rows.append((rel, i, tid, spec_cell, prereq_cell, red, 状态))
+                        execution = (_pointer_value(cells[h["execution"]])
+                                     if h["execution"] is not None
+                                     and h["execution"] < len(cells) else None)
+                        S.task_rows.append(
+                            (rel, i, tid, spec_cell, prereq_cell, red, 状态, execution))
                 else:
                     for k, cre in conv.def_forms.items():      # ^| 形 def_form 自选命中表行（^- 形不命中）
                         if k == "任务":
@@ -874,7 +841,7 @@ def _scan(g, conv):
                 add_prov(i, ln)
                 continue
             # ---- 普通行 ----
-            in_ledger, decl_hdr, cur_task_hdr, execution_pointer_hdr = False, None, None, None
+            in_ledger, decl_hdr, cur_task_hdr = False, None, None
             def_key = None
             for kind, cre in conv.def_forms.items():   # 列表形 def_form（^- 形命中普通行；^| 表格形不命中）
                 if kind == "任务":                       # 任务只在表格行（带行抽取），普通行不促
@@ -1066,7 +1033,7 @@ def _entities(g, S, conv):
         e["性质"] = _nature_at(S, p["doc"], p["line"]) if p else "unknown"
 
     # 状态属性（EG-12-AC3）：任务表 状态列 → 任务实体
-    for rel, line, tid, _spec, _pre, _red, 状态 in S.task_rows:
+    for rel, line, tid, _spec, _pre, _red, 状态, _execution in S.task_rows:
         ns = conv.namespace_for("任务", tid)
         if ns and 状态:
             key = ("任务", ns, tid)
@@ -1102,12 +1069,13 @@ def _edges(g, S, conv, ent, reports):
                 {"key": list(key), "occurrences": 0, "首现": {"doc": rel, "line": line}})
         return key
 
-    # 可选执行关系：task → execution_log → latest_event。
-    for task_key, log_key, event_key, rel, line in S.execution_links:
-        if task_key not in ent or log_key not in ent or event_key not in ent:
+    # 可选执行关系：task → Card → Log → latest_event。
+    for task_key, card_key, log_key, event_key, task_prov, card_prov, log_prov in S.execution_links:
+        if any(key not in ent for key in (task_key, card_key, log_key, event_key)):
             continue
-        add("执行日志", task_key, log_key, rel, line, "task_execution.pointer")
-        add("最新事件", log_key, event_key, rel, line, "task_execution.latest_event")
+        add("执行卡", task_key, card_key, *task_prov, "task_execution.card")
+        add("执行日志", card_key, log_key, *card_prov, "task_execution.log")
+        add("最新事件", log_key, event_key, *log_prov, "task_execution.latest_event")
 
     # 1. 修订落账（EG-2-AC2/DG-12）：文档→AC/节条目；空目标集→报告不静默丢
     for rel, line, date, rver, targets, cite, digest in S.ledger_rows:
@@ -1168,7 +1136,7 @@ def _edges(g, S, conv, ent, reports):
                 add("映射", src, dst, rel, line, "映射表行", {"展开": exp} if exp else {})
 
     # 4. 任务声明 + 阅读依赖 + 前置依赖 + 任务测试声明
-    for rel, line, tid, spec_cell, prereq_cell, red, _状态 in S.task_rows:
+    for rel, line, tid, spec_cell, prereq_cell, red, _状态, _execution in S.task_rows:
         ns = conv.namespace_for("任务", tid)
         if ns is None:
             continue

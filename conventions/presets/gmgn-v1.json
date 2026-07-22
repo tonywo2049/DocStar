@@ -42,17 +42,14 @@
   "task_columns": {
     "spec": "spec anchor",
     "prereq": "prerequisite",
-    "red": "failing test",
-    "status": "status"
+    "status": "status",
+    "execution": "execution"
   },
   "task_execution": {
-    "pointer_columns": {
-      "card_id": ["card_id", "card"],
-      "execution_log": ["execution_log", "execution log"],
-      "latest_event": ["latest_event"]
-    },
     "card_fields": {
-      "execution_log": ["execution_log"],
+      "execution_log": ["execution_log"]
+    },
+    "log_fields": {
       "latest_event": ["latest_event"]
     },
     "canonical_task_table_only": true
@@ -81,6 +78,6 @@
       "severity": "report"
     }
   ],
-  "uncovered_kind_exclusions": ["参数", "测试", "专名", "文档", "节条目", "里程碑", "执行日志", "最新事件"],
+  "uncovered_kind_exclusions": ["参数", "测试", "专名", "文档", "节条目", "里程碑", "任务卡", "执行日志", "最新事件"],
   "aliases": {}
 }

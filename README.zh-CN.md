@@ -190,7 +190,8 @@ python3 docstar.py check --preset gmgn-v1 --json --corpus /path/to/project
 ```
 
 GMGN preset 识别固定的 `Goal.md → Requirement.md → Design.md → Task.md` 文档链、
-`Rn-ACn` 验收标准、GMGN 任务编号和共享元信息契约。详见
+`Rn-ACn` 验收标准、GMGN 任务编号，以及可选的
+`Task → Card → Log → latest_event` 执行链。详见
 [references/conventions.zh-CN.md](references/conventions.zh-CN.md)。
 
 ## 读取检查结果

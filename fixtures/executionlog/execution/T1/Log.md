@@ -1,14 +1,16 @@
 ---
 locale: en
-purpose: Record T1 execution events.
-upstream: [Task T1](../Task.md#t1)
+purpose: Record T1 runtime events.
+upstream: [T1 Card](Card.md)
 downstream: none
-status: draft
+status: active
 type: execution-log
 nature: descriptive
 ---
 
-# T1 execution log
+# T1 Log
+
+`latest_event`: [event-2](#event-2)
 
 <a id="event-1"></a>
 ## event-1
